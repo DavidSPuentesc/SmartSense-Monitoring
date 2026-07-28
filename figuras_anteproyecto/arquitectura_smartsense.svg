@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#263238"/>
+    </marker>
+    <style>
+      .title{font:700 38px Arial;fill:#17324d}.sub{font:400 20px Arial;fill:#52606d}
+      .head{font:700 25px Arial;fill:#183b56}.body{font:400 20px Arial;fill:#263238}
+      .small{font:600 18px Arial;fill:#3c4b57}.link{stroke:#263238;stroke-width:4;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <text x="800" y="62" text-anchor="middle" class="title">Arquitectura delimitada para validación en planta piloto</text>
+  <text x="800" y="96" text-anchor="middle" class="sub">Tres nodos de temperatura, gateway local y almacenamiento histórico</text>
+
+  <g transform="translate(60 145)">
+    <rect width="430" height="180" rx="20" fill="#eaf6ee" stroke="#2b7a4b" stroke-width="3"/>
+    <text x="215" y="43" text-anchor="middle" class="head">Nodo de temperatura 1</text>
+    <text x="215" y="82" text-anchor="middle" class="body">XIAO ESP32-C6 + PT100 de 3 hilos</text>
+    <text x="215" y="116" text-anchor="middle" class="body">MAX31865 + batería LiPo</text>
+    <text x="215" y="150" text-anchor="middle" class="body">Ebyte E220 LoRa 433 MHz</text>
+  </g>
+  <g transform="translate(60 360)">
+    <rect width="430" height="180" rx="20" fill="#eaf6ee" stroke="#2b7a4b" stroke-width="3"/>
+    <text x="215" y="43" text-anchor="middle" class="head">Nodo de temperatura 2</text>
+    <text x="215" y="82" text-anchor="middle" class="body">XIAO ESP32-C6 + PT100 de 3 hilos</text>
+    <text x="215" y="116" text-anchor="middle" class="body">MAX31865 + batería LiPo</text>
+    <text x="215" y="150" text-anchor="middle" class="body">Ebyte E220 LoRa 433 MHz</text>
+  </g>
+  <g transform="translate(60 575)">
+    <rect width="430" height="180" rx="20" fill="#eaf6ee" stroke="#2b7a4b" stroke-width="3"/>
+    <text x="215" y="43" text-anchor="middle" class="head">Nodo de temperatura 3</text>
+    <text x="215" y="82" text-anchor="middle" class="body">XIAO ESP32-C6 + PT100 de 3 hilos</text>
+    <text x="215" y="116" text-anchor="middle" class="body">MAX31865 + batería LiPo</text>
+    <text x="215" y="150" text-anchor="middle" class="body">Ebyte E220 LoRa 433 MHz</text>
+  </g>
+
+  <g transform="translate(650 300)">
+    <rect width="410" height="300" rx="24" fill="#fff4dd" stroke="#c48616" stroke-width="4"/>
+    <text x="205" y="52" text-anchor="middle" class="head">Gateway / visualizador</text>
+    <text x="205" y="98" text-anchor="middle" class="body">ESP32-C6 Touch LCD 1.47</text>
+    <text x="205" y="134" text-anchor="middle" class="body">Pantalla ST7789 + módulo E220</text>
+    <text x="205" y="170" text-anchor="middle" class="body">Recepción y procesamiento local</text>
+    <text x="205" y="206" text-anchor="middle" class="body">microSD con respaldo LittleFS</text>
+    <text x="205" y="242" text-anchor="middle" class="body">Punto de acceso Wi-Fi local</text>
+  </g>
+
+  <g transform="translate(1190 175)">
+    <rect width="350" height="220" rx="20" fill="#eaf0ff" stroke="#4267a9" stroke-width="3"/>
+    <text x="175" y="49" text-anchor="middle" class="head">Dashboard web local</text>
+    <text x="175" y="92" text-anchor="middle" class="body">Temperatura y batería</text>
+    <text x="175" y="126" text-anchor="middle" class="body">Histórico de 24 horas</text>
+    <text x="175" y="160" text-anchor="middle" class="body">Offset, umbrales y alarmas</text>
+    <text x="175" y="194" text-anchor="middle" class="body">Comparación entre sensores</text>
+  </g>
+  <g transform="translate(1190 520)">
+    <rect width="350" height="220" rx="20" fill="#eef7fb" stroke="#287b9b" stroke-width="3"/>
+    <text x="175" y="49" text-anchor="middle" class="head">Registro y análisis</text>
+    <text x="175" y="92" text-anchor="middle" class="body">Archivo diario por sensor</text>
+    <text x="175" y="126" text-anchor="middle" class="body">Mínimo, máximo y promedio</text>
+    <text x="175" y="160" text-anchor="middle" class="body">PDR, latencia y disponibilidad</text>
+    <text x="175" y="194" text-anchor="middle" class="body">Evidencias de planta piloto</text>
+  </g>
+
+  <path d="M490 235 C565 235 570 350 650 380" class="link"/>
+  <path d="M490 450 L650 450" class="link"/>
+  <path d="M490 665 C565 665 570 550 650 520" class="link"/>
+  <text x="555" y="430" class="small">LoRa 433 MHz</text>
+  <path d="M1060 390 C1110 350 1130 300 1190 285" class="link"/>
+  <text x="1080" y="320" class="small">Wi-Fi local</text>
+  <path d="M1060 520 C1110 555 1130 610 1190 630" class="link"/>
+  <text x="1072" y="600" class="small">Datos históricos</text>
+
+  <rect x="60" y="815" width="1480" height="55" rx="15" fill="#f4f6f8" stroke="#aab3bb" stroke-width="2"/>
+  <text x="800" y="850" text-anchor="middle" class="small">Alcance inicial: monitoreo térmico; no se incluyen actuadores físicos en la validación del anteproyecto.</text>
+</svg>

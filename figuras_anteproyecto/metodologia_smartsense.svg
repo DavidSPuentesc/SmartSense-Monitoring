@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#365267"/></marker>
+    <style>
+      .title{font:700 39px Arial;fill:#17324d}.subtitle{font:400 21px Arial;fill:#52606d}
+      .num{font:700 28px Arial;fill:#ffffff}.head{font:700 23px Arial;fill:#183b56}
+      .body{font:400 18px Arial;fill:#334e5c}.time{font:700 18px Arial;fill:#8a5a00}
+      .arrow{stroke:#365267;stroke-width:4;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <text x="800" y="60" text-anchor="middle" class="title">Metodología experimental y articulación con el cronograma</text>
+  <text x="800" y="96" text-anchor="middle" class="subtitle">Diseño, construcción, integración y validación del prototipo SmartSense Monitoring</text>
+
+  <g transform="translate(55 160)">
+    <rect width="430" height="230" rx="22" fill="#edf7f0" stroke="#2b7a4b" stroke-width="3"/>
+    <circle cx="45" cy="45" r="27" fill="#2b7a4b"/><text x="45" y="54" text-anchor="middle" class="num">1</text>
+    <text x="85" y="52" class="head">Requerimientos y delimitación</text>
+    <text x="28" y="100" class="body">• Selección de tres puntos de medición</text>
+    <text x="28" y="135" class="body">• Rangos, muestreo y criterios de aceptación</text>
+    <text x="28" y="170" class="body">• Protocolo preliminar y matriz de riesgos</text>
+    <text x="28" y="210" class="time">Meses 1–2</text>
+  </g>
+  <g transform="translate(585 160)">
+    <rect width="430" height="230" rx="22" fill="#eef4ff" stroke="#4267a9" stroke-width="3"/>
+    <circle cx="45" cy="45" r="27" fill="#4267a9"/><text x="45" y="54" text-anchor="middle" class="num">2</text>
+    <text x="85" y="52" class="head">Diseño y construcción de nodos</text>
+    <text x="28" y="100" class="body">• Integración PT100–MAX31865–ESP32-C6</text>
+    <text x="28" y="135" class="body">• Lectura, batería, identificación y carcasa</text>
+    <text x="28" y="170" class="body">• Verificación funcional de tres nodos</text>
+    <text x="28" y="210" class="time">Meses 2–4</text>
+  </g>
+  <g transform="translate(1115 160)">
+    <rect width="430" height="230" rx="22" fill="#fff4dd" stroke="#c48616" stroke-width="3"/>
+    <circle cx="45" cy="45" r="27" fill="#c48616"/><text x="45" y="54" text-anchor="middle" class="num">3</text>
+    <text x="85" y="52" class="head">Comunicación LoRa</text>
+    <text x="28" y="100" class="body">• Configuración Ebyte E220 y canal</text>
+    <text x="28" y="135" class="body">• Trama, ID, contador e integridad</text>
+    <text x="28" y="170" class="body">• Pruebas de PDR, alcance y latencia</text>
+    <text x="28" y="210" class="time">Meses 3–5</text>
+  </g>
+
+  <path d="M485 275 L585 275" class="arrow"/><path d="M1015 275 L1115 275" class="arrow"/>
+
+  <g transform="translate(55 520)">
+    <rect width="430" height="230" rx="22" fill="#eef7fb" stroke="#287b9b" stroke-width="3"/>
+    <circle cx="45" cy="45" r="27" fill="#287b9b"/><text x="45" y="54" text-anchor="middle" class="num">4</text>
+    <text x="85" y="52" class="head">Gateway y dashboard</text>
+    <text x="28" y="100" class="body">• Recepción, pantalla y servidor local</text>
+    <text x="28" y="135" class="body">• Histórico, microSD y visualización 24 h</text>
+    <text x="28" y="170" class="body">• Offset, comparación y alarmas</text>
+    <text x="28" y="210" class="time">Meses 4–6</text>
+  </g>
+  <g transform="translate(585 520)">
+    <rect width="430" height="230" rx="22" fill="#f4effa" stroke="#7656a8" stroke-width="3"/>
+    <circle cx="45" cy="45" r="27" fill="#7656a8"/><text x="45" y="54" text-anchor="middle" class="num">5</text>
+    <text x="85" y="52" class="head">Integración en planta piloto</text>
+    <text x="28" y="100" class="body">• Montaje temporal de las PT100</text>
+    <text x="28" y="135" class="body">• Operación simultánea de los nodos</text>
+    <text x="28" y="170" class="body">• Registro de jornadas y evidencias</text>
+    <text x="28" y="210" class="time">Meses 6–8</text>
+  </g>
+  <g transform="translate(1115 520)">
+    <rect width="430" height="230" rx="22" fill="#fff0f0" stroke="#b34a4a" stroke-width="3"/>
+    <circle cx="45" cy="45" r="27" fill="#b34a4a"/><text x="45" y="54" text-anchor="middle" class="num">6</text>
+    <text x="85" y="52" class="head">Evaluación y documentación</text>
+    <text x="28" y="100" class="body">• Exactitud, PDR, latencia y autonomía</text>
+    <text x="28" y="135" class="body">• Recuperación y estabilidad</text>
+    <text x="28" y="170" class="body">• Informe, conclusiones y mejoras</text>
+    <text x="28" y="210" class="time">Meses 8–10</text>
+  </g>
+
+  <path d="M1330 390 C1330 460 270 450 270 520" class="arrow"/>
+  <path d="M485 635 L585 635" class="arrow"/><path d="M1015 635 L1115 635" class="arrow"/>
+  <rect x="55" y="810" width="1490" height="55" rx="15" fill="#f4f6f8" stroke="#aab3bb" stroke-width="2"/>
+  <text x="800" y="845" text-anchor="middle" class="body">Actividad transversal: análisis de datos, control de versiones, documentación técnica y seguimiento de riesgos.</text>
+</svg>
