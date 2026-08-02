@@ -1,0 +1,9 @@
+<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M6 16.5H9.2L14.6 21V7L9.2 11.5H6C5.44772 11.5 5 11.9477 5 12.5V15.5C5 16.0523 5.44772 16.5 6 16.5Z" fill="#2563EB"/>
+  <path d="M18.2 10.4C19.3778 11.3563 20.1 12.8172 20.1 14.45C20.1 16.0828 19.3778 17.5437 18.2 18.5" stroke="#22C55E" stroke-width="2" stroke-linecap="round">
+    <animate attributeName="stroke-opacity" values="0.45;1;0.45" dur="1.2s" repeatCount="indefinite"/>
+  </path>
+  <path d="M20.9 8.2C22.6697 9.67839 23.8 11.9015 23.8 14.4C23.8 16.8985 22.6697 19.1216 20.9 20.6" stroke="#22C55E" stroke-width="2" stroke-linecap="round">
+    <animate attributeName="stroke-opacity" values="0.25;0.9;0.25" dur="1.4s" repeatCount="indefinite"/>
+  </path>
+</svg>

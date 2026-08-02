@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="base" x1="18" y1="48" x2="46" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#dc2626"/>
+      <stop offset="1" stop-color="#fb7185"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="22" y1="36" x2="42" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fecaca"/>
+      <stop offset="1" stop-color="#fff1f2"/>
+    </linearGradient>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g filter="url(#softGlow)">
+    <ellipse cx="32" cy="50" rx="15" ry="4" fill="#991b1b" opacity=".18"/>
+    <path d="M18 48h28c1.7 0 3 1.3 3 3s-1.3 3-3 3H18c-1.7 0-3-1.3-3-3s1.3-3 3-3Z" fill="#334155"/>
+    <path d="M22 45c0-10.2 4.6-24 10-24s10 13.8 10 24H22Z" fill="url(#base)"/>
+    <path d="M26 43c0-7.2 2.7-17 6-17s6 9.8 6 17H26Z" fill="url(#glow)" opacity=".9"/>
+    <rect x="29.5" y="14" width="5" height="8" rx="2.5" fill="#f8fafc" opacity=".92"/>
+  </g>
+
+  <g stroke-linecap="round" stroke-width="3.4">
+    <path d="M12 22l8 5" stroke="#fda4af" opacity=".7">
+      <animate attributeName="opacity" values=".15;1;.15" dur="1.15s" begin="0s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-width" values="2.2;4.2;2.2" dur="1.15s" begin="0s" repeatCount="indefinite"/>
+    </path>
+    <path d="M52 22l-8 5" stroke="#fda4af" opacity=".7">
+      <animate attributeName="opacity" values=".15;1;.15" dur="1.15s" begin=".18s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-width" values="2.2;4.2;2.2" dur="1.15s" begin=".18s" repeatCount="indefinite"/>
+    </path>
+    <path d="M15 12l7 7" stroke="#fecdd3" opacity=".64">
+      <animate attributeName="opacity" values=".1;.92;.1" dur="1.15s" begin=".08s" repeatCount="indefinite"/>
+    </path>
+    <path d="M49 12l-7 7" stroke="#fecdd3" opacity=".64">
+      <animate attributeName="opacity" values=".1;.92;.1" dur="1.15s" begin=".26s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <circle cx="32" cy="31" r="18" fill="#fb7185" opacity=".08">
+    <animate attributeName="r" values="16;20;16" dur="1.15s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values=".08;.2;.08" dur="1.15s" repeatCount="indefinite"/>
+  </circle>
+</svg>
