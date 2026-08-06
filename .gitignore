@@ -1,6 +1,13 @@
 # Compilador local y herramientas descargadas
 .tools/
 
+# Credenciales locales (usar secrets.example.h como plantilla)
+secrets.h
+
+# Entorno local de la réplica Docker
+docker/.env
+docker/data/
+
 # Archivos auxiliares generados por LaTeX
 *.aux
 *.bbl

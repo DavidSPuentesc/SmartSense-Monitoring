@@ -84,9 +84,9 @@ static constexpr float BAT_VMIN = 3.30f;
 static constexpr float BAT_VMAX = 4.10f;
 static constexpr int BAT_SAMPLES = 1;
 
-static constexpr const char* OTA_WIFI_SSID = "elyisus1";
-static constexpr const char* OTA_WIFI_PASS = "123456789";
-static constexpr const char* OTA_UPDATE_PASSWORD = "12345678";
+// OTA_WIFI_SSID / OTA_WIFI_PASS / OTA_UPDATE_PASSWORD en secrets.h
+// (no versionado; copiar secrets.example.h como secrets.h)
+#include "secrets.h"
 static constexpr int OTA_BTN_FIRE = PIN_BTN_FIRE;
 static constexpr int OTA_BTN_MEDICAL = PIN_BTN_MEDICAL;
 

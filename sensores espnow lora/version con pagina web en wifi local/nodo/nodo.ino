@@ -9,8 +9,8 @@
 #include <math.h>
 
 // ================= CONFIG WIFI =================
-const char* WIFI_SSID = "elyisus";
-const char* WIFI_PASS = "4j6vx7gm:DEDOS";
+// Credenciales en secrets.h (no versionado; copiar secrets.example.h como secrets.h)
+#include "secrets.h"
 
 // ================= MAESTRO =================
 const char* MASTER_HOST = "192.168.0.33";

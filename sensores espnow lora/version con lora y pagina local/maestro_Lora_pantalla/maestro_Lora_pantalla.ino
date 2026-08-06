@@ -20,7 +20,8 @@
 // WIFI - MODO ACCESS POINT
 // =====================================================
 const char* AP_SSID = "Sensores_Temp";
-const char* AP_PASS = "123456789";
+// AP_PASS en secrets.h (no versionado; copiar secrets.example.h como secrets.h)
+#include "secrets.h"
 
 // =====================================================
 // IP FIJA DEL MAESTRO (en modo AP)
