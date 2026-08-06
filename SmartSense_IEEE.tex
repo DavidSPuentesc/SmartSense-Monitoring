@@ -74,7 +74,12 @@ Las contribuciones principales del proyecto fueron: 1) integración de nodos PT1
 
 La arquitectura implementada, mostrada conceptualmente en la Fig.~\ref{fig:arquitectura}, está formada por nodos sensores, un enlace LoRa, un gateway y clientes locales conectados por Wi-Fi. Cada nodo adquiere la temperatura y el estado estimado de batería. El gateway recibe las tramas, identifica el nodo, aplica la compensación configurada, almacena la muestra y actualiza la interfaz.
 
-\figpendiente{arquitectura}{Arquitectura implementada de SmartSense Monitoring.}
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=0.9\textwidth]{arquitectura_smartsense.png}
+  \caption{Arquitectura implementada de SmartSense Monitoring: nodos de temperatura con XIAO ESP32-C6, PT100 y MAX31865, enlace LoRa de 433~MHz, gateway/visualizador con pantalla táctil y almacenamiento local, dashboard web servido por Wi-Fi local y registro histórico para análisis.}
+  \label{fig:arquitectura}
+\end{figure*}
 
 \subsection{Nodo sensor}
 
@@ -83,6 +88,15 @@ Cada nodo fue construido con un Seeed Studio XIAO ESP32-C6, una sonda PT100 de t
 En cada ciclo se efectuaron varias conversiones de temperatura y se descartaron valores inválidos. El firmware también consultó el registro de fallas del MAX31865 para detectar problemas de conexión o lecturas fuera de rango. La tensión de batería se obtuvo mediante el convertidor analógico-digital del ESP32-C6 y un divisor resistivo. El porcentaje estimado se calculó entre \SI{3.30}{\volt} y \SI{4.10}{\volt}.
 
 La trama de aplicación incluyó el identificador del nodo, temperatura, porcentaje de batería y dirección MAC. Después de la transmisión, el nodo ingresó en sueño profundo. El periodo puede configurarse entre 5 y 7200 segundos; durante la versión evaluada se utilizó un valor predeterminado de 60 segundos.
+
+La Fig.~\ref{fig:esquematico-nodo} presenta el esquemático de conexiones del nodo: la interfaz SPI hacia el MAX31865, el enlace UART hacia el módulo E220, la alimentación del acondicionador conmutada por un pin digital para reducir el consumo durante el sueño profundo, y el divisor resistivo utilizado para estimar la carga de la batería.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{esquematico-nodo.pdf}
+  \caption{Esquemático de conexiones del nodo sensor: XIAO ESP32-C6, acondicionador MAX31865 con sonda PT100 de tres hilos, módulo LoRa Ebyte E220-433, circuito de carga y divisor resistivo para la estimación de batería. Los saltos largos se indican con etiquetas de red (VBAT, GND, VBAT\_SENSE).}
+  \label{fig:esquematico-nodo}
+\end{figure*}
 
 \subsection{Comunicación LoRa}
 
@@ -95,6 +109,15 @@ El firmware del gateway posee un campo reservado para RSSI, pero la versión rev
 El gateway fue implementado con un ESP32-C6, pantalla táctil con controlador ST7789, módulo E220 y tarjeta microSD. La tarjeta se utiliza como medio principal para los históricos. Si no está disponible, LittleFS funciona como respaldo.
 
 Para cada dirección MAC se crea un directorio independiente y un archivo por fecha. Cada línea contiene el segundo transcurrido desde el inicio del día y la temperatura representada con resolución de \SI{0.1}{\celsius}. El firmware conserva hasta 30 días por sensor. La hora se sincroniza desde el navegador y se ajusta a la zona horaria UTC--5, por lo cual el sistema puede trabajar localmente sin conexión permanente a Internet.
+
+La Fig.~\ref{fig:esquematico-gateway} resume las conexiones externas del gateway. La pantalla, el panel táctil y la ranura microSD están integrados en la placa; las conexiones agregadas corresponden al módulo E220 por UART, con las líneas de modo M0 y M1 unidas a un mismo pin, y a la salida digital para la señalización de alarma crítica.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{esquematico-gateway.pdf}
+  \caption{Esquemático de conexiones externas del gateway/visualizador: placa ESP32-C6 con pantalla táctil, módulo LoRa Ebyte E220-433 y salida de alarma crítica.}
+  \label{fig:esquematico-gateway}
+\end{figure*}
 
 \section{Dashboard y funciones de supervisión}
 
