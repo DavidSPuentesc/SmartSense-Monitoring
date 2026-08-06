@@ -1,0 +1,12 @@
+services:
+  smartsense:
+    build: .
+    ports:
+      # 8500 por defecto: la franja 8080-8161 la ocupa la granja securapp (ramo, psp, expro...)
+      - "${PORT:-8500}:8080"
+    environment:
+      # El .env es opcional: si existe en esta carpeta, Compose lo lee solo.
+      APP_NAME: ${APP_NAME:-Monitoreo de Temperatura Industrial}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
