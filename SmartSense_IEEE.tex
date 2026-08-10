@@ -254,6 +254,53 @@ RSSI y SNR experimentales & No implementados \\
 \end{tabularx}
 \end{table}
 
+\subsection{Despliegue de 32 días y disponibilidad}
+
+Se analizó un registro real de la planta con \num{51338} muestras provenientes de tres nodos, con un intervalo de muestreo mediano de \SI{121}{\second}. La Fig.~\ref{fig:val-serie} presenta la serie completa de temperatura de uno de los nodos durante el despliegue, en la que se aprecia el máximo de \SI{70.0}{\celsius} asociado al caso del succionador.
+
+La Fig.~\ref{fig:val-cobertura} muestra la cobertura de datos de los tres nodos. Las interrupciones no se distribuyen de forma independiente entre nodos, sino que ocurren de manera \emph{simultánea} en los tres, con el mismo instante de inicio. Este comportamiento indica que las interrupciones no correspondieron a fallas del enlace LoRa —que afectarían a un nodo a la vez— sino a periodos en los que el gateway permaneció apagado durante paradas de planta y de energía.
+
+En consecuencia, la Tabla~\ref{tab:disponibilidad} reporta dos indicadores. La disponibilidad cruda considera todo el intervalo de despliegue, incluidos los periodos de gateway apagado. La disponibilidad del enlace excluye dichos periodos, identificados por su simultaneidad, y estima la fracción de tramas efectivamente recibidas mientras el sistema estuvo activo. La disponibilidad del enlace se mantuvo por encima del \SI{97}{\percent} en los tres nodos. La Fig.~\ref{fig:val-intervalos} confirma la regularidad de la recepción durante los tramos activos: la mayoría de los intervalos entre llegadas se concentraron alrededor de la mediana de \SI{121}{\second}.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{val-serie-evento.pdf}
+  \caption{Serie de temperatura superficial de un nodo durante el despliegue de 32 días, con el máximo asociado al caso del succionador.}
+  \label{fig:val-serie}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{val-cobertura.pdf}
+  \caption{Cobertura de datos de los tres nodos. Las interrupciones son simultáneas en todos los nodos, lo que corresponde a periodos de gateway apagado (paradas de planta) y no a fallas del enlace LoRa.}
+  \label{fig:val-cobertura}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Disponibilidad por nodo durante el despliegue}
+\label{tab:disponibilidad}
+\centering
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}Xccccc@{}}
+\toprule
+\textbf{Nodo} & \textbf{Muestras} & \textbf{Cruda} & \textbf{Enlace} & \textbf{Paradas} & \textbf{h fuera} \\
+\midrule
+Nodo A & \num{17537} & \SI{76.0}{\percent} & \SI{98.4}{\percent} & 66 & 176 \\
+Nodo B & \num{16487} & \SI{32.3}{\percent} & \SI{98.3}{\percent} & 73 & 1154 \\
+Nodo C & \num{17314} & \SI{75.1}{\percent} & \SI{97.8}{\percent} & 81 & 180 \\
+\bottomrule
+\end{tabularx}
+\vskip 0.2cm
+{\footnotesize La disponibilidad del enlace excluye los periodos de gateway apagado, identificados por ser simultáneos en los tres nodos. El Nodo B incluye una parada prolongada de aproximadamente 33 días.}
+\end{table}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.75\columnwidth]{val-intervalos.pdf}
+  \caption{Distribución de los intervalos entre llegadas durante los tramos activos. La escala vertical es logarítmica; la mayoría de las tramas se recibieron con una cadencia cercana a la mediana de \SI{121}{\second}.}
+  \label{fig:val-intervalos}
+\end{figure}
+
 \subsection{Caso del motor del succionador}
 
 La Fig.~\ref{fig:historico-succionador} corresponde al succionador de la máquina Twin y presenta una jornada completa, desde aproximadamente las 00:01 hasta las 23:59. Al inicio se observó una condición relativamente estable cercana a \SIrange{48}{49}{\celsius}. Alrededor de la 01:30 ocurrió un incremento rápido hasta una zona superior a \SI{63}{\celsius}. Después del transitorio, la mayor parte de la curva permaneció aproximadamente entre \SIrange{57}{61}{\celsius}, con ciclos repetidos de calentamiento y enfriamiento.
