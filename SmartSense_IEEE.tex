@@ -53,7 +53,7 @@ Universidad ECCI, Bogotá D.C., Colombia\\
 \maketitle
 
 \begin{abstract}
-Este artículo presenta el diseño, implementación y evaluación preliminar de SmartSense Monitoring, un sistema inalámbrico para medir temperatura superficial en equipos de una planta piloto. La solución está compuesta por nodos con microcontrolador XIAO ESP32-C6, sondas PT100 de tres hilos, acondicionadores MAX31865, alimentación mediante batería y comunicación LoRa con módulos Ebyte E220. Un gateway con ESP32-C6 recibe las mediciones, las almacena en una tarjeta microSD y las presenta mediante una pantalla local y un dashboard web. A diferencia de una inspección manual puntual, la solución conserva el comportamiento térmico durante las 24 horas, permite consultar días anteriores, comparar sensores, aplicar compensaciones de temperatura y configurar alarmas. Durante la validación en planta, el histórico permitió observar un incremento de temperatura en el motor de un succionador después de la parada de la máquina; el comportamiento se relacionó posteriormente con una condición anómala de los rodamientos. El sistema se comparó cualitativamente con una pistola de temperatura Fluke y con un sensor Advantech WISE-2410 en la configuración disponible en planta. Los resultados funcionales verificaron la adquisición, transmisión, almacenamiento, visualización histórica, compensación y gestión de alarmas. La evaluación cuantitativa de exactitud y disponibilidad se completará con los registros pareados de los instrumentos de referencia.
+Este artículo presenta el diseño, implementación y evaluación preliminar de SmartSense Monitoring, un sistema inalámbrico para medir temperatura superficial en equipos de una planta piloto. La solución está compuesta por nodos con microcontrolador XIAO ESP32-C6, sondas PT100 de tres hilos, acondicionadores MAX31865, alimentación mediante batería y comunicación LoRa con módulos Ebyte E220. Un gateway con ESP32-C6 recibe las mediciones, las almacena en una tarjeta microSD y las presenta mediante una pantalla local y un dashboard web. A diferencia de una inspección manual puntual, la solución conserva el comportamiento térmico durante las 24 horas, permite consultar días anteriores, comparar sensores, aplicar compensaciones de temperatura y configurar alarmas. Durante la validación en planta, el histórico permitió observar un incremento de temperatura en el motor de un succionador después de la parada de la máquina; el comportamiento se relacionó posteriormente con una condición anómala de los rodamientos. El sistema se comparó cualitativamente con una pistola de temperatura Fluke y con un sensor Advantech WISE-2410 en la configuración disponible en planta. Los resultados funcionales verificaron la adquisición, transmisión, almacenamiento, visualización histórica, compensación y gestión de alarmas. A partir de un registro real de 32 días con tres nodos (\num{51338} muestras), la disponibilidad del enlace superó el \SI{97}{\percent} una vez descontadas las paradas de planta. La evaluación cuantitativa de exactitud, autonomía y latencia se completará con las pruebas controladas correspondientes.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -68,17 +68,26 @@ Las redes de sensores inalámbricos permiten distribuir puntos de medición sin 
 
 El propósito del proyecto fue implementar y validar un sistema capaz de medir temperatura superficial, transmitirla de manera inalámbrica, conservar un histórico por sensor y facilitar el análisis del comportamiento térmico. El trabajo evolucionó desde un anteproyecto hasta un prototipo funcional instalado en una planta piloto. Por tanto, este documento describe las actividades realizadas y los resultados evidenciados, en lugar de presentar únicamente resultados esperados.
 
-Las contribuciones principales del proyecto fueron: 1) integración de nodos PT100 de tres hilos con comunicación LoRa; 2) almacenamiento diario con respaldo local; 3) dashboard de 24 horas con comparación de sensores; 4) compensación configurable de temperatura; y 5) alarmas térmicas visuales, sonoras y mediante salida física.
+Aunque las redes de sensores inalámbricos, la tecnología LoRa y los sensores RTD son tecnologías conocidas, la revisión del estado del arte muestra que su integración suele orientarse a variables ambientales y depender de plataformas en la nube. El aporte de este trabajo no fue inventar un componente nuevo, sino el \emph{diseño y la validación experimental de una arquitectura inalámbrica de bajo costo para el monitoreo térmico superficial distribuido en una planta piloto}, que integra adquisición RTD industrial (PT100/MAX31865), comunicación LoRa, alimentación autónoma y visualización local, y que evalúa simultáneamente el desempeño de comunicación, la medición y la autonomía bajo condiciones reales de operación.
+
+En términos concretos, las contribuciones fueron: 1) integración de nodos PT100 de tres hilos con comunicación LoRa y operación por batería; 2) almacenamiento diario con respaldo local que opera sin Internet; 3) dashboard de 24 horas con comparación de sensores; 4) compensación configurable de temperatura; y 5) alarmas térmicas visuales, sonoras y mediante salida física. La validación se apoyó en un despliegue real de 32 días en la planta.
 
 \section{Arquitectura del sistema}
 
-La arquitectura implementada, mostrada conceptualmente en la Fig.~\ref{fig:arquitectura}, está formada por nodos sensores, un enlace LoRa, un gateway y clientes locales conectados por Wi-Fi. Cada nodo adquiere la temperatura y el estado estimado de batería. El gateway recibe las tramas, identifica el nodo, aplica la compensación configurada, almacena la muestra y actualiza la interfaz.
+La arquitectura implementada, mostrada conceptualmente en la Fig.~\ref{fig:arquitectura}, está formada por nodos sensores, un enlace LoRa, un gateway y clientes locales conectados por Wi-Fi. Cada nodo adquiere la temperatura y el estado estimado de batería. El gateway recibe las tramas, identifica el nodo, aplica la compensación configurada, almacena la muestra y actualiza la interfaz. La Fig.~\ref{fig:arquitectura-detalle} detalla la cadena de señal de cada nodo (PT100~$\rightarrow$~MAX31865~$\rightarrow$~ESP32-C6) y el flujo de datos hacia la visualización local y el dashboard.
 
 \begin{figure*}[!t]
   \centering
   \includegraphics[width=0.9\textwidth]{arquitectura_smartsense.png}
   \caption{Arquitectura implementada de SmartSense Monitoring: nodos de temperatura con XIAO ESP32-C6, PT100 y MAX31865, enlace LoRa de 433~MHz, gateway/visualizador con pantalla táctil y almacenamiento local, dashboard web servido por Wi-Fi local y registro histórico para análisis.}
   \label{fig:arquitectura}
+\end{figure*}
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=0.92\textwidth]{arquitectura-detalle.pdf}
+  \caption{Cadena de señal por nodo y flujo de datos. Cada uno de los tres nodos ejecuta la cadena PT100 (tres hilos)~$\rightarrow$~MAX31865~$\rightarrow$~ESP32-C6, con alimentación por batería, y transmite por LoRa de 433~MHz al gateway. El gateway presenta la lectura en la pantalla local y sirve el dashboard web con el histórico por Wi-Fi local.}
+  \label{fig:arquitectura-detalle}
 \end{figure*}
 
 \subsection{Nodo sensor}
@@ -159,14 +168,14 @@ La arquitectura permite integrar posteriormente módulos de relés o variables d
 
 La validación se estructuró en cuatro etapas. Primero se verificó la lectura de las PT100 y el reporte de fallas del MAX31865. Luego se comprobó el envío de tramas y la identificación de los nodos. En la tercera etapa se validaron el almacenamiento, la consulta por fecha y las funciones del dashboard. Finalmente, el sistema se instaló temporalmente en equipos de la planta para observar el comportamiento térmico durante la operación.
 
-La exactitud se evaluará con muestras pareadas entre SmartSense y un instrumento de referencia. Para $n$ pares de datos, el error absoluto medio se calcula mediante
+La exactitud se evalúa con muestras pareadas entre SmartSense y un instrumento de referencia. Para $n$ pares de datos, el error absoluto medio se calcula mediante
 
 \begin{equation}
 \mathrm{MAE}=\frac{1}{n}\sum_{i=1}^{n}\left|T_{SS,i}-T_{ref,i}\right|.
 \label{eq:mae}
 \end{equation}
 
-También se calcularán temperatura mínima, máxima, promedio, diferencia antes y después del offset y duración de los incrementos térmicos relevantes.
+A partir del registro se calcularon la temperatura mínima, máxima y promedio por sensor. La diferencia antes y después del offset y el error respecto al instrumento de referencia se documentarán con las mediciones pareadas descritas en el procedimiento de validación.
 
 \begin{table}[!t]
 \caption{Formato de medición pareada en planta}
@@ -225,7 +234,37 @@ Operación sin Internet & Sí & Depende de la arquitectura & Sí, mediante servi
 
 \section{Resultados obtenidos}
 
-La Tabla~\ref{tab:resultados} resume las funciones verificadas mediante revisión del firmware y pruebas funcionales del prototipo. Los resultados cuantitativos de planta se mantienen separados hasta incorporar los archivos originales y las mediciones de referencia.
+\subsection{Criterios de aceptación y resultados}
+
+La Tabla~\ref{tab:criterios} contrasta cada criterio de aceptación definido para el proyecto con el resultado obtenido. La disponibilidad del enlace se determinó a partir del registro real de 32 días y cumple el criterio. Las métricas que requieren pruebas controladas específicas (PDR, pérdida, latencia, error de temperatura, autonomía y recuperación) se reportan como pendientes de medición, con la prueba que produce cada valor indicada en la nota de la tabla; ninguna se declara cumplida sin evidencia.
+
+\begin{table}[!t]
+\caption{Criterios de aceptación frente a resultados obtenidos}
+\label{tab:criterios}
+\centering
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}Xccc@{}}
+\toprule
+\textbf{Métrica} & \textbf{Criterio} & \textbf{Resultado} & \textbf{¿Cumple?} \\
+\midrule
+Disponibilidad del enlace & $\geq$\,\SI{95}{\percent} & \SIrange{97.8}{98.4}{\percent} & Sí \\
+PDR & $\geq$\,\SI{95}{\percent} & Por medir$^{a}$ & -- \\
+Pérdida de paquetes & $\leq$\,\SI{5}{\percent} & Por medir$^{a}$ & -- \\
+Latencia promedio & $\leq$\,\SI{5}{\second} & Por medir$^{b}$ & -- \\
+Error de temperatura (MAE) & $\leq$\,\SI{1}{\celsius} & Por medir$^{c}$ & -- \\
+Autonomía & $\geq$\,\SI{8}{\hour} & Por medir$^{d}$ & -- \\
+Recuperación & $\leq$\,\SI{120}{\second} & Por medir$^{e}$ & -- \\
+\bottomrule
+\end{tabularx}
+\vskip 0.15cm
+{\footnotesize $^{a}$Contador de secuencia por nodo (enviados/recibidos) en una sesión controlada. $^{b}$Requiere sincronización de reloj nodo--gateway. $^{c}$Medición pareada con instrumento de referencia. $^{d}$Prueba de descarga real de batería. $^{e}$Interrupción controlada del enlace y tiempo hasta el primer paquete válido.}
+\end{table}
+
+La Tabla~\ref{tab:resultados} resume las funciones verificadas mediante revisión del firmware y pruebas funcionales del prototipo.
+
+\subsection{Disponibilidad y diferencia con el PDR}
+
+Conviene distinguir dos indicadores que a menudo se confunden. El \emph{PDR} (\textit{packet delivery ratio}) mide el desempeño del \emph{enlace}: es la razón entre paquetes recibidos y paquetes enviados por el nodo, y requiere un contador de secuencia en la trama para conocer cuántos se enviaron. La \emph{disponibilidad de datos} mide la fracción de mediciones efectivamente disponibles para el usuario respecto de las esperadas según el intervalo de muestreo. En este sistema ambos indicadores son numéricamente cercanos, salvo cuando el gateway estuvo apagado: esos periodos reducen la disponibilidad cruda pero no representan fallas del enlace, por lo que se contabilizan por separado.
 
 \begin{table}[!t]
 \caption{Resultados funcionales verificados}
@@ -383,7 +422,7 @@ El dashboard superó la presentación de un valor instantáneo al ofrecer histó
 
 La comparación mostró que la pistola Fluke continúa siendo útil como instrumento de referencia puntual y que el WISE-2410 aporta variables industriales adicionales, especialmente vibración. SmartSense se destacó por la adaptación del dashboard a las necesidades específicas de visualización y análisis térmico de la planta.
 
-Como trabajo siguiente se incorporarán las mediciones pareadas, se calculará el MAE antes y después de la compensación, se documentará la disponibilidad del enlace, se habilitará RSSI y se completará la exportación directa de datos.
+La disponibilidad del enlace ya se documentó a partir del registro de 32 días. Como trabajo siguiente se incorporarán las mediciones pareadas de exactitud y se calculará el MAE antes y después de la compensación, se medirá el PDR mediante el contador de secuencia incorporado al firmware, se ejecutarán las pruebas de autonomía y de recuperación, se habilitará el RSSI y se completará la exportación directa de datos.
 
 \section*{Agradecimientos}
 
