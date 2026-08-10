@@ -2805,11 +2805,49 @@ void processCfgReq(const String& line) {
   pushSnapshot();
 }
 
+// -----------------------------------------------------
+// PDR: seguimiento del contador de secuencia por nodo.
+// Evidencia reproducible para la sustentacion: en el monitor serie
+// aparece, en cada paquete, enviados/recibidos/perdidos/PDR por nodo.
+// Enviados = ultimoSEQ - primerSEQ + 1 (lo que el nodo intento enviar).
+// Recibidos = paquetes que llegaron al gateway.
+// -----------------------------------------------------
+struct PdrStats {
+  uint32_t firstSeq = 0;
+  uint32_t lastSeq = 0;
+  uint32_t received = 0;
+};
+std::map<String, PdrStats> pdrByNode;
+
+void trackPdr(const String& mac, uint32_t seq) {
+  PdrStats& p = pdrByNode[mac];
+  if (p.received == 0 || seq < p.firstSeq) {
+    // Primer paquete visto, o el nodo se reinicio (SEQ volvio a empezar):
+    // se reinicia la ventana de medicion para no contar huecos falsos.
+    p.firstSeq = seq;
+    p.lastSeq = seq;
+    p.received = 1;
+  } else {
+    if (seq > p.lastSeq) p.lastSeq = seq;
+    p.received++;
+  }
+  uint32_t enviados = p.lastSeq - p.firstSeq + 1;
+  uint32_t perdidos = (enviados > p.received) ? (enviados - p.received) : 0;
+  float pdr = enviados ? (100.0f * p.received / enviados) : 0.0f;
+  Serial.printf("[PDR] mac=%s seq=%lu enviados=%lu recibidos=%lu perdidos=%lu PDR=%.2f%%\n",
+                mac.c_str(), (unsigned long)seq,
+                (unsigned long)enviados, (unsigned long)p.received,
+                (unsigned long)perdidos, pdr);
+}
+
 void processDataLine(const String& line) {
   uint16_t nodeId = 0;
   fieldToUInt16(line, "ID", nodeId);
   String mac = normalizeMac(getFieldValue(line, "MAC"));
   if (mac.isEmpty()) return;
+
+  uint32_t seq = 0;
+  if (fieldToUInt32(line, "SEQ", seq)) trackPdr(mac, seq);
 
   String fallbackName = resolvedNodeName(mac, getFieldValue(line, "NAME"));
   NodeData& n = getOrCreateNode(mac, fallbackName, nodeId);

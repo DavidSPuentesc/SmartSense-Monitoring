@@ -113,6 +113,11 @@ static uint32_t bootMs = 0;
 static String radioRxLine;
 static bool g_gotConfigReply = false;
 
+// Contador de paquetes para calcular PDR en el gateway.
+// RTC_DATA_ATTR sobrevive al deep sleep; se reinicia solo al cortar la
+// alimentación (el gateway detecta ese reinicio porque SEQ vuelve a 1).
+RTC_DATA_ATTR uint32_t txSeq = 0;
+
 // =====================================================
 // DECLARACIONES ADELANTADAS
 // =====================================================
@@ -625,10 +630,13 @@ static void sendDataToMaster(float tempC, float battPct) {
            "%02X:%02X:%02X:%02X:%02X:%02X",
            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
+  txSeq++;  // primer paquete = 1
+
   char payload[128];
   snprintf(payload, sizeof(payload),
-           "DATA,ID=%u,TEMP=%.2f,BAT=%.1f,MAC=%s",
+           "DATA,ID=%u,SEQ=%lu,TEMP=%.2f,BAT=%.1f,MAC=%s",
            NODE_ADDR,
+           (unsigned long)txSeq,
            tempC,
            battPct,
            macStr);
