@@ -37,17 +37,22 @@ def db():
                bateria REAL,
                UNIQUE(sensor, ts))"""
     )
+    con.execute(
+        "CREATE TABLE IF NOT EXISTS nombres (sensor TEXT PRIMARY KEY, nombre TEXT, maquina TEXT)"
+    )
     return con
 
 
 # Alias aceptados en el encabezado del CSV (case-insensitive)
 COLS = {
-    "sensor": {"sensor", "mac", "nodo", "nombre", "id"},
+    "sensor": {"sensor", "mac", "nodo", "nombre", "id", "mac_sensor"},
     "fecha": {"fecha", "date", "dia"},
     "hora": {"hora", "time"},
     "ts": {"timestamp", "ts", "fecha_hora", "fechahora", "datetime"},
     "temp": {"temp", "temperatura", "temp_c", "temperatura_c", "temperature"},
     "bat": {"bateria", "battery", "bat", "bateria_pct"},
+    "nom": {"nombre_sensor"},      # opcionales: nombre amigable y máquina
+    "maq": {"maquina", "machine"},
 }
 
 TS_FORMATS = (
@@ -76,13 +81,15 @@ def normaliza_ts(texto):
 
 
 def parse_csv(data):
-    """Devuelve (filas_ok, errores). errores = [{linea, motivo}, ...].
+    """Devuelve (filas_ok, errores, nombres). errores = [{linea, motivo}, ...];
+    nombres = {sensor: (nombre, maquina)} si el CSV trae esas columnas.
 
     Tolera ',' o ';' y coma decimal (Excel es-CO). Lanza CsvInvalido si el
     archivo o el encabezado no sirven, con un mensaje que explica qué falta.
     """
     texto = data.decode("utf-8-sig", errors="replace")
     lineas = texto.splitlines()
+    nombres = {}
     if not lineas:
         raise CsvInvalido("El archivo está vacío.")
     delim = ";" if lineas[0].count(";") > lineas[0].count(",") else ","
@@ -125,6 +132,11 @@ def parse_csv(data):
         if not sensor:
             error(nlinea, "sensor vacío")
             continue
+        if "nom" in idx or "maq" in idx:
+            nom = fila[idx["nom"]].strip() if "nom" in idx and idx["nom"] < len(fila) else ""
+            maq = fila[idx["maq"]].strip() if "maq" in idx and idx["maq"] < len(fila) else ""
+            if nom or maq:
+                nombres[sensor] = (nom, maq)
 
         try:
             if "ts" in idx:
@@ -159,7 +171,7 @@ def parse_csv(data):
                 bat = None
 
         ok.append((sensor, ts, temp, bat))
-    return ok, errores
+    return ok, errores, nombres
 
 
 @app.errorhandler(413)
@@ -186,12 +198,15 @@ def importar():
         return jsonify({"error": "El archivo debe ser .csv (o .txt separado por comas)."}), 400
 
     try:
-        filas, errores = parse_csv(archivo.read())
+        filas, errores, nombres_csv = parse_csv(archivo.read())
     except CsvInvalido as e:
         return jsonify({"error": str(e)}), 400
 
     con = db()
     cur = con.executemany("INSERT OR IGNORE INTO lecturas VALUES (?,?,?,?)", filas)
+    if nombres_csv:
+        con.executemany("INSERT OR REPLACE INTO nombres VALUES (?,?,?)",
+                        [(s, n, m) for s, (n, m) in nombres_csv.items()])
     con.commit()
     insertadas = cur.rowcount if cur.rowcount != -1 else 0
     con.close()
@@ -207,11 +222,15 @@ def importar():
 def sensores():
     con = db()
     filas = con.execute(
-        "SELECT sensor, COUNT(*), MIN(ts), MAX(ts) FROM lecturas GROUP BY sensor ORDER BY sensor"
+        "SELECT l.sensor, COUNT(*), MIN(l.ts), MAX(l.ts), n.nombre, n.maquina"
+        " FROM lecturas l LEFT JOIN nombres n ON n.sensor = l.sensor"
+        " GROUP BY l.sensor ORDER BY l.sensor"
     ).fetchall()
     con.close()
     return jsonify([
-        {"sensor": s, "lecturas": n, "desde": d, "hasta": h} for s, n, d, h in filas
+        {"sensor": s, "lecturas": cnt, "desde": d, "hasta": h,
+         "etiqueta": " · ".join(x for x in (nom, maq) if x) or s}
+        for s, cnt, d, h, nom, maq in filas
     ])
 
 
@@ -251,18 +270,23 @@ def historico():
 
 
 def selftest():
-    filas, err = parse_csv(b"sensor,timestamp,temperatura_c,bateria_pct\nA1,2026-01-15 10:00:00,25.4,87\nA1,2026-01-15 10:01:00,25.6,87\n")
+    filas, err, _ = parse_csv(b"sensor,timestamp,temperatura_c,bateria_pct\nA1,2026-01-15 10:00:00,25.4,87\nA1,2026-01-15 10:01:00,25.6,87\n")
     assert len(filas) == 2 and not err and filas[0][2] == 25.4, (filas, err)
 
-    filas, err = parse_csv("mac;fecha;hora;temperatura\nAA:BB;15/01/2026;10:00;25,4\nAA:BB;fila;mala;x\n".encode())
+    filas, err, _ = parse_csv("mac;fecha;hora;temperatura\nAA:BB;15/01/2026;10:00;25,4\nAA:BB;fila;mala;x\n".encode())
     assert len(filas) == 1 and len(err) == 1 and filas[0][1] == "2026-01-15 10:00:00", (filas, err)
     assert err[0]["motivo"] == "fecha/hora inválida", err
 
-    filas, err = parse_csv(b"sensor,timestamp,temperatura\nA1,2026-01-15 10:00:00,999\nA1,2026-01-15 10:01:00,-300\n")
+    filas, err, _ = parse_csv(b"sensor,timestamp,temperatura\nA1,2026-01-15 10:00:00,999\nA1,2026-01-15 10:01:00,-300\n")
     assert not filas and len(err) == 2, (filas, err)
 
-    filas, err = parse_csv(b"sensor,timestamp,temperatura,bateria\nA1,2026-01-15 10:00:00,25.0,150\n")
+    filas, err, _ = parse_csv(b"sensor,timestamp,temperatura,bateria\nA1,2026-01-15 10:00:00,25.0,150\n")
     assert len(filas) == 1 and filas[0][3] is None, filas
+
+    # formato real del export de planta
+    filas, err, noms = parse_csv('﻿mac_sensor,nombre_sensor,maquina,fecha,hora,temperatura_c\n"AA:BB","Succionador","Twin","2026-05-08","14:07:00",64.5\n'.encode("utf-8"))
+    assert len(filas) == 1 and filas[0][0] == "AA:BB" and not err, (filas, err)
+    assert noms == {"AA:BB": ("Succionador", "Twin")}, noms
 
     for datos, esperado in (
         (b"", "vacío"),

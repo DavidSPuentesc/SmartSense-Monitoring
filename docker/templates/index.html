@@ -88,7 +88,7 @@ async function cargarSensores() {
     const lista = await llamar('/api/sensores');
     const sel = $('sensor');
     sel.innerHTML = lista.length
-      ? lista.map(s => `<option value="${s.sensor}">${s.sensor} (${s.lecturas} lecturas)</option>`).join('')
+      ? lista.map(s => `<option value="${s.sensor}">${s.etiqueta || s.sensor} (${s.lecturas} lecturas)</option>`).join('')
       : '<option value="">— sin datos —</option>';
     aviso($('aviso'), lista.length ? '' : 'Carga primero un CSV para ver datos.');
   } catch (e) {
