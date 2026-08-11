@@ -279,6 +279,10 @@ Dado que el registro histórico no incluía un contador de secuencia, la pérdid
 
 Con este criterio, la pérdida estimada fue de \SI{3.45}{\percent} en el Nodo~A, \SI{3.93}{\percent} en el Nodo~B y \SI{4.68}{\percent} en el Nodo~C, equivalente a un PDR estimado entre \SI{95.3}{\percent} y \SI{96.6}{\percent}. Los tres nodos cumplen el criterio de pérdida $\leq$\,\SI{5}{\percent} y de PDR $\geq$\,\SI{95}{\percent}. Como evidencia puntual, en una ventana continua representativa de una hora se recibieron las \num{30} muestras esperadas por nodo, sin pérdidas (\SI{0}{\percent}), lo que confirma la cadencia nominal durante la operación normal. Estos valores, obtenidos por inferencia temporal, se confirmarán con la medición directa de enviados y recibidos mediante el contador de secuencia incorporado al firmware.
 
+\subsection{Tiempo activo por ciclo}
+
+El tiempo activo por ciclo ---desde el arranque del nodo hasta completar la lectura y la transmisión, inmediatamente antes de entrar en sueño profundo--- se midió a partir del registro del firmware. En diez arranques consecutivos, el valor fue de \SI{2.279}{\second} en ocho de las diez muestras, con variaciones menores en las restantes. Con un ciclo de muestreo de \SI{120}{\second}, este tiempo corresponde a un ciclo de trabajo (fracción de tiempo activo) de aproximadamente \SI{1.9}{\percent}. Este valor es la base para estimar la autonomía: combinado con la corriente en estado activo y en sueño profundo, permite calcular la corriente promedio y, junto con la capacidad de la batería, la autonomía. La medición de corriente en ambos estados queda pendiente para completar la estimación experimental.
+
 \begin{table}[!t]
 \caption{Resultados funcionales verificados}
 \label{tab:resultados}
