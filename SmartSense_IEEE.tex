@@ -168,7 +168,13 @@ La arquitectura permite integrar posteriormente módulos de relés o variables d
 
 La validación se estructuró en cuatro etapas. Primero se verificó la lectura de las PT100 y el reporte de fallas del MAX31865. Luego se comprobó el envío de tramas y la identificación de los nodos. En la tercera etapa se validaron el almacenamiento, la consulta por fecha y las funciones del dashboard. Finalmente, el sistema se instaló temporalmente en equipos de la planta para observar el comportamiento térmico durante la operación.
 
-La exactitud se evalúa con muestras pareadas entre SmartSense y un instrumento de referencia. Para $n$ pares de datos, el error absoluto medio se calcula mediante
+\subsection{Instrumento de referencia}
+
+El instrumento de referencia empleado fue un termómetro infrarrojo \textbf{Fluke 62 MAX}, con rango de \SIrange{-30}{500}{\celsius}, exactitud de \SI{\pm 1.5}{\celsius} o \SI{\pm 1.5}{\percent} de la lectura (el mayor de ambos), repetibilidad de \SI{\pm 0.8}{\celsius}, relación distancia-punto de 10:1, respuesta espectral de \SIrange{8}{14}{\micro\meter} y emisividad fija de \num{0.95}. La medición es sin contacto sobre la superficie del equipo.
+
+Deben señalarse dos limitaciones metodológicas que condicionan la comparación. Primero, la exactitud del propio Fluke (\SI{\pm 1.5}{\celsius}) es mayor que el criterio de error objetivo del sistema (\SI{\pm 1}{\celsius}); por lo tanto, el Fluke sirve como referencia de campo para verificar la coherencia de las lecturas, pero una validación estricta de \SI{\pm 1}{\celsius} requeriría un patrón de menor incertidumbre (por ejemplo, una sonda de contacto o RTD de referencia calibrada). Segundo, la emisividad fija de \num{0.95} y la naturaleza sin contacto introducen error adicional frente a la medición por contacto de la PT100, en especial sobre superficies metálicas. Por estas razones, los resultados se reportan como \emph{diferencia respecto al instrumento de referencia} y no como una calibración formal.
+
+La exactitud se evalúa con muestras pareadas entre SmartSense y este instrumento de referencia, tomadas de forma simultánea y en el mismo punto de la superficie. Para $n$ pares de datos, el error absoluto medio se calcula mediante
 
 \begin{equation}
 \mathrm{MAE}=\frac{1}{n}\sum_{i=1}^{n}\left|T_{SS,i}-T_{ref,i}\right|.
@@ -236,7 +242,7 @@ Operación sin Internet & Sí & Depende de la arquitectura & Sí, mediante servi
 
 \subsection{Criterios de aceptación y resultados}
 
-La Tabla~\ref{tab:criterios} contrasta cada criterio de aceptación definido para el proyecto con el resultado obtenido. La disponibilidad del enlace se determinó a partir del registro real de 32 días y cumple el criterio. Las métricas que requieren pruebas controladas específicas (PDR, pérdida, latencia, error de temperatura, autonomía y recuperación) se reportan como pendientes de medición, con la prueba que produce cada valor indicada en la nota de la tabla; ninguna se declara cumplida sin evidencia.
+La Tabla~\ref{tab:criterios} contrasta cada criterio de aceptación definido para el proyecto con el resultado obtenido. La disponibilidad del enlace, el PDR y la pérdida de paquetes se determinaron a partir del registro real de 32 días y cumplen los criterios. Las métricas que requieren pruebas controladas adicionales (latencia, error de temperatura, autonomía y recuperación) se reportan como pendientes de medición, con la prueba que produce cada valor indicada en la nota de la tabla; ninguna se declara cumplida sin evidencia.
 
 \begin{table}[!t]
 \caption{Criterios de aceptación frente a resultados obtenidos}
@@ -248,8 +254,8 @@ La Tabla~\ref{tab:criterios} contrasta cada criterio de aceptación definido par
 \textbf{Métrica} & \textbf{Criterio} & \textbf{Resultado} & \textbf{¿Cumple?} \\
 \midrule
 Disponibilidad del enlace & $\geq$\,\SI{95}{\percent} & \SIrange{97.8}{98.4}{\percent} & Sí \\
-PDR & $\geq$\,\SI{95}{\percent} & Por medir$^{a}$ & -- \\
-Pérdida de paquetes & $\leq$\,\SI{5}{\percent} & Por medir$^{a}$ & -- \\
+PDR & $\geq$\,\SI{95}{\percent} & \SIrange{95.3}{96.6}{\percent}$^{a}$ & Sí \\
+Pérdida de paquetes & $\leq$\,\SI{5}{\percent} & \SIrange{3.5}{4.7}{\percent}$^{a}$ & Sí \\
 Latencia promedio & $\leq$\,\SI{5}{\second} & Por medir$^{b}$ & -- \\
 Error de temperatura (MAE) & $\leq$\,\SI{1}{\celsius} & Por medir$^{c}$ & -- \\
 Autonomía & $\geq$\,\SI{8}{\hour} & Por medir$^{d}$ & -- \\
@@ -257,7 +263,7 @@ Recuperación & $\leq$\,\SI{120}{\second} & Por medir$^{e}$ & -- \\
 \bottomrule
 \end{tabularx}
 \vskip 0.15cm
-{\footnotesize $^{a}$Contador de secuencia por nodo (enviados/recibidos) en una sesión controlada. $^{b}$Requiere sincronización de reloj nodo--gateway. $^{c}$Medición pareada con instrumento de referencia. $^{d}$Prueba de descarga real de batería. $^{e}$Interrupción controlada del enlace y tiempo hasta el primer paquete válido.}
+{\footnotesize $^{a}$Estimado por análisis de intervalos de llegada (Sección~\ref{sec:perdida}); se confirmará con el contador de secuencia por nodo incorporado al firmware. $^{b}$Requiere sincronización de reloj nodo--gateway. $^{c}$Medición pareada con instrumento de referencia. $^{d}$Prueba de descarga real de batería. $^{e}$Interrupción controlada del enlace y tiempo hasta el primer paquete válido.}
 \end{table}
 
 La Tabla~\ref{tab:resultados} resume las funciones verificadas mediante revisión del firmware y pruebas funcionales del prototipo.
@@ -265,6 +271,13 @@ La Tabla~\ref{tab:resultados} resume las funciones verificadas mediante revisió
 \subsection{Disponibilidad y diferencia con el PDR}
 
 Conviene distinguir dos indicadores que a menudo se confunden. El \emph{PDR} (\textit{packet delivery ratio}) mide el desempeño del \emph{enlace}: es la razón entre paquetes recibidos y paquetes enviados por el nodo, y requiere un contador de secuencia en la trama para conocer cuántos se enviaron. La \emph{disponibilidad de datos} mide la fracción de mediciones efectivamente disponibles para el usuario respecto de las esperadas según el intervalo de muestreo. En este sistema ambos indicadores son numéricamente cercanos, salvo cuando el gateway estuvo apagado: esos periodos reducen la disponibilidad cruda pero no representan fallas del enlace, por lo que se contabilizan por separado.
+
+\subsection{Pérdida de paquetes}
+\label{sec:perdida}
+
+Dado que el registro histórico no incluía un contador de secuencia, la pérdida de paquetes se estimó a partir de los intervalos entre llegadas. El ciclo de muestreo nominal fue de \SI{120}{\second}. Dentro de los tramos activos (excluyendo los periodos de gateway apagado, identificados por intervalos mayores a \SI{30}{\minute}), un intervalo cercano a $k$ veces el ciclo indica que faltaron $k-1$ paquetes entre dos recepciones consecutivas. El número de paquetes esperados se obtiene entonces como la suma de recibidos más los inferidos como perdidos.
+
+Con este criterio, la pérdida estimada fue de \SI{3.45}{\percent} en el Nodo~A, \SI{3.93}{\percent} en el Nodo~B y \SI{4.68}{\percent} en el Nodo~C, equivalente a un PDR estimado entre \SI{95.3}{\percent} y \SI{96.6}{\percent}. Los tres nodos cumplen el criterio de pérdida $\leq$\,\SI{5}{\percent} y de PDR $\geq$\,\SI{95}{\percent}. Como evidencia puntual, en una ventana continua representativa de una hora se recibieron las \num{30} muestras esperadas por nodo, sin pérdidas (\SI{0}{\percent}), lo que confirma la cadencia nominal durante la operación normal. Estos valores, obtenidos por inferencia temporal, se confirmarán con la medición directa de enviados y recibidos mediante el contador de secuencia incorporado al firmware.
 
 \begin{table}[!t]
 \caption{Resultados funcionales verificados}
