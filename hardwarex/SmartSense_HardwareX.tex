@@ -222,7 +222,8 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 \item LoRa link availability $>$97\% (active intervals) at a 121~s cadence over 32 days.
 \item Local operation with per-sensor daily history (up to 30 days on-device) and no Internet dependency.
 \item Temperature readings agreed with an infrared reference within $\pm$0.4~$^{\circ}$C; a strict $\leq$1~$^{\circ}$C validation requires a calibrated contact reference (planned).
-\item Limitations: absolute temperature accuracy depends on PT100 tolerance, mounting and per-node calibration; RSSI/SNR are not exposed by the current firmware; end-to-end latency and battery autonomy were not yet measured with dedicated tests.
+\item The measured active time per cycle is 2.279~s over a 120~s period (1.9\% duty cycle); with typical ESP32-C6 active (tens of mA) and deep-sleep (tens of $\mu$A) currents this implies an average current in the sub-mA range and an autonomy on the order of months on a 2000~mAh battery. A direct current measurement is pending to confirm the figure.
+\item Limitations: absolute temperature accuracy depends on PT100 tolerance, mounting and per-node calibration; RSSI/SNR are not exposed by the current firmware; end-to-end latency was not measured (no node--gateway clock synchronization).
 \end{itemize}
 
 \noindent

@@ -283,7 +283,9 @@ Con este criterio, la pérdida estimada fue de \SI{3.45}{\percent} en el Nodo~A,
 
 \subsection{Tiempo activo por ciclo}
 
-El tiempo activo por ciclo ---desde el arranque del nodo hasta completar la lectura y la transmisión, inmediatamente antes de entrar en sueño profundo--- se midió a partir del registro del firmware. En diez arranques consecutivos, el valor fue de \SI{2.279}{\second} en ocho de las diez muestras, con variaciones menores en las restantes. Con un ciclo de muestreo de \SI{120}{\second}, este tiempo corresponde a un ciclo de trabajo (fracción de tiempo activo) de aproximadamente \SI{1.9}{\percent}. Este valor es la base para estimar la autonomía: combinado con la corriente en estado activo y en sueño profundo, permite calcular la corriente promedio y, junto con la capacidad de la batería, la autonomía. La medición de corriente en ambos estados queda pendiente para completar la estimación experimental.
+El tiempo activo por ciclo ---desde el arranque del nodo hasta completar la lectura y la transmisión, inmediatamente antes de entrar en sueño profundo--- se midió a partir del registro del firmware. En diez arranques consecutivos, el valor fue de \SI{2.279}{\second} en ocho de las diez muestras, con variaciones menores en las restantes. Con un ciclo de muestreo de \SI{120}{\second}, este tiempo corresponde a un ciclo de trabajo (fracción de tiempo activo) de aproximadamente \SI{1.9}{\percent}.
+
+Dado este bajo ciclo de trabajo, el nodo permanece en sueño profundo el \SI{98.1}{\percent} del tiempo. Con las corrientes típicas de un ESP32-C6 en estado activo (decenas de mA) y en sueño profundo (del orden de decenas de \si{\micro\ampere}), la corriente promedio resultante es del orden de fracciones de \si{\milli\ampere}, lo que implica una autonomía estimada del orden de meses con la batería de \SI{2000}{\milli\ampere\hour}, muy por encima del criterio de \SI{8}{\hour}. Este resultado se presenta como estimación de orden de magnitud; la medición directa de la corriente activa y en reposo queda pendiente para confirmar el valor cuantitativo.
 
 \begin{table}[!t]
 \caption{Resultados funcionales verificados}
