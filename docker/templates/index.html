@@ -170,7 +170,8 @@ $('btnVer').onclick = async () => {
   }
 };
 
-cargarSensores();
+// Al abrir, muestra el primer sensor automáticamente (mejor que un gráfico vacío)
+cargarSensores().then(() => { if ($('sensor').value) $('btnVer').click(); });
 </script>
 </body>
 </html>
