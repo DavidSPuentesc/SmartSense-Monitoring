@@ -170,6 +170,11 @@ $('btnVer').onclick = async () => {
   }
 };
 
+// ?kiosk oculta la tarjeta de carga CSV (para capturas limpias del histórico)
+if (new URLSearchParams(location.search).has('kiosk')) {
+  document.querySelector('.tarjeta').style.display = 'none';
+}
+
 // Al abrir, muestra el primer sensor automáticamente (mejor que un gráfico vacío)
 cargarSensores().then(() => { if ($('sensor').value) $('btnVer').click(); });
 </script>

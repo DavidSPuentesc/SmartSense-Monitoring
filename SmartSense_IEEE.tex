@@ -34,10 +34,6 @@
     \label{fig:#1}
   \end{figure}}
 
-\newcommand{\imgslot}[1]{%
-  \fbox{\parbox[c][2.35cm][c]{0.93\linewidth}{%
-    \centering\small\textit{#1}}}}
-
 \title{SmartSense Monitoring: Sistema Inalámbrico para el Monitoreo y Análisis Histórico de Temperatura en Equipos Industriales}
 
 \author{
@@ -319,7 +315,26 @@ RSSI y SNR experimentales & No implementados \\
 
 \subsection{Despliegue de 32 días y disponibilidad}
 
-Se analizó un registro real de la planta con \num{51338} muestras provenientes de tres nodos, con un intervalo de muestreo mediano de \SI{121}{\second}. La Fig.~\ref{fig:val-serie} presenta la serie completa de temperatura de uno de los nodos durante el despliegue, en la que se aprecia el máximo de \SI{70.0}{\celsius} asociado al caso del succionador.
+Se analizó un registro real de la planta con \num{51338} muestras provenientes de tres nodos, con un intervalo de muestreo mediano de \SI{121}{\second}. La Tabla~\ref{tab:estadisticas} resume la temperatura registrada por cada sensor durante el despliegue. La Fig.~\ref{fig:val-serie} presenta la serie completa de temperatura de uno de los nodos, en la que se aprecia el máximo de \SI{70.0}{\celsius} asociado al caso del succionador.
+
+\begin{table}[!t]
+\caption{Estadísticas de temperatura por sensor durante el despliegue}
+\label{tab:estadisticas}
+\centering
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}Xccccc@{}}
+\toprule
+\textbf{Nodo} & \textbf{Muestras} & \textbf{Mín.} & \textbf{Máx.} & \textbf{Prom.} & \textbf{Desv.} \\
+ & & (\si{\celsius}) & (\si{\celsius}) & (\si{\celsius}) & (\si{\celsius}) \\
+\midrule
+Nodo A & \num{17537} & 17,1 & 70,0 & 45,4 & 20,1 \\
+Nodo B & \num{16487} & 15,3 & 62,4 & 39,5 & 14,5 \\
+Nodo C & \num{17314} & 16,4 & 65,0 & 44,7 & 16,7 \\
+\bottomrule
+\end{tabularx}
+\vskip 0.15cm
+{\footnotesize Nodos A y C: del 8 de mayo al 9 de junio de 2026 (32 días). Nodo B: del 10 de mayo al 20 de julio de 2026 (72 días). La desviación estándar alta refleja los ciclos de marcha y parada de las máquinas.}
+\end{table}
 
 La Fig.~\ref{fig:val-cobertura} muestra la cobertura de datos de los tres nodos. Las interrupciones no se distribuyen de forma independiente entre nodos, sino que ocurren de manera \emph{simultánea} en los tres, con el mismo instante de inicio. Este comportamiento indica que las interrupciones no correspondieron a fallas del enlace LoRa —que afectarían a un nodo a la vez— sino a periodos en los que el gateway permaneció apagado durante paradas de planta y de energía.
 
@@ -405,51 +420,6 @@ La Fig.~\ref{fig:evidencias-reales} reúne las evidencias de la instalación y l
 \end{minipage}
 \caption{Evidencias de la validación en planta: (a) nodo PT100 con módulo LoRa instalado en el motor del succionador; (b) medición de referencia con el termómetro infrarrojo Fluke 62 MAX; (c) lectura simultánea en el dashboard local.}
 \label{fig:evidencias-reales}
-\end{figure*}
-
-\section{Evidencias complementarias pendientes}
-
-La Fig.~\ref{fig:evidencias-pendientes} reserva los espacios de las evidencias que se incorporarán en la versión final. Cada fotografía deberá acompañarse con fecha, equipo, instrumento y una descripción breve del procedimiento realizado.
-
-\begin{figure*}[!t]
-\centering
-\begin{minipage}[t]{0.24\textwidth}\centering
-  \imgslot{Nodo PT100 instalado en el succionador de la Twin}\\[-1mm]
-  {\footnotesize(a) Instalación del nodo}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.24\textwidth}\centering
-  \imgslot{Medición simultánea con pistola Fluke}\\[-1mm]
-  {\footnotesize(b) Referencia Fluke}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.24\textwidth}\centering
-  \imgslot{Captura o fotografía de la cámara termográfica}\\[-1mm]
-  {\footnotesize(c) Cámara termográfica}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.24\textwidth}\centering
-  \imgslot{Interfaz del Advantech WISE-2410 usada en planta}\\[-1mm]
-  {\footnotesize(d) WISE-2410}
-\end{minipage}
-
-\vspace{2mm}
-
-\begin{minipage}[t]{0.24\textwidth}\centering
-  \imgslot{Tres nodos construidos y gateway con pantalla}\\[-1mm]
-  {\footnotesize(e) Prototipos físicos}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.24\textwidth}\centering
-  \imgslot{Inspección o mantenimiento de los rodamientos}\\[-1mm]
-  {\footnotesize(f) Evidencia mecánica}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.24\textwidth}\centering
-  \imgslot{Históricos de los otros puntos de medición}\\[-1mm]
-  {\footnotesize(g) Otros sensores}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.24\textwidth}\centering
-  \imgslot{Configuración de offset y umbrales de alarma}\\[-1mm]
-  {\footnotesize(h) Configuración}
-\end{minipage}
-\caption{Espacios reservados para las evidencias experimentales y de implementación que se incorporarán en la versión final.}
-\label{fig:evidencias-pendientes}
 \end{figure*}
 
 \section{Discusión}

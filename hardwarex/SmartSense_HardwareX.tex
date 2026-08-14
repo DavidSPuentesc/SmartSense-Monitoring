@@ -183,7 +183,7 @@ The following steps describe the construction of one sensor node and the gateway
 
 \begin{figure}[h]\centering
 \includegraphics[width=\linewidth]{dashboard-neutro.png}
-\caption{Local web dashboard: per-sensor temperature history over the deployment, with minimum, maximum and mean statistics and bulk CSV import. Shown here running on the open-source software replica with generic sensor labels.}
+\caption{Local web dashboard: per-sensor temperature history over the deployment, with minimum, maximum and mean statistics. Shown here running on the open-source software replica with generic sensor labels.}
 \label{fig:dashboard}
 \end{figure}
 
@@ -213,7 +213,9 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 
 \textbf{Temperature agreement.} Paired readings against a Fluke 62 MAX infrared thermometer on the same surface point agreed within $\pm$0.4~$^{\circ}$C (mean difference $\approx$0.1~$^{\circ}$C). Because the per-node offset was tuned using the same Fluke, and the Fluke's own accuracy is $\pm$1.5~$^{\circ}$C, this demonstrates that the compensation reproduces the reference but is not an independent accuracy validation; a rigorous $\leq$1~$^{\circ}$C characterization would require a calibrated contact reference (thermocouple or reference RTD).
 
-\textbf{Use case.} The continuous history captured a surface-temperature rise on a suction-fan motor of the ``Twin'' machine, reaching a maximum of 70.0~$^\circ$C (Fig.~\ref{fig:serie}). The rising segments corresponded to periods when the machine stopped while the fan motor kept spinning unloaded; the pattern was later related to a bearing anomaly. This demonstrates the practical value of continuous logging over spot measurements.
+\textbf{Use case.} The continuous history captured a surface-temperature rise on a suction-fan motor, reaching a maximum of 70.0~$^\circ$C (Fig.~\ref{fig:serie}). The rising segments corresponded to periods when the machine stopped while the fan motor kept spinning unloaded; the pattern was later related to a bearing anomaly. This demonstrates the practical value of continuous logging over spot measurements.
+
+\textbf{Recovery and temperature range.} After a node reset, the node boots, samples and transmits its first frame in about 2.279~s (measured from the firmware), well within one sampling cycle and far below any practical requirement. Across the three nodes, the recorded surface temperature spanned 15.3--70.0~$^{\circ}$C, with per-node mean values of 39.5--45.4~$^{\circ}$C.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.9\linewidth]{val-serie-evento.pdf}
