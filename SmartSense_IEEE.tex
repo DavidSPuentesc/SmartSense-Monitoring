@@ -181,7 +181,7 @@ La exactitud se evalúa con muestras pareadas entre SmartSense y este instrument
 \label{eq:mae}
 \end{equation}
 
-A partir del registro se calcularon la temperatura mínima, máxima y promedio por sensor. La diferencia antes y después del offset y el error respecto al instrumento de referencia se documentarán con las mediciones pareadas descritas en el procedimiento de validación.
+A partir del registro se calcularon la temperatura mínima, máxima y promedio por sensor. Las mediciones pareadas frente al Fluke 62 MAX se muestran en la Tabla~\ref{tab:mediciones}: las lecturas del SmartSense coincidieron con la referencia dentro de \SI{\pm 0.4}{\celsius}, con una diferencia media cercana a \SI{0.1}{\celsius}. No obstante, como el offset del sistema se ajustó con el mismo Fluke y la exactitud de este es \SI{\pm 1.5}{\celsius}, esta comparación demuestra que la compensación funciona y que el sistema reproduce la referencia, pero no constituye una validación independiente de exactitud \SI{\leq 1}{\celsius}; para ello se requeriría un patrón de contacto calibrado (termocupla o RTD de referencia).
 
 \begin{table}[!t]
 \caption{Formato de medición pareada en planta}
@@ -190,12 +190,14 @@ A partir del registro se calcularon la temperatura mínima, máxima y promedio p
 \footnotesize
 \begin{tabular}{@{}lccc@{}}
 \toprule
-Hora & SmartSense & Referencia & Estado \\
- & (\si{\celsius}) & (\si{\celsius}) & máquina \\
+Hora & SmartSense & Fluke 62 MAX & $|\Delta|$ \\
+ & (\si{\celsius}) & (\si{\celsius}) & (\si{\celsius}) \\
 \midrule
-Pendiente & -- & -- & Operación/parada \\
-Pendiente & -- & -- & Operación/parada \\
-Pendiente & -- & -- & Operación/parada \\
+06:40 & 71,0 & 71,0 & 0,0 \\
+07:06 & 70,6 & 70,6 & 0,0 \\
+07:58 & 69,7 & 69,6 & 0,1 \\
+08:09 & 69,5 & 69,4 & 0,1 \\
+09:49 & 65,1 & 65,2 & 0,1 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -257,13 +259,13 @@ Disponibilidad del enlace & $\geq$\,\SI{95}{\percent} & \SIrange{97.8}{98.4}{\pe
 PDR & $\geq$\,\SI{95}{\percent} & \SIrange{95.3}{96.6}{\percent}$^{a}$ & Sí \\
 Pérdida de paquetes & $\leq$\,\SI{5}{\percent} & \SIrange{3.5}{4.7}{\percent}$^{a}$ & Sí \\
 Latencia promedio & $\leq$\,\SI{5}{\second} & Por medir$^{b}$ & -- \\
-Error de temperatura (MAE) & $\leq$\,\SI{1}{\celsius} & Por medir$^{c}$ & -- \\
+Error de temperatura & $\leq$\,\SI{1}{\celsius} & $\leq$\,\SI{0.4}{\celsius} vs Fluke$^{c}$ & Sí* \\
 Autonomía & $\geq$\,\SI{8}{\hour} & Por medir$^{d}$ & -- \\
 Recuperación & $\leq$\,\SI{120}{\second} & Por medir$^{e}$ & -- \\
 \bottomrule
 \end{tabularx}
 \vskip 0.15cm
-{\footnotesize $^{a}$Estimado por análisis de intervalos de llegada (Sección~\ref{sec:perdida}); se confirmará con el contador de secuencia por nodo incorporado al firmware. $^{b}$Requiere sincronización de reloj nodo--gateway. $^{c}$Medición pareada con instrumento de referencia. $^{d}$Prueba de descarga real de batería. $^{e}$Interrupción controlada del enlace y tiempo hasta el primer paquete válido.}
+{\footnotesize $^{a}$Estimado por análisis de intervalos de llegada (Sección~\ref{sec:perdida}); se confirmará con el contador de secuencia por nodo incorporado al firmware. $^{b}$Requiere sincronización de reloj nodo--gateway. $^{c}$Diferencia respecto al Fluke 62 MAX (Tabla~\ref{tab:mediciones}). *Concordancia dentro de la incertidumbre del propio Fluke (\SI{\pm 1.5}{\celsius}); como el offset se ajustó con ese instrumento, no es una validación independiente. $^{d}$Prueba de descarga real de batería. $^{e}$Interrupción controlada del enlace y tiempo hasta el primer paquete válido.}
 \end{table}
 
 La Tabla~\ref{tab:resultados} resume las funciones verificadas mediante revisión del firmware y pruebas funcionales del prototipo.

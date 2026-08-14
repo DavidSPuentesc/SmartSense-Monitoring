@@ -192,7 +192,9 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 \label{tab:avail}
 \end{table}
 
-\textbf{Reception cadence.} During active intervals the frame inter-arrival time was tightly concentrated around the 121~s median (Fig.~\ref{fig:intervalos}), confirming a stable reception cadence with occasional single-frame losses.
+\textbf{Reception cadence and packet loss.} During active intervals the frame inter-arrival time was tightly concentrated around the 121~s median (Fig.~\ref{fig:intervalos}), confirming a stable reception cadence. Estimating losses from the arrival intervals (a gap of $k$ times the cycle implies $k-1$ missing frames), the packet loss during active operation was 3.5--4.7\% across the three nodes, i.e. a packet delivery ratio of 95--97\%.
+
+\textbf{Temperature agreement.} Paired readings against a Fluke 62 MAX infrared thermometer on the same surface point agreed within $\pm$0.4~$^{\circ}$C (mean difference $\approx$0.1~$^{\circ}$C). Because the per-node offset was tuned using the same Fluke, and the Fluke's own accuracy is $\pm$1.5~$^{\circ}$C, this demonstrates that the compensation reproduces the reference but is not an independent accuracy validation; a rigorous $\leq$1~$^{\circ}$C characterization would require a calibrated contact reference (thermocouple or reference RTD).
 
 \textbf{Use case.} The continuous history captured a surface-temperature rise on a suction-fan motor of the ``Twin'' machine, reaching a maximum of 70.0~$^\circ$C (Fig.~\ref{fig:serie}). The rising segments corresponded to periods when the machine stopped while the fan motor kept spinning unloaded; the pattern was later related to a bearing anomaly. This demonstrates the practical value of continuous logging over spot measurements.
 
@@ -219,7 +221,8 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 \item Measures surface temperature with a three-wire PT100 over the MAX31865 range; per-node configurable offset.
 \item LoRa link availability $>$97\% (active intervals) at a 121~s cadence over 32 days.
 \item Local operation with per-sensor daily history (up to 30 days on-device) and no Internet dependency.
-\item Limitations: absolute temperature accuracy depends on PT100 tolerance, mounting and per-node calibration; RSSI/SNR are not exposed by the current firmware; a quantitative accuracy comparison against a calibrated reference is planned with paired measurements.
+\item Temperature readings agreed with an infrared reference within $\pm$0.4~$^{\circ}$C; a strict $\leq$1~$^{\circ}$C validation requires a calibrated contact reference (planned).
+\item Limitations: absolute temperature accuracy depends on PT100 tolerance, mounting and per-node calibration; RSSI/SNR are not exposed by the current firmware; end-to-end latency and battery autonomy were not yet measured with dedicated tests.
 \end{itemize}
 
 \noindent
