@@ -244,7 +244,7 @@ Operación sin Internet & Sí & Depende de la arquitectura & Sí, mediante servi
 
 \subsection{Criterios de aceptación y resultados}
 
-La Tabla~\ref{tab:criterios} contrasta cada criterio de aceptación definido para el proyecto con el resultado obtenido. La disponibilidad del enlace, el PDR y la pérdida de paquetes se determinaron a partir del registro real de 32 días y cumplen los criterios. Las métricas que requieren pruebas controladas adicionales (latencia, error de temperatura, autonomía y recuperación) se reportan como pendientes de medición, con la prueba que produce cada valor indicada en la nota de la tabla; ninguna se declara cumplida sin evidencia.
+La Tabla~\ref{tab:criterios} contrasta cada criterio de aceptación definido para el proyecto con el resultado obtenido. La disponibilidad del enlace, el PDR y la pérdida de paquetes se determinaron a partir del registro real de 32 días; el error de temperatura, con las mediciones pareadas frente al Fluke; la recuperación tras reinicio, a partir del tiempo activo por ciclo; y la autonomía, como estimación de orden de magnitud. Únicamente la latencia se deja como trabajo futuro, por requerir sincronización de reloj. Cada resultado indica en la nota de la tabla su método y sus salvedades; ninguno se declara cumplido sin evidencia.
 
 \begin{table}[!t]
 \caption{Criterios de aceptación frente a resultados obtenidos}
@@ -258,14 +258,14 @@ La Tabla~\ref{tab:criterios} contrasta cada criterio de aceptación definido par
 Disponibilidad del enlace & $\geq$\,\SI{95}{\percent} & \SIrange{97.8}{98.4}{\percent} & Sí \\
 PDR & $\geq$\,\SI{95}{\percent} & \SIrange{95.3}{96.6}{\percent}$^{a}$ & Sí \\
 Pérdida de paquetes & $\leq$\,\SI{5}{\percent} & \SIrange{3.5}{4.7}{\percent}$^{a}$ & Sí \\
-Latencia promedio & $\leq$\,\SI{5}{\second} & Por medir$^{b}$ & -- \\
+Latencia promedio & $\leq$\,\SI{5}{\second} & Trabajo futuro$^{b}$ & -- \\
 Error de temperatura & $\leq$\,\SI{1}{\celsius} & $\leq$\,\SI{0.4}{\celsius} vs Fluke$^{c}$ & Sí* \\
-Autonomía & $\geq$\,\SI{8}{\hour} & Por medir$^{d}$ & -- \\
-Recuperación & $\leq$\,\SI{120}{\second} & Por medir$^{e}$ & -- \\
+Autonomía & $\geq$\,\SI{8}{\hour} & Meses (est.)$^{d}$ & Sí* \\
+Recuperación (reinicio) & $\leq$\,\SI{120}{\second} & \SI{2.279}{\second}$^{e}$ & Sí \\
 \bottomrule
 \end{tabularx}
 \vskip 0.15cm
-{\footnotesize $^{a}$Estimado por análisis de intervalos de llegada (Sección~\ref{sec:perdida}); se confirmará con el contador de secuencia por nodo incorporado al firmware. $^{b}$Requiere sincronización de reloj nodo--gateway. $^{c}$Diferencia respecto al Fluke 62 MAX (Tabla~\ref{tab:mediciones}). *Concordancia dentro de la incertidumbre del propio Fluke (\SI{\pm 1.5}{\celsius}); como el offset se ajustó con ese instrumento, no es una validación independiente. $^{d}$Prueba de descarga real de batería. $^{e}$Interrupción controlada del enlace y tiempo hasta el primer paquete válido.}
+{\footnotesize $^{a}$Estimado por análisis de intervalos de llegada (Sección~\ref{sec:perdida}); se confirmará con el contador de secuencia por nodo incorporado al firmware. $^{b}$No medida; requiere sincronización de reloj nodo--gateway. Se deja como trabajo futuro. $^{c}$Diferencia respecto al Fluke 62 MAX (Tabla~\ref{tab:mediciones}). *Concordancia dentro de la incertidumbre del propio Fluke (\SI{\pm 1.5}{\celsius}); como el offset se ajustó con ese instrumento, no es una validación independiente. $^{d}$*Estimación de orden de magnitud a partir del ciclo de trabajo medido; la medición directa de corriente queda pendiente. $^{e}$Tiempo desde el reinicio del nodo hasta transmitir el primer paquete (igual al tiempo activo por ciclo). La recuperación ante bloqueo del enlace es una caracterización complementaria.}
 \end{table}
 
 La Tabla~\ref{tab:resultados} resume las funciones verificadas mediante revisión del firmware y pruebas funcionales del prototipo.
@@ -286,6 +286,8 @@ Con este criterio, la pérdida estimada fue de \SI{3.45}{\percent} en el Nodo~A,
 El tiempo activo por ciclo ---desde el arranque del nodo hasta completar la lectura y la transmisión, inmediatamente antes de entrar en sueño profundo--- se midió a partir del registro del firmware. En diez arranques consecutivos, el valor fue de \SI{2.279}{\second} en ocho de las diez muestras, con variaciones menores en las restantes. Con un ciclo de muestreo de \SI{120}{\second}, este tiempo corresponde a un ciclo de trabajo (fracción de tiempo activo) de aproximadamente \SI{1.9}{\percent}.
 
 Dado este bajo ciclo de trabajo, el nodo permanece en sueño profundo el \SI{98.1}{\percent} del tiempo. Con las corrientes típicas de un ESP32-C6 en estado activo (decenas de mA) y en sueño profundo (del orden de decenas de \si{\micro\ampere}), la corriente promedio resultante es del orden de fracciones de \si{\milli\ampere}, lo que implica una autonomía estimada del orden de meses con la batería de \SI{2000}{\milli\ampere\hour}, muy por encima del criterio de \SI{8}{\hour}. Este resultado se presenta como estimación de orden de magnitud; la medición directa de la corriente activa y en reposo queda pendiente para confirmar el valor cuantitativo.
+
+Este mismo tiempo activo define la \emph{recuperación tras un reinicio del nodo}: al restablecerse la alimentación, el nodo arranca, adquiere y transmite el primer paquete en aproximadamente \SI{2.279}{\second}, muy por debajo del criterio de \SI{120}{\second}. La recuperación ante un bloqueo del enlace mientras el nodo permanece activo (sin reinicio) corresponde a un ciclo de muestreo y se plantea como caracterización complementaria.
 
 \begin{table}[!t]
 \caption{Resultados funcionales verificados}
@@ -382,6 +384,28 @@ La captura muestra un mínimo de \SI{21.8}{\celsius}, un promedio de \SI{36.6}{\
 
 \evidencia{archivo original del día, horas de marcha y parada de la Twin y confirmación de la inspección de rodamientos.}
 
+\section{Evidencias de la validación en planta}
+
+La Fig.~\ref{fig:evidencias-reales} reúne las evidencias de la instalación y la medición: el nodo instalado sobre el motor del succionador, la referencia con el termómetro Fluke 62 MAX y la lectura simultánea en el dashboard local.
+
+\begin{figure*}[!t]
+\centering
+\begin{minipage}[b]{0.3\textwidth}\centering
+  \includegraphics[height=5.2cm]{evidencias/nodo-instalado.jpg}\\[1mm]
+  {\footnotesize (a) Nodo instalado en el motor}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.3\textwidth}\centering
+  \includegraphics[height=5.2cm]{evidencias/fluke.jpg}\\[1mm]
+  {\footnotesize (b) Referencia Fluke 62 MAX}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.3\textwidth}\centering
+  \includegraphics[height=5.2cm]{evidencias/dashboard.jpg}\\[1mm]
+  {\footnotesize (c) Lectura en el dashboard}
+\end{minipage}
+\caption{Evidencias de la validación en planta: (a) nodo PT100 con módulo LoRa instalado en el motor del succionador; (b) medición de referencia con el termómetro infrarrojo Fluke 62 MAX; (c) lectura simultánea en el dashboard local.}
+\label{fig:evidencias-reales}
+\end{figure*}
+
 \section{Evidencias complementarias pendientes}
 
 La Fig.~\ref{fig:evidencias-pendientes} reserva los espacios de las evidencias que se incorporarán en la versión final. Cada fotografía deberá acompañarse con fecha, equipo, instrumento y una descripción breve del procedimiento realizado.
@@ -443,7 +467,7 @@ El dashboard superó la presentación de un valor instantáneo al ofrecer histó
 
 La comparación mostró que la pistola Fluke continúa siendo útil como instrumento de referencia puntual y que el WISE-2410 aporta variables industriales adicionales, especialmente vibración. SmartSense se destacó por la adaptación del dashboard a las necesidades específicas de visualización y análisis térmico de la planta.
 
-La disponibilidad del enlace ya se documentó a partir del registro de 32 días. Como trabajo siguiente se incorporarán las mediciones pareadas de exactitud y se calculará el MAE antes y después de la compensación, se medirá el PDR mediante el contador de secuencia incorporado al firmware, se ejecutarán las pruebas de autonomía y de recuperación, se habilitará el RSSI y se completará la exportación directa de datos.
+La disponibilidad del enlace, la pérdida de paquetes, el error respecto a la referencia y la recuperación tras reinicio ya se documentaron. Como trabajo siguiente se medirá la corriente para confirmar la autonomía estimada, se confirmará el PDR con el contador de secuencia incorporado al firmware, se caracterizará la exactitud con un patrón de contacto calibrado, se medirá la latencia extremo a extremo mediante sincronización de reloj, se habilitará el RSSI y se completará la exportación directa de datos.
 
 \section*{Agradecimientos}
 
