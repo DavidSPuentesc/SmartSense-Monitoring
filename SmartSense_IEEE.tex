@@ -61,7 +61,7 @@ Internet de las cosas industrial, LoRa, PT100, MAX31865, monitoreo de temperatur
 
 El seguimiento de temperatura en motores y otros equipos industriales permite identificar cambios asociados con fricción, sobrecarga, ventilación deficiente o degradación mecánica. En una inspección manual, el operario obtiene únicamente el valor correspondiente al instante de la medición. Si este valor no se registra de manera sistemática, no es posible reconstruir la evolución térmica del equipo ni relacionarla con sus ciclos de operación y parada.
 
-Las redes de sensores inalámbricos permiten distribuir puntos de medición sin instalar cableado de comunicación en cada ubicación \cite{akyildiz2002,yick2008}. Para aplicaciones de baja tasa de datos, LoRa ofrece una alternativa de largo alcance y bajo consumo adecuada para nodos alimentados por batería \cite{centenaro2016,semtech2015}. Estas características se aprovecharon en SmartSense Monitoring para construir una plataforma local, modular y configurable.
+Las redes de sensores inalámbricos permiten distribuir puntos de medición sin instalar cableado de comunicación en cada ubicación \cite{akyildiz2002,yick2008,mois2017}. Para aplicaciones de baja tasa de datos, LoRa ofrece una alternativa de largo alcance y bajo consumo adecuada para nodos alimentados por batería, cuyo alcance y escalabilidad se han caracterizado experimentalmente \cite{centenaro2016,semtech2015,augustin2016,bor2016}. Diversos trabajos han empleado LoRa para el monitoreo de temperatura y de condición en entornos industriales y de infraestructura \cite{polonelli2019,jakobsen2024}. Estas soluciones se enmarcan en el mantenimiento predictivo de la Industria 4.0, donde el seguimiento continuo de variables como la temperatura permite anticipar fallas \cite{cinar2020,jardine2006}. Estas características se aprovecharon en SmartSense Monitoring para construir una plataforma local, modular y configurable.
 
 El propósito del proyecto fue implementar y validar un sistema capaz de medir temperatura superficial, transmitirla de manera inalámbrica, conservar un histórico por sensor y facilitar el análisis del comportamiento térmico. El trabajo evolucionó desde un anteproyecto hasta un prototipo funcional instalado en una planta piloto. Por tanto, este documento describe las actividades realizadas y los resultados evidenciados, en lugar de presentar únicamente resultados esperados.
 
@@ -539,6 +539,27 @@ J. Lee, B. Bagheri y H.-A. Kao, ``A cyber-physical systems architecture for Indu
 
 \bibitem{shi2016}
 W. Shi, J. Cao, Q. Zhang, Y. Li y L. Xu, ``Edge computing: Vision and challenges,'' \textit{IEEE Internet of Things Journal}, vol. 3, no. 5, pp. 637--646, 2016.
+
+\bibitem{jardine2006}
+A. K. S. Jardine, D. Lin y D. Banjevic, ``A review on machinery diagnostics and prognostics implementing condition-based maintenance,'' \textit{Mechanical Systems and Signal Processing}, vol. 20, no. 7, pp. 1483--1510, 2006. \url{https://doi.org/10.1016/j.ymssp.2005.09.012}
+
+\bibitem{augustin2016}
+A. Augustin, J. Yi, T. Clausen y W. M. Townsley, ``A study of LoRa: Long range \& low power networks for the Internet of Things,'' \textit{Sensors}, vol. 16, no. 9, art. 1466, 2016. \url{https://doi.org/10.3390/s16091466}
+
+\bibitem{bor2016}
+M. Bor, U. Roedig, T. Voigt y J. M. Alonso, ``Do LoRa low-power wide-area networks scale?'' en \textit{Proc. 19th ACM Int. Conf. Modeling, Analysis and Simulation of Wireless and Mobile Systems (MSWiM)}, 2016, pp. 59--67. \url{https://doi.org/10.1145/2988287.2989163}
+
+\bibitem{polonelli2019}
+T. Polonelli, D. Brunelli, A. Bartolini y L. Benini, ``A LoRaWAN wireless sensor network for data center temperature monitoring,'' en \textit{Applications in Electronics Pervading Industry, Environment and Society}, Lecture Notes in Electrical Engineering, vol. 573, Springer, 2019. \url{https://doi.org/10.1007/978-3-030-11973-7_20}
+
+\bibitem{mois2017}
+G. Mois, S. Folea y T. Sanislav, ``Analysis of three IoT-based wireless sensors for environmental monitoring,'' \textit{IEEE Transactions on Instrumentation and Measurement}, vol. 66, no. 8, pp. 2056--2064, 2017. \url{https://doi.org/10.1109/TIM.2017.2677619}
+
+\bibitem{cinar2020}
+Z. M. Çınar, A. A. Nuhu, Q. Zeeshan, O. Korhan, M. Asmael y B. Safaei, ``Machine learning in predictive maintenance towards sustainable smart manufacturing in Industry 4.0,'' \textit{Sustainability}, vol. 12, no. 19, art. 8211, 2020. \url{https://doi.org/10.3390/su12198211}
+
+\bibitem{jakobsen2024}
+M. O. Jakobsen, ``Low cost MEMS accelerometer and microphone based condition monitoring sensor, with LoRa and Bluetooth Low Energy radio,'' \textit{HardwareX}, vol. 18, art. e00525, 2024. \url{https://doi.org/10.1016/j.ohx.2024.e00525}
 
 \end{thebibliography}
 
