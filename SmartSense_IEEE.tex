@@ -357,6 +357,22 @@ Nodo C & \num{17314} & 16,4 & 65,0 & 44,7 & 16,7 \\
 {\footnotesize Nodos A y C: del 8 de mayo al 9 de junio de 2026 (32 días). Nodo B: del 10 de mayo al 20 de julio de 2026 (72 días). La desviación estándar alta refleja los ciclos de marcha y parada de las máquinas.}
 \end{table}
 
+La Fig.~\ref{fig:comparacion} compara las series de temperatura de los tres nodos en la ventana común, donde se aprecia que cada máquina presenta un comportamiento térmico distinto y que las interrupciones son simultáneas. La Fig.~\ref{fig:distribucion} resume la distribución de temperatura por nodo: el Nodo A (succionador) es el más caliente, con la mediana más alta y el mayor rango.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{comparacion-sensores.pdf}
+  \caption{Series de temperatura de los tres nodos en la ventana común de medición. Cada nodo corresponde a una máquina distinta; las interrupciones simultáneas confirman que fueron periodos de gateway apagado.}
+  \label{fig:comparacion}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.72\columnwidth]{distribucion-temperatura.pdf}
+  \caption{Distribución de temperatura por nodo (mediana, cuartiles y rango). El Nodo A, sobre el motor del succionador, presenta la mediana y el máximo más altos.}
+  \label{fig:distribucion}
+\end{figure}
+
 La Fig.~\ref{fig:val-cobertura} muestra la cobertura de datos de los tres nodos. Las interrupciones no se distribuyen de forma independiente entre nodos, sino que ocurren de manera \emph{simultánea} en los tres, con el mismo instante de inicio. Este comportamiento indica que las interrupciones no correspondieron a fallas del enlace LoRa —que afectarían a un nodo a la vez— sino a periodos en los que el gateway permaneció apagado durante paradas de planta y de energía.
 
 En consecuencia, la Tabla~\ref{tab:disponibilidad} reporta dos indicadores. La disponibilidad cruda considera todo el intervalo de despliegue, incluidos los periodos de gateway apagado. La disponibilidad del enlace excluye dichos periodos, identificados por su simultaneidad, y estima la fracción de tramas efectivamente recibidas mientras el sistema estuvo activo. La disponibilidad del enlace se mantuvo por encima del \SI{97}{\percent} en los tres nodos. La Fig.~\ref{fig:val-intervalos} confirma la regularidad de la recepción durante los tramos activos: la mayoría de los intervalos entre llegadas se concentraron alrededor de la mediana de \SI{121}{\second}.
