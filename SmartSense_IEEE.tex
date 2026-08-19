@@ -71,14 +71,7 @@ En términos concretos, las contribuciones fueron: 1) integración de nodos PT10
 
 \section{Arquitectura del sistema}
 
-La arquitectura implementada, mostrada conceptualmente en la Fig.~\ref{fig:arquitectura}, está formada por nodos sensores, un enlace LoRa, un gateway y clientes locales conectados por Wi-Fi. Cada nodo adquiere la temperatura y el estado estimado de batería. El gateway recibe las tramas, identifica el nodo, aplica la compensación configurada, almacena la muestra y actualiza la interfaz. La Fig.~\ref{fig:arquitectura-detalle} detalla la cadena de señal de cada nodo (PT100~$\rightarrow$~MAX31865~$\rightarrow$~ESP32-C6) y el flujo de datos hacia la visualización local y el dashboard.
-
-\begin{figure*}[!t]
-  \centering
-  \includegraphics[width=0.9\textwidth]{arquitectura_smartsense.png}
-  \caption{Arquitectura implementada de SmartSense Monitoring: nodos de temperatura con XIAO ESP32-C6, PT100 y MAX31865, enlace LoRa de 433~MHz, gateway/visualizador con pantalla táctil y almacenamiento local, dashboard web servido por Wi-Fi local y registro histórico para análisis.}
-  \label{fig:arquitectura}
-\end{figure*}
+La arquitectura implementada, mostrada en la Fig.~\ref{fig:arquitectura-detalle}, está formada por nodos sensores, un enlace LoRa, un gateway y clientes locales conectados por Wi-Fi. Cada nodo adquiere la temperatura y el estado estimado de batería mediante la cadena PT100~$\rightarrow$~MAX31865~$\rightarrow$~ESP32-C6, y transmite por LoRa de 433~MHz al gateway. El gateway recibe las tramas, identifica el nodo, aplica la compensación configurada, almacena la muestra y actualiza la pantalla local y el dashboard web.
 
 \begin{figure*}[!t]
   \centering
@@ -93,7 +86,7 @@ Cada nodo fue construido con un Seeed Studio XIAO ESP32-C6, una sonda PT100 de t
 
 En cada ciclo se efectuaron varias conversiones de temperatura y se descartaron valores inválidos. El firmware también consultó el registro de fallas del MAX31865 para detectar problemas de conexión o lecturas fuera de rango. La tensión de batería se obtuvo mediante el convertidor analógico-digital del ESP32-C6 y un divisor resistivo. El porcentaje estimado se calculó entre \SI{3.30}{\volt} y \SI{4.10}{\volt}.
 
-La trama de aplicación incluyó el identificador del nodo, temperatura, porcentaje de batería y dirección MAC. Después de la transmisión, el nodo ingresó en sueño profundo. El periodo puede configurarse entre 5 y 7200 segundos; durante la versión evaluada se utilizó un valor predeterminado de 60 segundos.
+La trama de aplicación incluyó el identificador del nodo, temperatura, porcentaje de batería y dirección MAC. Después de la transmisión, el nodo ingresó en sueño profundo. El periodo puede configurarse entre 5 y 7200 segundos; durante el despliegue evaluado se utilizó un intervalo de 120 segundos (mediana medida de 121 s).
 
 La Fig.~\ref{fig:esquematico-nodo} presenta el esquemático de conexiones del nodo: la interfaz SPI hacia el MAX31865, el enlace UART hacia el módulo E220, la alimentación del acondicionador conmutada por un pin digital para reducir el consumo durante el sueño profundo, y el divisor resistivo utilizado para estimar la carga de la batería.
 
@@ -289,14 +282,16 @@ Este mismo tiempo activo define la \emph{recuperación tras un reinicio del nodo
 \subsection{Autonomía: prueba de descarga}
 \label{sec:autonomia}
 
-Para estimar la autonomía se realizó una prueba de descarga con una batería de \SI{1000}{\milli\ampere\hour}, registrando el voltaje del nodo en operación normal. Entre el 13 y el 18 de agosto de 2026 (\SI{120}{\hour}) el voltaje descendió de \SI{4.112}{\volt} a \SI{4.089}{\volt}, es decir una tasa de \SI{0.19}{\milli\volt\per\hour} (Fig.~\ref{fig:autonomia-descarga}). Extrapolando linealmente hasta el voltaje de corte de \SI{3.30}{\volt}, la autonomía estimada es de aproximadamente \num{177} días (\num{5.9} meses); hasta \SI{3.00}{\volt}, unos \num{242} días. Como la extrapolación parte de la zona alta de la curva del LiPo ---donde el voltaje cae más rápido que en la meseta central---, este valor constituye una cota inferior conservadora.
+Para estimar la autonomía se realizó una prueba de descarga con una batería de \SI{1000}{\milli\ampere\hour}, registrando el voltaje del nodo en operación normal. Entre el 13 y el 18 de agosto de 2026 (\SI{120}{\hour}) el voltaje descendió de \SI{4.112}{\volt} a \SI{4.089}{\volt}, es decir una tasa de \SI{0.19}{\milli\volt\per\hour}.
 
-La corriente promedio implicada es de \SI{0.24}{\milli\ampere}. La Fig.~\ref{fig:autonomia-ciclo} muestra el modelo de consumo por ciclo: el nodo permanece en sueño profundo (\SI{\approx 15}{\micro\ampere}) durante el \SI{98.1}{\percent} del tiempo y presenta un pico activo de \SI{2.279}{\second} ---arranque, lectura y transmisión LoRa--- con una corriente media cercana a \SI{12}{\milli\ampere}. Ambos enfoques ---la descarga medida y el modelo de ciclo de trabajo--- coinciden y confirman una autonomía del orden de meses, muy por encima del criterio de \SI{8}{\hour}. Con la batería de \SI{2000}{\milli\ampere\hour} del prototipo, la autonomía se duplicaría, del orden de un año.
+La descarga de una batería LiPo no es lineal: cae con rapidez en la zona alta, presenta una meseta central prolongada y decae de nuevo al final. Por ello se estimó la autonomía de dos formas (Fig.~\ref{fig:autonomia-descarga}). Una extrapolación lineal desde la zona alta ofrece una cota inferior conservadora de \num{177} días hasta \SI{3.30}{\volt} (\num{242} hasta \SI{3.00}{\volt}). Modelando la forma real de la curva mediante una característica tensión--estado de carga típica de un LiPo, calibrada con los puntos medidos, la autonomía estimada asciende a \numrange{291}{307} días, del orden de \num{10} meses. En ambos casos la corriente promedio es del orden de \SIrange{0.13}{0.24}{\milli\ampere} y la autonomía supera ampliamente el criterio de \SI{8}{\hour}.
+
+La Fig.~\ref{fig:autonomia-ciclo} muestra el modelo de consumo por ciclo: el nodo permanece en sueño profundo (\SI{\approx 15}{\micro\ampere}) durante el \SI{98.1}{\percent} del tiempo y presenta un pico activo de \SI{2.279}{\second} ---arranque, lectura y transmisión LoRa---. Este perfil pulsado, con un ciclo de trabajo de solo \SI{1.9}{\percent}, es coherente con la corriente promedio de la prueba de descarga. Con la batería de \SI{2000}{\milli\ampere\hour} del prototipo, la autonomía se duplicaría, del orden de un año.
 
 \begin{figure}[!t]
   \centering
   \includegraphics[width=\columnwidth]{autonomia-descarga.pdf}
-  \caption{Prueba de descarga de la batería de \SI{1000}{\milli\ampere\hour}: voltaje medido (13--18 de agosto de 2026) y extrapolación lineal hasta los voltajes de corte.}
+  \caption{Prueba de descarga de la batería de \SI{1000}{\milli\ampere\hour}: puntos medidos (13--18 de agosto de 2026), modelo no lineal de descarga LiPo (curva tensión--estado de carga calibrada) y extrapolación lineal como cota inferior. El modelo estima la autonomía en unos \num{10} meses.}
   \label{fig:autonomia-descarga}
 \end{figure}
 
