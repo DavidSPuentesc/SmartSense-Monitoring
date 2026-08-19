@@ -84,6 +84,8 @@ La arquitectura implementada, mostrada en la Fig.~\ref{fig:arquitectura-detalle}
 
 Cada nodo fue construido con un Seeed Studio XIAO ESP32-C6, una sonda PT100 de tres hilos, un MAX31865, una batería LiPo y un módulo Ebyte E220. El MAX31865 fue configurado mediante la biblioteca de Adafruit en el modo \texttt{MAX31865\_3WIRE}. Se utilizó una resistencia nominal de \SI{100}{\ohm} y una resistencia de referencia caracterizada en \SI{421.1}{\ohm}.
 
+Se optó por una sonda PT100 en lugar de un sensor digital como el DS18B20 por varias razones. La PT100 es el estándar en instrumentación industrial (IEC~60751), con excelente estabilidad a largo plazo y baja deriva, lo que favorece un monitoreo prolongado. Su naturaleza resistiva permite un acondicionamiento analógico preciso: el MAX31865 es un convertidor RTD-a-digital diseñado específicamente para PT100 de dos, tres y cuatro hilos, con compensación de la resistencia de los conductores. La PT100 ofrece además un rango mucho más amplio (\SIrange{-200}{850}{\celsius}) que el DS18B20 (\SIrange{-55}{125}{\celsius}), adecuado para superficies industriales que pueden acercarse o superar el límite del sensor digital, y está disponible en encapsulados de superficie y magnéticos apropiados para el montaje sobre motores. En conjunto ---estabilidad, comportamiento industrial, precisión, rango, naturaleza resistiva, acondicionamiento y compatibilidad con el MAX31865--- estas características la hacen preferible para el monitoreo de temperatura superficial de equipos.
+
 En cada ciclo se efectuaron varias conversiones de temperatura y se descartaron valores inválidos. El firmware también consultó el registro de fallas del MAX31865 para detectar problemas de conexión o lecturas fuera de rango. La tensión de batería se obtuvo mediante el convertidor analógico-digital del ESP32-C6 y un divisor resistivo. El porcentaje estimado se calculó entre \SI{3.30}{\volt} y \SI{4.10}{\volt}.
 
 La trama de aplicación incluyó el identificador del nodo, temperatura, porcentaje de batería y dirección MAC. Después de la transmisión, el nodo ingresó en sueño profundo. El periodo puede configurarse entre 5 y 7200 segundos; durante el despliegue evaluado se utilizó un intervalo de 120 segundos (mediana medida de 121 s).
@@ -162,9 +164,9 @@ La validación se estructuró en cuatro etapas. Primero se verificó la lectura 
 
 El instrumento de referencia empleado fue un termómetro infrarrojo \textbf{Fluke 62 MAX}, con rango de \SIrange{-30}{500}{\celsius}, exactitud de \SI{\pm 1.5}{\celsius} o \SI{\pm 1.5}{\percent} de la lectura (el mayor de ambos), repetibilidad de \SI{\pm 0.8}{\celsius}, relación distancia-punto de 10:1, respuesta espectral de \SIrange{8}{14}{\micro\meter} y emisividad fija de \num{0.95}. La medición es sin contacto sobre la superficie del equipo.
 
-Deben señalarse dos limitaciones metodológicas que condicionan la comparación. Primero, la exactitud del propio Fluke (\SI{\pm 1.5}{\celsius}) es mayor que el criterio de error objetivo del sistema (\SI{\pm 1}{\celsius}); por lo tanto, el Fluke sirve como referencia de campo para verificar la coherencia de las lecturas, pero una validación estricta de \SI{\pm 1}{\celsius} requeriría un patrón de menor incertidumbre (por ejemplo, una sonda de contacto o RTD de referencia calibrada). Segundo, la emisividad fija de \num{0.95} y la naturaleza sin contacto introducen error adicional frente a la medición por contacto de la PT100, en especial sobre superficies metálicas. Por estas razones, los resultados se reportan como \emph{diferencia respecto al instrumento de referencia} y no como una calibración formal.
+El instrumento se empleó como \emph{referencia de campo} y no dispuso de un certificado de calibración vigente, lo que constituye una limitación reconocida. Deben señalarse además dos limitaciones metodológicas que condicionan la comparación. Primero, la exactitud del propio Fluke (\SI{\pm 1.5}{\celsius}) es mayor que el criterio de error objetivo del sistema (\SI{\pm 1}{\celsius}); por lo tanto, sirve para verificar la coherencia de las lecturas, pero una validación estricta de \SI{\pm 1}{\celsius} requeriría un patrón de menor incertidumbre y con calibración trazable (por ejemplo, una sonda de contacto o RTD de referencia calibrada). Segundo, la emisividad fija de \num{0.95} y la naturaleza sin contacto introducen error adicional frente a la medición por contacto de la PT100, en especial sobre superficies metálicas. Por estas razones, los resultados se reportan como \emph{diferencia respecto al instrumento de referencia} y no como una calibración formal.
 
-La exactitud se evalúa con muestras pareadas entre SmartSense y este instrumento de referencia, tomadas de forma simultánea y en el mismo punto de la superficie. Para $n$ pares de datos, el error absoluto medio se calcula mediante
+La comparación se realizó tomando muestras pareadas de forma simultánea y en el mismo punto de la superficie del motor del succionador. Se registraron cinco parejas de lecturas (Tabla~\ref{tab:mediciones}) en el rango de \SIrange{65}{71}{\celsius}, correspondiente a la condición caliente del motor. Se reconoce como limitación que la comparación se concentró en un nodo y en un rango de temperatura estrecho; una caracterización más completa debería abarcar los tres nodos de forma simultánea y un rango más amplio, desde temperatura ambiente hasta la máxima de operación. Para $n$ pares de datos, el error absoluto medio se calculó mediante
 
 \begin{equation}
 \mathrm{MAE}=\frac{1}{n}\sum_{i=1}^{n}\left|T_{SS,i}-T_{ref,i}\right|.
@@ -269,7 +271,37 @@ Conviene distinguir dos indicadores que a menudo se confunden. El \emph{PDR} (\t
 
 Dado que el registro histórico no incluía un contador de secuencia, la pérdida de paquetes se estimó a partir de los intervalos entre llegadas. El ciclo de muestreo nominal fue de \SI{120}{\second}. Dentro de los tramos activos (excluyendo los periodos de gateway apagado, identificados por intervalos mayores a \SI{30}{\minute}), un intervalo cercano a $k$ veces el ciclo indica que faltaron $k-1$ paquetes entre dos recepciones consecutivas. El número de paquetes esperados se obtiene entonces como la suma de recibidos más los inferidos como perdidos.
 
-Con este criterio, la pérdida estimada fue de \SI{3.45}{\percent} en el Nodo~A, \SI{3.93}{\percent} en el Nodo~B y \SI{4.68}{\percent} en el Nodo~C, equivalente a un PDR estimado entre \SI{95.3}{\percent} y \SI{96.6}{\percent}. Los tres nodos cumplen el criterio de pérdida $\leq$\,\SI{5}{\percent} y de PDR $\geq$\,\SI{95}{\percent}. Como evidencia puntual, en una ventana continua representativa de una hora se recibieron las \num{30} muestras esperadas por nodo, sin pérdidas (\SI{0}{\percent}), lo que confirma la cadencia nominal durante la operación normal. Estos valores, obtenidos por inferencia temporal, se confirmarán con la medición directa de enviados y recibidos mediante el contador de secuencia incorporado al firmware.
+Con este criterio, la pérdida estimada fue de \SI{3.45}{\percent} en el Nodo~A, \SI{3.93}{\percent} en el Nodo~B y \SI{4.68}{\percent} en el Nodo~C, equivalente a un PDR estimado entre \SI{95.3}{\percent} y \SI{96.6}{\percent}. Los tres nodos cumplen el criterio de pérdida $\leq$\,\SI{5}{\percent} y de PDR $\geq$\,\SI{95}{\percent}. Estos valores, obtenidos por inferencia temporal, se confirmarán con la medición directa de enviados y recibidos mediante el contador de secuencia incorporado al firmware.
+
+\subsection{Prueba representativa de 60 minutos}
+\label{sec:prueba60}
+
+El protocolo de validación definió una prueba continua mínima de 60 minutos. El despliegue de 32 días contiene numerosas ventanas equivalentes; la Fig.~\ref{fig:prueba60} presenta una ventana representativa de una hora (10 de mayo de 2026, 00:00--01:00) con los tres nodos activos, y la Tabla~\ref{tab:prueba60} resume sus indicadores. En \SI{60}{\minute}, a un ciclo de \SI{120}{\second}, se esperaban \num{30} paquetes por nodo; se recibieron 29, 30 y 30, con un PDR de \SIlist{96.7;100;100}{\percent}.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{prueba-60min.pdf}
+  \caption{Ventana representativa de 60 minutos del despliegue: temperatura de los tres nodos (10 de mayo de 2026, 00:00--01:00), durante el enfriamiento nocturno de las máquinas.}
+  \label{fig:prueba60}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Indicadores de la ventana de 60 minutos}
+\label{tab:prueba60}
+\centering
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}Xcccc@{}}
+\toprule
+\textbf{Nodo} & \textbf{Esperados} & \textbf{Recibidos} & \textbf{Perdidos} & \textbf{PDR} \\
+\midrule
+Nodo A & 30 & 29 & 1 & \SI{96.7}{\percent} \\
+Nodo B & 30 & 30 & 0 & \SI{100}{\percent} \\
+Nodo C & 30 & 30 & 0 & \SI{100}{\percent} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+En esta ventana se registraron la temperatura y el PDR (recibidos frente a esperados). La batería se caracterizó por separado en la prueba de descarga (Sección~\ref{sec:autonomia}) y la recuperación tras reinicio fue de \SI{2.279}{\second}. El \textbf{RSSI y el SNR} no se habilitaron en la versión de firmware evaluada, y la \textbf{latencia} extremo a extremo requería sincronización de reloj entre el nodo y el gateway; ambos se dejaron como trabajo futuro. Para obtener el PDR con conteo directo de enviados y recibidos, se incorporó al firmware un contador de secuencia por nodo que permite repetir la prueba de forma instrumentada.
 
 \subsection{Tiempo activo por ciclo}
 
