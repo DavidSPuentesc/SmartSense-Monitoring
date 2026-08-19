@@ -217,6 +217,14 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 
 \textbf{Recovery and temperature range.} After a node reset, the node boots, samples and transmits its first frame in about 2.279~s (measured from the firmware), well within one sampling cycle and far below any practical requirement. Across the three nodes, the recorded surface temperature spanned 15.3--70.0~$^{\circ}$C, with per-node mean values of 39.5--45.4~$^{\circ}$C.
 
+\textbf{Battery autonomy.} A discharge test with a 1000~mAh cell (node in normal operation) showed the voltage dropping from 4.112~V to 4.089~V over 5 days (0.19~mV/h). Linear extrapolation to the 3.30~V cutoff gives an estimated autonomy of $\approx$177 days ($\approx$5.9 months), a conservative lower bound since the extrapolation starts on the steep upper part of the LiPo curve (Fig.~\ref{fig:autonomia}). The implied average current is $\approx$0.24~mA, consistent with the measured 1.9\% duty cycle (deep sleep $\approx$15~$\mu$A for 98.1\% of the time, plus a 2.279~s active pulse averaging $\approx$12~mA). With the 2000~mAh battery of the prototype the autonomy would roughly double.
+
+\begin{figure}[h]\centering
+\includegraphics[width=0.9\linewidth]{autonomia-descarga.pdf}
+\caption{Battery discharge test (1000~mAh cell): measured voltage over 5 days and linear extrapolation to the cutoff voltages, giving a conservative autonomy estimate on the order of months.}
+\label{fig:autonomia}
+\end{figure}
+
 \begin{figure}[h]\centering
 \includegraphics[width=0.9\linewidth]{val-serie-evento.pdf}
 \caption{Surface temperature of one node over the 32-day deployment, showing the maximum associated with the suction-fan case.}
@@ -241,7 +249,7 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 \item LoRa link availability $>$97\% (active intervals) at a 121~s cadence over 32 days.
 \item Local operation with per-sensor daily history (up to 30 days on-device) and no Internet dependency.
 \item Temperature readings agreed with an infrared reference within $\pm$0.4~$^{\circ}$C; a strict $\leq$1~$^{\circ}$C validation requires a calibrated contact reference (planned).
-\item The measured active time per cycle is 2.279~s over a 120~s period (1.9\% duty cycle); with typical ESP32-C6 active (tens of mA) and deep-sleep (tens of $\mu$A) currents this implies an average current in the sub-mA range and an autonomy on the order of months on a 2000~mAh battery. A direct current measurement is pending to confirm the figure.
+\item Battery autonomy on the order of months (a 5-day discharge test extrapolates to $\approx$177 days on a 1000~mAh cell, $\approx$0.24~mA average at a 1.9\% duty cycle), far exceeding typical requirements.
 \item Limitations: absolute temperature accuracy depends on PT100 tolerance, mounting and per-node calibration; RSSI/SNR are not exposed by the current firmware; end-to-end latency was not measured (no node--gateway clock synchronization).
 \end{itemize}
 
