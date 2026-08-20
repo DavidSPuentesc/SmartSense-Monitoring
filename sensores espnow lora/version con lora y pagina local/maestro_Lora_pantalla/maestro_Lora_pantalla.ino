@@ -2633,6 +2633,29 @@ String debugRadioText(const String& text) {
   return out;
 }
 
+// One-shot: habilita el byte de RSSI en el E220 receptor (gateway).
+// Solo toca el registro de RSSI, no reconfigura canal/tasa/potencia (menos riesgo).
+// Si el comando AT no lo reconoce el modulo, no pasa nada: el resto sigue igual.
+// IMPORTANTE: verificar tras flashear que la recepcion sigue OK y que llegan RSSI.
+#define TRY_RSSI 1
+void enableRssiByte() {
+#if TRY_RSSI
+  Serial.println("[E220][RSSI] Habilitando byte de RSSI (AT+RSSI=1)...");
+  setModeConfig();
+  delay(150);
+  clearRadioInput();
+  Serial1.print("AT+RSSI=1\r\n");
+  delay(250);
+  String resp;
+  unsigned long t0 = millis();
+  while (millis() - t0 < 600) { while (Serial1.available()) resp += (char)Serial1.read(); }
+  Serial.printf("[E220][RSSI] respuesta: %s\n",
+                resp.length() ? debugRadioText(resp).c_str() : "<sin respuesta>");
+  setModeNormal();
+  delay(150);
+#endif
+}
+
 #if AUTO_CONFIGURE_ON_BOOT
 String readATResponse(uint32_t timeoutMs = 800) {
   String out;
@@ -2819,6 +2842,10 @@ struct PdrStats {
 };
 std::map<String, PdrStats> pdrByNode;
 
+// RSSI del ultimo paquete recibido (byte anexado por el E220 si esta habilitado).
+// -1 = no disponible. Lo llena handleRadioRx y lo consume processDataLine.
+int g_pendingRssiRaw = -1;
+
 void trackPdr(const String& mac, uint32_t seq) {
   PdrStats& p = pdrByNode[mac];
   if (p.received == 0 || seq < p.firstSeq) {
@@ -2862,6 +2889,18 @@ void processDataLine(const String& line) {
     n.temperature = applyNodeOffset(n, ftmp);
   }
   if (fieldToFloat(line, "BAT", fbat)) n.battery = fbat;
+
+  // Campos extra de la prueba y linea CSV por paquete (capturar el monitor serie).
+  // Formato: CSV,epoch,mac,id,seq,temp_c,vbat,bat_pct,rssi_dbm,rssi_raw,up_ms
+  float fvbat = NAN; uint32_t up = 0;
+  fieldToFloat(line, "VBAT", fvbat);
+  fieldToUInt32(line, "UP", up);
+  int rssiDbm = (g_pendingRssiRaw >= 0) ? (g_pendingRssiRaw - 256) : 0;
+  Serial.printf("CSV,%lu,%s,%u,%lu,%.2f,%.3f,%.1f,%d,%d,%lu\n",
+                (unsigned long)masterNowEpoch(), mac.c_str(), nodeId,
+                (unsigned long)seq, ftmp, fvbat, fbat,
+                rssiDbm, g_pendingRssiRaw, (unsigned long)up);
+  g_pendingRssiRaw = -1;
 
   if (isfinite(ftmp)) {
     saveTemperatureSample(mac, n.temperature, 0, 0);  // Los últimos dos parámetros no se usan
@@ -2995,6 +3034,18 @@ void handleRadioRx() {
     if (c == '\r') continue;
 
     if (c == '\n') {
+      // El E220 (con RSSI habilitado) anexa 1 byte binario de RSSI tras cada
+      // paquete. Se lee aqui, justo despues del '\n' y antes de procesar. Si el
+      // siguiente byte es imprimible, es el inicio de otra linea: no se consume.
+      g_pendingRssiRaw = -1;
+      unsigned long tw = millis();
+      while ((millis() - tw) < 12) {
+        if (Serial1.available() > 0) {
+          int pk = Serial1.peek();
+          if (pk < 32 || pk > 126) g_pendingRssiRaw = Serial1.read();
+          break;
+        }
+      }
       if (!radioOverflow) {
         if (!radioLine.isEmpty()) {
           MASTER_DEBUG_LOGF("[RADIO][RX RAW] %s\n", debugRadioText(radioLine).c_str());
@@ -3540,6 +3591,8 @@ void setup() {
   Serial1.begin(9600, SERIAL_8N1, PIN_E220_RX, PIN_E220_TX);
   delay(100);
   Serial.println("[E220] UART iniciada");
+
+  enableRssiByte();  // one-shot: habilita el byte de RSSI (persistente); ver TRY_RSSI
 
   // -------------------------------------------------
   // SSE

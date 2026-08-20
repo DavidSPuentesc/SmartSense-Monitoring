@@ -632,13 +632,19 @@ static void sendDataToMaster(float tempC, float battPct) {
 
   txSeq++;  // primer paquete = 1
 
-  char payload[128];
+  // Campos extra para las pruebas: VBAT (voltaje real, para autonomia) y
+  // UP (ms encendido hasta transmitir, para jitter/consumo).
+  float vbat = readBatteryVoltage();
+
+  char payload[160];
   snprintf(payload, sizeof(payload),
-           "DATA,ID=%u,SEQ=%lu,TEMP=%.2f,BAT=%.1f,MAC=%s",
+           "DATA,ID=%u,SEQ=%lu,TEMP=%.2f,VBAT=%.3f,BAT=%.1f,UP=%lu,MAC=%s",
            NODE_ADDR,
            (unsigned long)txSeq,
            tempC,
+           vbat,
            battPct,
+           (unsigned long)millis(),
            macStr);
 
   sendToMaster(payload);
