@@ -28,7 +28,7 @@
 \begin{flushleft}
 
 \textbf{Article title}\\
-SmartSense Monitoring: an open-source wireless PT100 node and gateway for long-term surface-temperature monitoring of industrial equipment
+SmartSense Monitoring: an open-source wireless PT100 node and gateway for surface-temperature monitoring of industrial equipment
 
 \textbf{Authors}\\
 Jesus Andre Bojaca Lopez, David Santiago Puentes Cardenas*, Jhon Edwin Vera, Sergio Francisco Mora Martinez
@@ -43,7 +43,7 @@ davids.puentesc@ecci.edu.co
 SmartSense Monitoring is an open-source wireless system for measuring and logging the surface temperature of industrial equipment. Each battery-powered node combines a Seeed Studio XIAO ESP32-C6 microcontroller, a three-wire PT100 probe, a MAX31865 RTD front-end and an Ebyte E220 LoRa radio at 433~MHz. A gateway based on a second ESP32-C6 with an integrated touch display receives the frames, stores a per-sensor daily history on a microSD card (with LittleFS as a fallback) and serves a local web dashboard over Wi-Fi, requiring no cloud service or permanent Internet connection. Unlike a handheld spot measurement, the system preserves the continuous 24-hour thermal behaviour of each machine, enabling the detection of trends and anomalies. Over a 32-day pilot deployment with three nodes (51{,}338 samples), the LoRa link availability exceeded 97\% once scheduled plant stoppages were excluded, and the continuous history revealed a temperature rise on a suction-fan motor later associated with a bearing anomaly. All design files, firmware and the bill of materials are released under open-source licenses.
 
 \textbf{Keywords}\\
-Open-source hardware; LoRa; PT100; RTD; MAX31865; ESP32-C6; industrial temperature monitoring; predictive maintenance
+Open-source hardware; LoRa; PT100; RTD; MAX31865; ESP32-C6; industrial temperature monitoring; condition monitoring
 
 \newpage
 \textbf{Specifications table}\\
@@ -75,11 +75,31 @@ Open-source hardware; LoRa; PT100; RTD; MAX31865; ESP32-C6; industrial temperatu
 
 Continuous temperature monitoring of motors and other industrial equipment helps identify conditions associated with friction, overload, poor ventilation or mechanical degradation. In a manual inspection, an operator obtains only the value at the instant of measurement; if that value is not systematically recorded, the thermal evolution of the equipment cannot be reconstructed or related to its operating and stop cycles.
 
-Wireless sensor networks distribute measurement points without installing communication cabling at each location [1,2,6]. For low-data-rate applications, LoRa provides a long-range, low-power alternative suited to battery-powered nodes, whose range and scalability have been characterised experimentally [3,7,8]. LoRa has been used for temperature and condition monitoring in industrial and infrastructure settings [9,10], within the predictive-maintenance paradigm of Industry 4.0 [4,11]. However, published open-source LoRa nodes typically target ambient or DHT-class humidity/temperature sensors and rely on a cloud back-end. SmartSense Monitoring differs in three respects relevant to industrial surface monitoring: (i) it uses an industrial-grade three-wire PT100 with a MAX31865 front-end rather than a low-cost ambient sensor; (ii) it stores a per-sensor daily history locally and serves the dashboard from the gateway itself, so it operates without Internet; and (iii) the design targets replication and customization, releasing the schematics, firmware and bill of materials under open-source licenses.
+Wireless sensor networks distribute measurement points without installing communication cabling at each location [1,2,6]. For low-data-rate applications, LoRa provides a long-range, low-power alternative suited to battery-powered nodes, whose range and scalability have been characterised experimentally [3,7,8]. LoRa has been used for temperature and condition monitoring in industrial and infrastructure settings [9,10]; continuous temperature monitoring supports condition-based maintenance in Industry 4.0 [4,11]. This work provides the acquisition and monitoring platform and does not implement or validate a predictive-maintenance algorithm. However, published open-source LoRa nodes typically target ambient or DHT-class humidity/temperature sensors and rely on a cloud back-end. SmartSense Monitoring differs in three respects relevant to industrial surface monitoring: (i) it uses an industrial-grade three-wire PT100 with a MAX31865 front-end rather than a low-cost ambient sensor; (ii) it stores a per-sensor daily history locally and serves the dashboard from the gateway itself, so it operates without Internet; and (iii) the design targets replication and customization, releasing the schematics, firmware and bill of materials under open-source licenses.
 
 A PT100 RTD was chosen over a digital sensor such as the DS18B20 for several reasons: the PT100 is the industrial standard (IEC~60751) with excellent long-term stability and low drift; its resistive nature allows precise analog conditioning through the MAX31865, a purpose-built RTD-to-digital converter for two-, three- and four-wire PT100 with lead-resistance compensation; it offers a far wider range ($-200$ to $850~^{\circ}$C) than the DS18B20 ($-55$ to $125~^{\circ}$C), suitable for industrial surfaces that may exceed the digital sensor's limit; and it is available in surface-mount and magnetic probe forms appropriate for mounting on motors.
 
-Compared with proprietary industrial loggers such as the Advantech WISE-2410, SmartSense Monitoring trades integrated vibration sensing for a lower cost, full openness and local-first operation, making it suitable for pilot plants and educational settings where flexibility and reproducibility matter more than a turnkey platform.
+Compared with proprietary industrial loggers such as the Advantech WISE-2410, SmartSense Monitoring trades integrated vibration sensing for full openness and local-first operation. Table~\ref{tab:comparison} contrasts both systems by capability rather than price alone, making it suitable for pilot plants and educational settings where flexibility and reproducibility matter more than a turnkey platform.
+
+\begin{table}[h]
+\centering
+\tabulinesep=1ex
+\begin{tabu} to \linewidth {|X|X[c]|X[c]|}
+\hline
+\textbf{Feature} & \textbf{SmartSense} & \textbf{WISE-2410} \\\hline
+Open hardware & Yes & No \\\hline
+Primary sensor & 3-wire PT100 (RTD) & Integrated (vibration + temp.) \\\hline
+Communication & LoRa 433~MHz (point-to-point) & LoRaWAN \\\hline
+Vibration sensing & No & Yes \\\hline
+Local storage & Yes (microSD, 30 days) & Cloud / ecosystem \\\hline
+Cloud dependency & No (local dashboard) & Commercial ecosystem \\\hline
+IP rating & To be characterised & IP66 \\\hline
+Battery autonomy & $\approx$ months (measured) & $\approx$2 years (specified) \\\hline
+Cost & $\approx$USD 35 per node & Commercial \\\hline
+\end{tabu}
+\caption{Feature comparison between SmartSense and a commercial condition-monitoring logger (Advantech WISE-2410).}
+\label{tab:comparison}
+\end{table}
 
 \section{Hardware description}
 
@@ -146,7 +166,7 @@ The following steps describe the construction of one sensor node and the gateway
 
 \textbf{Sensor node}
 \begin{enumerate}[noitemsep]
-\item Solder the MAX31865 module in three-wire mode (bridge the 2/3-wire jumper), and connect the PT100 leads: the two leads from the same probe end to F+ and RTD+, and the remaining lead to RTD-, bridged to F-.
+\item Use a three-wire magnetic PT100 probe, tolerance Class~B per IEC~60751 ($\pm$0.3~$^{\circ}$C at 0~$^{\circ}$C; the exact manufacturer reference is given in the bill of materials). Solder the MAX31865 module in three-wire mode (bridge the 2/3-wire jumper), and connect the PT100 leads: the two leads from the same probe end to F+ and RTD+, and the remaining lead to RTD-, bridged to F-.
 \item Wire the MAX31865 SPI bus to the XIAO ESP32-C6: CLK\,$\rightarrow$\,D6 (GPIO16), SDO\,$\rightarrow$\,D5 (GPIO23), SDI\,$\rightarrow$\,D4 (GPIO22), CS\,$\rightarrow$\,D3 (GPIO21). Power the module VIN from D2 (GPIO2) so the firmware can switch it off during deep sleep.
 \item Connect the E220 LoRa module by UART: E220 TXD\,$\rightarrow$\,D7 (GPIO17), RXD\,$\rightarrow$\,D8 (GPIO19), M0\,$\rightarrow$\,D10 (GPIO18), M1\,$\rightarrow$\,D9 (GPIO20); power VCC/GND from 3V3/GND.
 \item Build the battery divider: VBAT\,--\,R1 (344.8~k$\Omega$)\,--\,A0 (GPIO0)\,--\,R2 (994.3~k$\Omega$)\,--\,GND. Connect the LiPo cell through the TP4056 charge/protection module to the XIAO battery pads.
@@ -222,9 +242,15 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 \label{fig:prueba60}
 \end{figure}
 
-\textbf{Temperature agreement.} Five paired readings were taken simultaneously at the same surface point of the suction-fan motor, in the 65--71~$^{\circ}$C range, against a Fluke 62 MAX infrared thermometer (accuracy $\pm$1.5~$^{\circ}$C or $\pm$1.5\%, fixed 0.95 emissivity, used as a field reference without a current calibration certificate). The SmartSense readings agreed with the Fluke within $\pm$0.4~$^{\circ}$C (mean difference $\approx$0.1~$^{\circ}$C). Two caveats apply: the per-node offset was tuned using the same Fluke, and the Fluke's own accuracy ($\pm$1.5~$^{\circ}$C) exceeds the $\leq$1~$^{\circ}$C target. This therefore demonstrates that the compensation reproduces the reference, but is not an independent accuracy validation; a rigorous $\leq$1~$^{\circ}$C characterization over a wider range and across all three nodes would require a calibrated contact reference (thermocouple or reference RTD).
+\textbf{Temperature agreement.} Five paired readings were taken simultaneously at the same surface point of the suction-fan motor, in the 65--71~$^{\circ}$C range, against a Fluke 62 MAX infrared thermometer (accuracy $\pm$1.5~$^{\circ}$C or $\pm$1.5\%, fixed 0.95 emissivity, used as a field reference without a current calibration certificate). The SmartSense readings were \emph{consistent} with the Fluke within $\pm$0.4~$^{\circ}$C (mean difference $\approx$0.1~$^{\circ}$C), and the independent FLIR C8 thermal camera ($\pm$2~$^{\circ}$C) corroborated the same hotspot at $\approx$71~$^{\circ}$C. To avoid over-claiming, we report this as \emph{consistency} rather than metrological accuracy: the per-node offset was tuned using the same Fluke, and both infrared instruments have uncertainties ($\pm$1.5 and $\pm$2~$^{\circ}$C) larger than the $\leq$1~$^{\circ}$C target. A metrological accuracy figure (MAE/RMSE against a traceable reference) is therefore \emph{not yet established}; it requires a calibrated contact reference (thermocouple or reference RTD), measured at several temperatures across the three nodes, and is identified as the priority next step.
 
-\textbf{Use case.} The continuous history captured a surface-temperature rise on a suction-fan motor, reaching a maximum of 70.0~$^\circ$C (Fig.~\ref{fig:serie}). The rising segments corresponded to periods when the machine stopped while the fan motor kept spinning unloaded; the pattern was later related to a bearing anomaly. This demonstrates the practical value of continuous logging over spot measurements.
+\textbf{Field observation (case study).} As a field observation --- not a predictive-detection claim --- the continuous history captured a surface-temperature rise on a suction-fan motor, reaching a maximum of 70.0~$^\circ$C (Fig.~\ref{fig:serie}). A thermal image taken with a FLIR C8 camera confirmed the hotspot on the motor housing at $\approx$71~$^\circ$C (Fig.~\ref{fig:termica}), consistent with the PT100 and infrared-thermometer readings. The rising segments coincided with periods when the machine stopped while the fan motor kept spinning unloaded; the pattern was afterwards associated with a bearing anomaly during inspection. This illustrates the value of continuous logging over spot measurements, but does not by itself constitute validated predictive detection.
+
+\begin{figure}[h]\centering
+\includegraphics[width=0.7\linewidth]{evidencias/termica-succionador.jpg}
+\caption{Thermal image (FLIR C8) of the suction-fan motor, showing the hotspot at $\approx$70--71~$^{\circ}$C, consistent with the PT100 node and infrared-thermometer readings.}
+\label{fig:termica}
+\end{figure}
 
 \textbf{Recovery and temperature range.} After a node reset, the node boots, samples and transmits its first frame in about 2.279~s (measured from the firmware), well within one sampling cycle and far below any practical requirement. Across the three nodes, the recorded surface temperature spanned 15.3--70.0~$^{\circ}$C, with per-node mean values of 39.5--45.4~$^{\circ}$C.
 
@@ -258,8 +284,8 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 \begin{itemize}[noitemsep]
 \item Measures surface temperature with a three-wire PT100 over the MAX31865 range; per-node configurable offset.
 \item LoRa link availability $>$97\% (active intervals) at a 121~s cadence over 32 days.
-\item Local operation with per-sensor daily history (up to 30 days on-device) and no Internet dependency.
-\item Temperature readings agreed with an infrared reference within $\pm$0.4~$^{\circ}$C; a strict $\leq$1~$^{\circ}$C validation requires a calibrated contact reference (planned).
+\item Local operation with a rolling per-sensor history (30 days on-device; oldest days are overwritten beyond that) and no Internet dependency. The 32-day dataset was exported from the gateway before rotation.
+\item Temperature readings were consistent with two independent infrared references (Fluke $\pm$1.5~$^{\circ}$C, FLIR C8 $\pm$2~$^{\circ}$C) within their uncertainty; a metrological accuracy figure ($\leq$1~$^{\circ}$C) is not yet established and requires a calibrated contact reference (planned).
 \item Battery autonomy on the order of months (a 5-day discharge test gives $\approx$177 days conservatively and $\approx$10 months from the LiPo-curve model on a 1000~mAh cell; $\approx$0.13--0.24~mA average at a 1.9\% duty cycle), far exceeding typical requirements.
 \item Limitations: absolute temperature accuracy depends on PT100 tolerance, mounting and per-node calibration; RSSI/SNR are not exposed by the current firmware; end-to-end latency was not measured (no node--gateway clock synchronization).
 \end{itemize}

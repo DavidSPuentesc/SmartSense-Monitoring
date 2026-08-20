@@ -54,14 +54,14 @@ Este artículo presenta el diseño, implementación y evaluación preliminar de 
 \end{abstract}
 
 \begin{IEEEkeywords}
-Internet de las cosas industrial, LoRa, PT100, MAX31865, monitoreo de temperatura, mantenimiento predictivo, dashboard, ESP32-C6.
+Internet de las cosas industrial, LoRa, PT100, MAX31865, monitoreo de temperatura, monitoreo de condición, dashboard, ESP32-C6.
 \end{IEEEkeywords}
 
 \section{Introducción}
 
 El seguimiento de temperatura en motores y otros equipos industriales permite identificar cambios asociados con fricción, sobrecarga, ventilación deficiente o degradación mecánica. En una inspección manual, el operario obtiene únicamente el valor correspondiente al instante de la medición. Si este valor no se registra de manera sistemática, no es posible reconstruir la evolución térmica del equipo ni relacionarla con sus ciclos de operación y parada.
 
-Las redes de sensores inalámbricos permiten distribuir puntos de medición sin instalar cableado de comunicación en cada ubicación \cite{akyildiz2002,yick2008,mois2017}. Para aplicaciones de baja tasa de datos, LoRa ofrece una alternativa de largo alcance y bajo consumo adecuada para nodos alimentados por batería, cuyo alcance y escalabilidad se han caracterizado experimentalmente \cite{centenaro2016,semtech2015,augustin2016,bor2016}. Diversos trabajos han empleado LoRa para el monitoreo de temperatura y de condición en entornos industriales y de infraestructura \cite{polonelli2019,jakobsen2024}. Estas soluciones se enmarcan en el mantenimiento predictivo de la Industria 4.0, donde el seguimiento continuo de variables como la temperatura permite anticipar fallas \cite{cinar2020,jardine2006}. Estas características se aprovecharon en SmartSense Monitoring para construir una plataforma local, modular y configurable.
+Las redes de sensores inalámbricos permiten distribuir puntos de medición sin instalar cableado de comunicación en cada ubicación \cite{akyildiz2002,yick2008,mois2017}. Para aplicaciones de baja tasa de datos, LoRa ofrece una alternativa de largo alcance y bajo consumo adecuada para nodos alimentados por batería, cuyo alcance y escalabilidad se han caracterizado experimentalmente \cite{centenaro2016,semtech2015,augustin2016,bor2016}. Diversos trabajos han empleado LoRa para el monitoreo de temperatura y de condición en entornos industriales y de infraestructura \cite{polonelli2019,jakobsen2024}. El seguimiento continuo de variables como la temperatura constituye la base del monitoreo de condición (\textit{condition monitoring}) que sustenta el mantenimiento basado en condición en la Industria 4.0 \cite{cinar2020,jardine2006}. Es importante precisar que este trabajo aporta la plataforma de \emph{adquisición y monitoreo} de temperatura; no implementa ni valida un algoritmo de mantenimiento predictivo. Estas características se aprovecharon en SmartSense Monitoring para construir una plataforma local, modular y configurable.
 
 El propósito del proyecto fue implementar y validar un sistema capaz de medir temperatura superficial, transmitirla de manera inalámbrica, conservar un histórico por sensor y facilitar el análisis del comportamiento térmico. El trabajo evolucionó desde un anteproyecto hasta un prototipo funcional instalado en una planta piloto. Por tanto, este documento describe las actividades realizadas y los resultados evidenciados, en lugar de presentar únicamente resultados esperados.
 
@@ -82,7 +82,7 @@ La arquitectura implementada, mostrada en la Fig.~\ref{fig:arquitectura-detalle}
 
 \subsection{Nodo sensor}
 
-Cada nodo fue construido con un Seeed Studio XIAO ESP32-C6, una sonda PT100 de tres hilos, un MAX31865, una batería LiPo y un módulo Ebyte E220. El MAX31865 fue configurado mediante la biblioteca de Adafruit en el modo \texttt{MAX31865\_3WIRE}. Se utilizó una resistencia nominal de \SI{100}{\ohm} y una resistencia de referencia caracterizada en \SI{421.1}{\ohm}.
+Cada nodo fue construido con un Seeed Studio XIAO ESP32-C6, una sonda PT100 magnética de tres hilos, un MAX31865, una batería LiPo y un módulo Ebyte E220. La PT100 empleada es de tolerancia Clase~B según la norma IEC~60751 (\SI{\pm 0.3}{\celsius} a \SI{0}{\celsius}), en encapsulado magnético para montaje sobre superficies; su referencia exacta de fabricante se detalla en la lista de materiales publicada. El MAX31865 fue configurado mediante la biblioteca de Adafruit en el modo \texttt{MAX31865\_3WIRE}. Se utilizó una resistencia nominal de \SI{100}{\ohm} y una resistencia de referencia caracterizada en \SI{421.1}{\ohm}.
 
 Se optó por una sonda PT100 en lugar de un sensor digital como el DS18B20 por varias razones. La PT100 es el estándar en instrumentación industrial (IEC~60751), con excelente estabilidad a largo plazo y baja deriva, lo que favorece un monitoreo prolongado. Su naturaleza resistiva permite un acondicionamiento analógico preciso: el MAX31865 es un convertidor RTD-a-digital diseñado específicamente para PT100 de dos, tres y cuatro hilos, con compensación de la resistencia de los conductores. La PT100 ofrece además un rango mucho más amplio (\SIrange{-200}{850}{\celsius}) que el DS18B20 (\SIrange{-55}{125}{\celsius}), adecuado para superficies industriales que pueden acercarse o superar el límite del sensor digital, y está disponible en encapsulados de superficie y magnéticos apropiados para el montaje sobre motores. En conjunto ---estabilidad, comportamiento industrial, precisión, rango, naturaleza resistiva, acondicionamiento y compatibilidad con el MAX31865--- estas características la hacen preferible para el monitoreo de temperatura superficial de equipos.
 
@@ -109,7 +109,7 @@ El firmware del gateway posee un campo reservado para RSSI, pero la versión rev
 
 El gateway fue implementado con un ESP32-C6, pantalla táctil con controlador ST7789, módulo E220 y tarjeta microSD. La tarjeta se utiliza como medio principal para los históricos. Si no está disponible, LittleFS funciona como respaldo.
 
-Para cada dirección MAC se crea un directorio independiente y un archivo por fecha. Cada línea contiene el segundo transcurrido desde el inicio del día y la temperatura representada con resolución de \SI{0.1}{\celsius}. El firmware conserva hasta 30 días por sensor. La hora se sincroniza desde el navegador y se ajusta a la zona horaria UTC--5, por lo cual el sistema puede trabajar localmente sin conexión permanente a Internet.
+Para cada dirección MAC se crea un directorio independiente y un archivo por fecha en la microSD (con LittleFS como respaldo). Cada línea contiene el segundo transcurrido desde el inicio del día y la temperatura representada con resolución de \SI{0.1}{\celsius}. El firmware conserva una ventana móvil de 30 días por sensor: al superarse la capacidad, se eliminan los días más antiguos. El registro de 32 días analizado en este trabajo corresponde al archivo CSV exportado del gateway antes de dicha rotación, por lo que no existe conflicto entre la ventana de 30 días y la duración del despliegue. La hora se sincroniza desde el navegador y se ajusta a la zona horaria UTC--5, por lo cual el sistema puede trabajar localmente sin conexión permanente a Internet.
 
 La Fig.~\ref{fig:esquematico-gateway} resume las conexiones externas del gateway. La pantalla, el panel táctil y la ranura microSD están integrados en la placa; las conexiones agregadas corresponden al módulo E220 por UART, con las líneas de modo M0 y M1 unidas a un mismo pin, y a la salida digital para la señalización de alarma crítica.
 
@@ -451,7 +451,14 @@ Se identificaron varios picos breves por encima de \SI{63}{\celsius}. El mayor o
 
 Este patrón muestra que el calentamiento no correspondió a un único evento aislado. La serie histórica permitió observar transitorios y repeticiones que no podrían reconstruirse con una medición manual ocasional. De acuerdo con la operación observada en planta, los tramos ascendentes corresponden a periodos en los que la Twin se detuvo y el motor del succionador permaneció girando en vacío. Los descensos se presentaron cuando la máquina volvió a operar. Esta relación aporta contexto al comportamiento térmico, aunque las horas exactas deberán confirmarse con un registro de marcha y parada.
 
-La revisión posterior relacionó el patrón con una condición anómala en los rodamientos. Para presentar este hallazgo como resultado concluyente se incorporarán la gráfica original, la hora de parada, la magnitud del incremento y la evidencia de inspección o mantenimiento.
+La revisión posterior relacionó el patrón con una condición anómala en los rodamientos. Se presenta como \emph{observación de campo} y no como una detección predictiva validada: se describe lo que se observó (el incremento térmico) y lo que se confirmó después (la inspección). Una imagen térmica tomada con una cámara FLIR C8 confirmó el punto caliente sobre la carcasa del motor en torno a \SIrange{70}{71}{\celsius} (Fig.~\ref{fig:termica}), de forma coherente con la lectura de la PT100 y del termómetro infrarrojo.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.85\columnwidth]{evidencias/termica-succionador.jpg}
+  \caption{Imagen térmica (FLIR C8) del motor del succionador: el punto caliente aparece en torno a \SIrange{70}{71}{\celsius}, coherente con la lectura del nodo PT100 y del termómetro infrarrojo. La cámara IR ($\pm$\SI{2}{\celsius}) corrobora el patrón, aunque no constituye la validación metrológica de \SI{\leq 1}{\celsius}.}
+  \label{fig:termica}
+\end{figure}
 
 \begin{figure*}[!t]
   \centering
