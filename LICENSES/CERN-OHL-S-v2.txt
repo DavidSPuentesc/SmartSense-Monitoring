@@ -1,0 +1,16 @@
+This hardware (schematics, PCB/wiring, and 3D enclosure design files of
+SmartSense Monitoring) is licensed under the CERN Open Hardware Licence
+Version 2 - Strongly Reciprocal (CERN-OHL-S v2).
+
+SPDX-License-Identifier: CERN-OHL-S-2.0
+Copyright (c) 2026 Jesus Andre Bojaca Lopez, David Santiago Puentes Cardenas
+
+You may redistribute and modify this documentation and make products using it
+under the terms of the CERN-OHL-S v2 (https://cern.ch/cern-ohl). This
+documentation is distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY,
+INCLUDING OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A
+PARTICULAR PURPOSE. Please see the CERN-OHL-S v2 for applicable conditions.
+
+Source location (repository / Zenodo DOI): to be filled in upon deposit.
+
+Full licence text: https://ohwr.org/cern_ohl_s_v2.txt
