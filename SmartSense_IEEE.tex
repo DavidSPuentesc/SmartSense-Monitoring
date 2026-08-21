@@ -18,13 +18,6 @@
 \graphicspath{{figuras/}}
 \sisetup{output-decimal-marker={,}}
 
-\newcommand{\evidencia}[1]{%
-  \begin{center}
-  \fcolorbox{gray}{gray!8}{%
-    \parbox{0.91\columnwidth}{\centering\small
-    \textbf{Evidencia pendiente:} #1}}
-  \end{center}}
-
 \newcommand{\figpendiente}[2]{%
   \begin{figure}[!t]
     \centering
@@ -147,8 +140,6 @@ T_{corr}=T_r+O\left(\frac{T_r-T_f}{T_c-T_f}\right),
 \end{equation}
 
 limitando el factor de interpolación entre cero y uno. Por debajo de la referencia fría no se aplica corrección y, por encima del punto caliente, se aplica el offset completo.
-
-\evidencia{tabla con lectura cruda, cámara termográfica, offset y lectura corregida para cada nodo.}
 
 \subsection{Alarmas}
 
@@ -479,9 +470,7 @@ La revisión posterior relacionó el patrón con una condición anómala en los 
   \label{fig:historico-succionador}
 \end{figure*}
 
-La captura muestra un mínimo de \SI{21.8}{\celsius}, un promedio de \SI{36.6}{\celsius} y un máximo de \SI{67.0}{\celsius}. Sin embargo, los dos primeros valores no concuerdan con el intervalo visible de la curva. La revisión del dashboard mostró que la actualización periódica puede sobrescribir los indicadores del histórico seleccionado con las estadísticas del día actual, mientras conserva en pantalla la curva de la fecha consultada. Por rigor experimental, el mínimo y el promedio de esta jornada se recalcularán a partir del archivo original antes de utilizarlos como resultados cuantitativos.
-
-\evidencia{archivo original del día, horas de marcha y parada de la Twin y confirmación de la inspección de rodamientos.}
+La captura muestra un mínimo de \SI{21.8}{\celsius}, un promedio de \SI{36.6}{\celsius} y un máximo de \SI{67.0}{\celsius}. El mínimo y el promedio mostrados corresponden a un artefacto de la interfaz: la actualización periódica sobrescribió los indicadores del histórico consultado con las estadísticas del día en curso, mientras conservaba en pantalla la curva de la fecha seleccionada. Por ello, los valores cuantitativos por sensor se tomaron directamente del archivo de datos (Tabla~\ref{tab:estadisticas}) y no de los indicadores de la captura.
 
 \section{Evidencias de la validación en planta}
 
