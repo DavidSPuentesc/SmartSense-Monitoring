@@ -236,11 +236,11 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 
 \textbf{Representative 60-minute test.} A representative one-hour window with the three nodes active (Fig.~\ref{fig:prueba60}) illustrates a continuous test: at a 120~s cycle, 30 frames are expected per node in 60~min; 29, 30 and 30 were received (PDR 96.7\%, 100\%, 100\%). Temperature and PDR are captured in this window; battery is characterised separately (Fig.~\ref{fig:autonomia}) and recovery after a reset is 2.279~s. RSSI was later enabled in the firmware and measured in the range test below; SNR is not exposed by the E220 module, and end-to-end latency requires node--gateway clock synchronisation, so both are declared as future work. The node frame now carries a sequence counter, enabling a fully instrumented sent-vs-received PDR in a repeated test.
 
-\textbf{Outdoor range.} An outdoor range test on 20 August 2026 reached a straight-line distance exceeding 600~m (Fig.~\ref{fig:distancia}). The RSSI dropped from about $-15$~dBm near the gateway to $\approx-98$~dBm at the farthest point (20:44--20:54), where the link still delivered valid packets, i.e. operating close to the LoRa sensitivity floor. The battery stayed at $\approx$94\% throughout the 2.6-hour test, consistent with the low duty cycle. As the node was moving (not held at fixed distances), the trace reflects the walk; a controlled fixed-distance RSSI--distance curve is future work.
+\textbf{Range test.} A range test on 20 August 2026 was carried out in an urban setting with buildings between the node and the gateway (non-line-of-sight). The node moved to about 688~m away and back (Fig.~\ref{fig:distancia}). The RSSI dropped from about $-15$~dBm near the gateway to $\approx-98$~dBm at the farthest point (20:44--20:54), where the link still delivered valid packets with margin relative to the LoRa sensitivity floor (typically below $-120$~dBm). The test was stopped voluntarily rather than by a link failure, so 688~m is a lower bound on range --- notable given the obstructed path. The battery stayed at $\approx$94\% throughout the 2.6-hour test, consistent with the low duty cycle. As the node was moving (not held at fixed distances), the trace reflects the walk; a controlled fixed-distance RSSI--distance curve is future work.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.92\linewidth]{prueba-distancia.pdf}
-\caption{Outdoor range test (20 August 2026): per-packet RSSI (blue) and battery (green) versus time as the node moved away from the gateway and back. At the farthest point ($>$600~m) the RSSI reached $\approx-98$~dBm with the link still operational.}
+\caption{Range test with obstructions (20 August 2026, buildings in between): per-packet RSSI (blue) and battery (green) versus time as the node moved away from the gateway and back. At the farthest point ($\approx$688~m) the RSSI reached $\approx-98$~dBm with the link still operational and with margin.}
 \label{fig:distancia}
 \end{figure}
 
@@ -295,7 +295,7 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 \item Local operation with a rolling per-sensor history (30 days on-device; oldest days are overwritten beyond that) and no Internet dependency. The 32-day dataset was exported from the gateway before rotation.
 \item Temperature readings were consistent with two independent infrared references (Fluke $\pm$1.5~$^{\circ}$C, FLIR C8 $\pm$2~$^{\circ}$C) within their uncertainty; a metrological accuracy figure ($\leq$1~$^{\circ}$C) is not yet established and requires a calibrated contact reference (planned).
 \item Battery autonomy on the order of months (a 5-day discharge test gives $\approx$177 days conservatively and $\approx$10 months from the LiPo-curve model on a 1000~mAh cell; $\approx$0.13--0.24~mA average at a 1.9\% duty cycle), far exceeding typical requirements.
-\item Outdoor LoRa range exceeded 600~m, with the link operating down to $\approx-98$~dBm RSSI.
+\item LoRa range of at least $\approx$688~m in a non-line-of-sight urban path, with the link operating down to $\approx-98$~dBm RSSI (test stopped voluntarily, not by link failure).
 \item Limitations: absolute temperature accuracy depends on PT100 tolerance, mounting and per-node calibration; SNR is not exposed by the E220 module and end-to-end latency was not measured (no node--gateway clock synchronization).
 \end{itemize}
 

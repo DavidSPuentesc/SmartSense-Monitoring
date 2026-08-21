@@ -35,7 +35,7 @@ ax.plot(t, rssi, "-o", ms=2.5, lw=0.8, color="#1e88e5", label="RSSI")
 ax.set_ylabel("RSSI (dBm)", color="#1e88e5")
 ax.tick_params(axis="y", labelcolor="#1e88e5")
 ax.set_xlabel("Time (HH:MM)")
-ax.set_title("Outdoor range test: RSSI vs time (node moving away and back)")
+ax.set_title("Range test with obstructions: RSSI vs time (node moving away and back)")
 ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
 ax.grid(True, lw=0.3, alpha=0.5)
 
@@ -43,8 +43,8 @@ ax.grid(True, lw=0.3, alpha=0.5)
 far0 = datetime(2026, 8, 20, 20, 44)
 far1 = datetime(2026, 8, 20, 20, 55)
 ax.axvspan(far0, far1, color="#b91c1c", alpha=0.12)
-ax.annotate("farthest point (>600 m)\nRSSI $\\approx$ -98 dBm",
-            xy=(datetime(2026, 8, 20, 20, 49), -98), xytext=(datetime(2026, 8, 20, 21, 5), -70),
+ax.annotate("farthest point ($\\approx$688 m,\nbuildings in between)\nRSSI $\\approx$ -98 dBm",
+            xy=(datetime(2026, 8, 20, 20, 49), -98), xytext=(datetime(2026, 8, 20, 21, 5), -68),
             fontsize=8, color="#b91c1c",
             arrowprops=dict(arrowstyle="->", color="#b91c1c", lw=0.8))
 

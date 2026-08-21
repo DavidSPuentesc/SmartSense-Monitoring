@@ -306,12 +306,12 @@ En esta ventana se registraron la temperatura y el PDR (recibidos frente a esper
 \subsection{Prueba de alcance al aire libre}
 \label{sec:alcance}
 
-El 20 de agosto de 2026 se realizó una prueba de alcance en exteriores. El nodo se alejó del gateway hasta superar los \SI{600}{\meter} en línea recta y regresó, registrando el RSSI y la batería de cada paquete (Fig.~\ref{fig:distancia}). El RSSI descendió desde cerca de \SI{-15}{dBm} junto al gateway hasta aproximadamente \SI{-98}{dBm} en el punto más lejano (ventana 20:44--20:54), donde el enlace siguió entregando paquetes válidos, es decir operando cerca del umbral de sensibilidad de LoRa. La batería se mantuvo alrededor del \SI{94}{\percent} durante las \SI{2.6}{\hour} de la prueba, coherente con el bajo ciclo de trabajo y con la autonomía estimada. La medición se hizo desplazándose y no a distancias fijas controladas, por lo que la curva refleja el recorrido; una caracterización RSSI--distancia con posiciones fijas queda como trabajo futuro.
+El 20 de agosto de 2026 se realizó una prueba de alcance en exteriores, en un entorno urbano con edificios entre el nodo y el gateway (sin línea de vista directa). El nodo se alejó del gateway hasta aproximadamente \SI{688}{\meter} y regresó, registrando el RSSI y la batería de cada paquete (Fig.~\ref{fig:distancia}). El RSSI descendió desde cerca de \SI{-15}{dBm} junto al gateway hasta aproximadamente \SI{-98}{dBm} en el punto más lejano (ventana 20:44--20:54). En ese punto el enlace seguía entregando paquetes válidos con margen respecto al umbral de sensibilidad de LoRa (típicamente inferior a \SI{-120}{dBm}); la prueba se detuvo de forma voluntaria y no por pérdida del enlace, por lo que \SI{688}{\meter} constituye una cota inferior del alcance, tanto más destacable por tratarse de una trayectoria obstruida. La batería se mantuvo alrededor del \SI{94}{\percent} durante las \SI{2.6}{\hour} de la prueba, coherente con el bajo ciclo de trabajo y con la autonomía estimada. La medición se hizo desplazándose y no a distancias fijas controladas, por lo que la curva refleja el recorrido; una caracterización RSSI--distancia con posiciones fijas queda como trabajo futuro.
 
 \begin{figure}[!t]
   \centering
   \includegraphics[width=\columnwidth]{prueba-distancia.pdf}
-  \caption{Prueba de alcance al aire libre (20 de agosto de 2026): RSSI (azul) y batería (verde) frente al tiempo, mientras el nodo se alejaba del gateway y regresaba. En el punto más lejano ($>$\SI{600}{\meter}) el RSSI llegó a $\approx$\SI{-98}{dBm} con el enlace aún operativo.}
+  \caption{Prueba de alcance con obstrucciones (20 de agosto de 2026, edificios de por medio): RSSI (azul) y batería (verde) frente al tiempo, mientras el nodo se alejaba del gateway y regresaba. En el punto más lejano ($\approx$\SI{688}{\meter}) el RSSI llegó a $\approx$\SI{-98}{dBm} con el enlace aún operativo y con margen.}
   \label{fig:distancia}
 \end{figure}
 
