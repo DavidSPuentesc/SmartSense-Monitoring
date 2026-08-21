@@ -301,7 +301,19 @@ Nodo C & 30 & 30 & 0 & \SI{100}{\percent} \\
 \end{tabularx}
 \end{table}
 
-En esta ventana se registraron la temperatura y el PDR (recibidos frente a esperados). La batería se caracterizó por separado en la prueba de descarga (Sección~\ref{sec:autonomia}) y la recuperación tras reinicio fue de \SI{2.279}{\second}. El \textbf{RSSI y el SNR} no se habilitaron en la versión de firmware evaluada, y la \textbf{latencia} extremo a extremo requería sincronización de reloj entre el nodo y el gateway; ambos se dejaron como trabajo futuro. Para obtener el PDR con conteo directo de enviados y recibidos, se incorporó al firmware un contador de secuencia por nodo que permite repetir la prueba de forma instrumentada.
+En esta ventana se registraron la temperatura y el PDR (recibidos frente a esperados). La batería se caracterizó por separado en la prueba de descarga (Sección~\ref{sec:autonomia}) y la recuperación tras reinicio fue de \SI{2.279}{\second}. En el registro del despliegue de 32 días no se habilitó el \textbf{RSSI}; posteriormente se incorporó al firmware y se midió en la prueba de alcance (Sección~\ref{sec:alcance}). El \textbf{SNR} no lo expone el módulo E220 y la \textbf{latencia} extremo a extremo requiere sincronización de reloj entre el nodo y el gateway; ambos se dejan como trabajo futuro. Para obtener el PDR con conteo directo de enviados y recibidos, se incorporó al firmware un contador de secuencia por nodo que permite repetir la prueba de forma instrumentada.
+
+\subsection{Prueba de alcance al aire libre}
+\label{sec:alcance}
+
+El 20 de agosto de 2026 se realizó una prueba de alcance en exteriores. El nodo se alejó del gateway hasta superar los \SI{600}{\meter} en línea recta y regresó, registrando el RSSI y la batería de cada paquete (Fig.~\ref{fig:distancia}). El RSSI descendió desde cerca de \SI{-15}{dBm} junto al gateway hasta aproximadamente \SI{-98}{dBm} en el punto más lejano (ventana 20:44--20:54), donde el enlace siguió entregando paquetes válidos, es decir operando cerca del umbral de sensibilidad de LoRa. La batería se mantuvo alrededor del \SI{94}{\percent} durante las \SI{2.6}{\hour} de la prueba, coherente con el bajo ciclo de trabajo y con la autonomía estimada. La medición se hizo desplazándose y no a distancias fijas controladas, por lo que la curva refleja el recorrido; una caracterización RSSI--distancia con posiciones fijas queda como trabajo futuro.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{prueba-distancia.pdf}
+  \caption{Prueba de alcance al aire libre (20 de agosto de 2026): RSSI (azul) y batería (verde) frente al tiempo, mientras el nodo se alejaba del gateway y regresaba. En el punto más lejano ($>$\SI{600}{\meter}) el RSSI llegó a $\approx$\SI{-98}{dBm} con el enlace aún operativo.}
+  \label{fig:distancia}
+\end{figure}
 
 \subsection{Tiempo activo por ciclo}
 
