@@ -1,5 +1,6 @@
 # Compilador local y herramientas descargadas
 .tools/
+.worktrees/
 
 # Credenciales locales (usar secrets.example.h como plantilla)
 secrets.h
