@@ -1,2 +1,131 @@
 \chapter{Información complementaria y reproducibilidad}
-Este anexo reúne información complementaria para reproducir los cálculos, las pruebas y los artefactos del proyecto.
+\label{cap:anexos}
+
+Este anexo reúne los cálculos de diseño, el inventario verificable de artefactos del repositorio y una matriz para la sustentación. Las referencias indican dónde se define cada método y dónde se interpreta su evidencia.
+
+\section{Cálculos de diseño y alcance de sus supuestos}
+\label{sec:anexos-calculos}
+
+\subsection{Cadencia, actividad y almacenamiento}
+
+El periodo nominal del piloto fue \PeriodoNominal{}. El número de muestras programadas por nodo y día es
+\begin{equation}
+N_{\mathrm{día}}=\frac{86\,400~\mathrm{s}}{120~\mathrm{s}}=720
+\quad\text{muestras por nodo y día}.
+\label{eq:anexo-muestras-dia}
+\end{equation}
+Para \NumeroNodos{} nodos, el conteo nominal es 2160 registros diarios. Una ventana de 30 fechas con datos tiene como referencia 21\,600 registros por nodo o 64\,800 para tres nodos. Son conteos de diseño: huecos, cadencia efectiva y recepción pueden reducir el número real. La justificación térmica y las limitaciones del periodo están en la sección~\ref{sec:metodo-muestreo}; la cobertura observada, en la sección~\ref{sec:resultados-despliegue}.
+
+El tamaño de almacenamiento no se deduce solo del número de registros. Para dimensionarlo en bytes se mide en el archivo exportado el tamaño medio $b_{\mathrm{línea}}$ de una línea persistida y se reserva el espacio de directorios y sistema de archivos:
+\begin{equation}
+B_d\approx N_{\mathrm{día}}b_{\mathrm{línea}}+B_{\mathrm{metadatos}},
+\qquad B_{30}\approx30B_d.
+\label{eq:anexo-almacenamiento}
+\end{equation}
+No se afirma un número de bytes porque no se conservó una medición de $b_{\mathrm{línea}}$ ni de la sobrecarga del medio. La implementación y la rotación por \texttt{MAX\_DAYS\_HISTORY=30} se describen en la sección~\ref{sec:impl-almacenamiento}: se eliminan las fechas más antiguas al superar 30, por lo que el CSV usado en el estudio de 32 días tuvo que conservarse fuera del gateway antes de esa rotación.
+
+El tiempo activo instrumentado de \TiempoActivo{} frente al periodo nominal produce
+\begin{equation}
+D=\frac{t_{\mathrm{activo}}}{T}=\frac{2.279}{120}=0.01899
+\approx1.9\,\text{\%}.
+\label{eq:anexo-duty}
+\end{equation}
+Describe una parte instrumentada del ciclo de firmware, no la corriente total, el tiempo físico desde energización ni latencia extremo a extremo. La ecuación de corriente media está en la sección~\ref{sec:metodo-autonomia}; los resultados de arranque se limitan en la sección~\ref{sec:resultados-arranque}.
+
+\subsection{Extrapolación de batería}
+
+La descarga disponible corresponde a una celda de \SI{1000}{\milli\ampere\hour} con dos lecturas: \SI{4.112}{\volt} al inicio y \SI{4.089}{\volt} después de \SI{120}{\hour}. La proyección lineal supone pendiente de tensión constante hasta \SI{3.30}{\volt} y entrega \AutonomiaLinealEstimada{}. La otra proyección interpola una curva típica LiPo de tensión en circuito abierto frente a estado de carga y, con cortes de 3.30 y \SI{3.00}{\volt}, entrega \AutonomiaModeloEstimada{}. Ambas son resultados de modelos ajustados a dos puntos, no duraciones observadas.
+
+Sus supuestos incluyen relación tensión--carga aplicable, cadencia de uso equivalente, temperatura y carga comparables, y ausencia de efectos no medidos de relajación, envejecimiento, reguladores y periféricos. No existe integración de corriente del nodo completo por estado ni descarga hasta corte. Por ello, la conclusión correcta es \EstadoAutonomia{}, no autonomía de meses demostrada. El procedimiento y sus ecuaciones están en las secciones~\ref{sec:metodo-autonomia} y~\ref{sec:resultados-autonomia}; las amenazas se discuten en el capítulo~\ref{cap:discusion}.
+
+\subsection{Inferencia de PDR, RSSI y SNR}
+
+La definición ideal es
+\begin{equation}
+\mathrm{PDR}=\frac{N_{\mathrm{recibidos}}}{N_{\mathrm{enviados}}}\times100\%.
+\label{eq:anexo-pdr}
+\end{equation}
+En el CSV histórico faltaba el contador de envíos. Para dos llegadas consecutivas, el análisis calcula $k_i=\operatorname{round}(\Delta t_i/120~s)$ y asigna $\max(0,k_i-1)$ tramas faltantes cuando el intervalo no supera 1800~s. Los huecos mayores se excluyen de esa suma y se informan por separado. Así, la estimación \PDREstimado{} depende de cadencia estable, redondeo y clasificación de periodos activos; no separa directamente pérdida de radio, ausencia de adquisición o fallo de persistencia. El método, sus exclusiones y el protocolo posterior con \texttt{SEQ} están en la sección~\ref{sec:metodo-enlace}; los resultados están en la sección~\ref{sec:resultados-pdr}.
+
+RSSI es una indicación de potencia recibida y SNR es la relación entre señal y ruido; no son la misma variable ni una permite calcular la otra sin datos y modelo adicionales. El recorrido posterior con obstrucciones produjo RSSI cercano a \RSSILejano{} con enlace operativo al menos a \DistanciaDemostrada{}, pero no registró SNR. Ese RSSI no pertenece al despliegue de 32 días ni genera por sí solo un margen de enlace o un alcance máximo. Véanse las secciones~\ref{sec:metodo-enlace} y~\ref{sec:resultados-alcance}.
+
+\section{Mapa de reproducibilidad y estado del repositorio}
+\label{sec:anexos-reproducibilidad}
+
+La tabla~\ref{tab:anexos-reproducibilidad} describe la copia de trabajo revisada al redactar este documento. Un archivo presente permite inspeccionar o reutilizar ese artefacto; no prueba por sí solo que se ejecutó durante el piloto ni completa los datos que no fueron preservados.
+
+\begingroup
+\small\singlespacing
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{4.9cm}>{\raggedright\arraybackslash}p{3.9cm}>{\raggedright\arraybackslash}p{3.4cm}@{}}
+\caption{Mapa de recursos reproducibles y limitaciones verificables.}\label{tab:anexos-reproducibilidad}\\
+\toprule
+\textbf{Recurso} & \textbf{Ubicación en la copia revisada} & \textbf{Estado verificable} & \textbf{Límite o acción pendiente} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Recurso} & \textbf{Ubicación en la copia revisada} & \textbf{Estado verificable} & \textbf{Límite o acción pendiente} \\
+\midrule\endhead
+\bottomrule\endfoot
+Firmware del nodo & \texttt{sensores espnow lora/}\linebreak\texttt{version con lora y pagina local/}\linebreak\texttt{Nodo\_Lora/Nodo\_Lora.ino}. & El sketch LoRa del nodo está versionado; también hay prototipos ESP-NOW y Wi-Fi local. & Registrar versión usada en el piloto, parámetros finales y secretos fuera de publicación. \\
+Firmware y dashboard del gateway & \texttt{sensores espnow lora/}\linebreak\texttt{version con lora y pagina local/}\linebreak\texttt{maestro\_Lora\_pantalla/}. & Están el sketch principal, módulos de pantalla, microSD y recursos web. & La exportación CSV por web no está verificada en la revisión funcional. \\
+Esquemáticos & \texttt{hardware/kicad/} y \texttt{figuras/esquematico-*.pdf}. & Se conservan proyectos KiCad, esquemáticos editables, PDF y SVG de nodo y gateway. & Contrastar esquemas con cada montaje y completar identificación de componentes. \\
+Carcasas CAD/STL & \texttt{hardware/carcasa/}. & Están los STL y un proyecto 3MF comprimido para las carcasas. & No se dispone del CAD editable original; la carcasa PLA no tiene clasificación IP certificada. \\
+Lista de materiales & \texttt{hardware/BOM.csv}; conexiones en \texttt{hardware/CONEXIONES.md}. & La BOM identifica conjuntos y costos de referencia; las conexiones documentan pines y parámetros. & Falta fabricante, referencia y clase verificable de la PT100 y la variante completa del E220; la batería BOM no sustituye la celda de 1000 mAh del ensayo. \\
+Scripts y protocolos de análisis & \texttt{analisis/}: \texttt{perdida\_paquetes.py}, \texttt{autonomia\_bateria.py}, \texttt{prueba\_60min.py}, \texttt{prueba\_distancia.py}, \texttt{figuras\_validacion.py}, protocolos y utilidades. & Están los generadores de cálculos y varias figuras. & Varios scripts esperan CSV en rutas del equipo de desarrollo; CSV primarios y registros serie no están en esta copia. \\
+Figuras y evidencia visual & \texttt{figuras/}, incluidos PDF/PNG, esquemáticos y \texttt{evidencias/}. & Se conservan las figuras incorporadas y fotografías de apoyo. & Una figura o foto no reemplaza datos primarios, calibración, repetición controlada ni metadatos de captura. \\
+Licencias & \texttt{LICENSES/README.md}, \texttt{MIT.txt}, \texttt{CERN-OHL-S-v2.txt} y \texttt{CC-BY-4.0.txt}. & El repositorio declara MIT para firmware/software/análisis, CERN-OHL-S v2 para hardware y CC-BY 4.0 para documentación. & Antes de publicar se debe revisar cobertura final, dependencias y credenciales; el inventario advierte una clave histórica por rotar. \\
+Scripts de compilación & \texttt{compilar\_trabajo\_grado.ps1} y \texttt{compilar\_ieee.ps1}. & La tesis monográfica y el documento IEEE histórico tienen script de compilación en esta copia. & A esta fecha no existe script versionado para compilar el artículo HardwareX; queda fuera de este anexo. \\
+Datos y depósito identificable & CSV conservado usado por análisis y contenido del repositorio. & La tesis describe que el CSV se preservó antes de la rotación del gateway. & El CSV no está disponible en esta copia y no hay DOI de Zenodo. Publicar datos permitidos, versiones y metadatos antes de citar un DOI. \\
+\end{longtable}
+\endgroup
+
+La reproducibilidad actual es parcial: código, esquemas, STL, BOM, licencias, figuras y parte de los análisis son inspeccionables, pero no se puede reconstruir íntegramente el piloto ni repetir sus métricas sin datos primarios, configuración final e identificación pendiente de componentes. La publicación de una versión archivada con DOI es trabajo futuro de la sección~\ref{sec:conclusiones-futuro}; no se declara un DOI inexistente.
+
+
+\section{Matriz de preguntas para la sustentación}
+\label{sec:anexos-sustentacion}
+
+Las preguntas incluyen las formuladas en las correcciones del asesor y las necesarias para exponer la cadena de evidencia. Las respuestas conservan explícitamente los asuntos que todavía no están demostrados.
+
+\begingroup
+\footnotesize\singlespacing
+\setlength{\tabcolsep}{2.5pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{3.15cm}>{\raggedright\arraybackslash}p{4.25cm}>{\raggedright\arraybackslash}p{4.35cm}>{\raggedright\arraybackslash}p{2.65cm}@{}}
+\caption{Matriz de trazabilidad para la sustentación.}\label{tab:anexos-sustentacion}\\
+\toprule
+\textbf{Pregunta} & \textbf{Respuesta breve} & \textbf{Evidencia} & \textbf{Sección} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Pregunta} & \textbf{Respuesta breve} & \textbf{Evidencia} & \textbf{Sección} \\
+\midrule\endhead
+\bottomrule\endfoot
+¿Qué problema resuelve y cuál es el alcance? & Adquiere, transmite, almacena y consulta localmente temperatura superficial para monitoreo de condición; no diagnostica ni pronostica fallas. & Pregunta de investigación, arquitectura y límites declarados. & \ref{cap:problema}, \ref{cap:resultados} \\
+¿Cómo funciona integralmente el sistema? & PT100 $\rightarrow$ MAX31865 $\rightarrow$ ESP32-C6 $\rightarrow$ E220 $\rightarrow$ gateway $\rightarrow$ microSD/LittleFS $\rightarrow$ pantalla/dashboard. & Arquitectura, esquemáticos y firmware versionado. & \ref{cap:implementacion} \\
+¿Qué componentes se eligieron y con qué criterio? & La selección responde a adquisición RTD, operación local, bajo tráfico y energía por batería; cada alternativa conserva limitaciones. & Matriz de selección de componentes. & \ref{tab:seleccion-componentes} \\
+¿Por qué PT100, LoRa y 120 s? & PT100 permite contacto industrial de tres hilos; LoRa cubre baja tasa sin cable de comunicación; 120 s es compromiso de este piloto, no óptimo universal. & Marco técnico, matriz y cálculo de 720 muestras/día. & \ref{sec:marco-rtd}, \ref{sec:marco-lora}, \ref{sec:metodo-muestreo} \\
+¿Cuántos nodos y datos se evaluaron? & Se evaluaron \NumeroNodos{} nodos y \TotalMuestras{} registros; la ventana común principal fue de \DuracionComunDias{} días. & Tabla por nodo y definición de población. & \ref{sec:resultados-despliegue} \\
+¿Qué ocurrió durante los 32 días? & Hubo cobertura desigual y huecos; se reportan disponibilidad cruda y condicionada a actividad, no una sola disponibilidad total. & Estadísticas por nodo y tabla de disponibilidad. & \ref{sec:resultados-despliegue}, \ref{sec:resultados-disponibilidad} \\
+¿Cuál es la exactitud absoluta real? & No está establecida. La comparación aporta concordancia de campo, no calibración ni exactitud absoluta. & Cinco parejas, Fluke usado en ajuste y falta de referencia de contacto calibrada. & \ref{sec:resultados-termica}, \ref{cap:discusion} \\
+¿Qué significa el valor de 0,4~\textdegree C? & Es el máximo comunicado por el proyecto; no se reconstruye con las cinco filas transcritas, cuyo máximo es 0,1~\textdegree C. & Tabla de parejas y salvedad de trazabilidad. & \ref{tab:resultados-parejas} \\
+¿Cuál es la incertidumbre del sistema? & No hay presupuesto combinado y trazable. Las especificaciones declaradas son $\pm\SI{1.5}{\celsius}$ para Fluke y $\pm\SI{2}{\celsius}$ para FLIR. & Limitaciones de referencia, montaje y offset. & \ref{sec:marco-metrologia}, \ref{cap:discusion} \\
+¿Cómo se calculó exactamente la pérdida de paquetes/PDR? & Se infirió por intervalos de llegada: un hueco cercano a $kT$ implica $k-1$ faltantes; no es conteo directo de enviados. & Ecuación, script \texttt{perdida\_paquetes.py} y tabla de PDR. & \ref{sec:metodo-enlace}, \ref{sec:resultados-pdr} \\
+¿Qué PDR se demuestra? & \PDREstimado{} en periodos activos bajo el estimador; el PDR directo de los 32 días sigue pendiente. & Tabla por nodo, exclusión de huecos y ausencia de secuencia histórica. & \ref{tab:resultados-pdr}, \ref{cap:discusion} \\
+¿La disponibilidad superior a 97\,\% es del sistema completo? & No. Corresponde al enlace en periodos clasificados como activos; la disponibilidad cruda se mantiene separada. & Dos métricas con poblaciones y reglas distintas. & \ref{sec:resultados-disponibilidad} \\
+¿Cuál es la autonomía real de meses? & No fue medida. Hay descarga parcial de cinco días y estimaciones de \AutonomiaLinealEstimada{} (lineal) y \AutonomiaModeloEstimada{} (LiPo). & Dos tensiones, ecuaciones de extrapolación y supuestos. & \ref{sec:metodo-autonomia}, \ref{sec:resultados-autonomia} \\
+¿Cuál es el consumo real por estado? & No está medido para el nodo completo. Hay montaje y código de instrumentación, pero no integración de corriente registrada. & Esquema shunt/INA219 y limitación explícita. & \ref{sec:metodo-autonomia}, \ref{cap:discusion} \\
+¿Cómo se diseñó la alimentación? & Batería LiPo, carga/protección, divisor de tensión y sueño profundo; el ciclo calculado es \CicloTrabajo{} para actividad instrumentada. & Conexiones, ecuación de batería y ciclo de trabajo. & \ref{cap:implementacion}, \ref{sec:anexos-calculos} \\
+¿Cuál es la distancia de comunicación? & Se demostró enlace operativo al menos a \DistanciaDemostrada{} en recorrido NLOS; no es alcance máximo ni cobertura garantizada. & Registro de recorrido y RSSI cercano a \RSSILejano{}. & \ref{sec:resultados-alcance} \\
+¿Cuál es la potencia de transmisión? & La copia revisada documenta frecuencia, canal, modo, UART y tasa aérea, pero no verifica una potencia final del piloto. & Tabla de parámetros en \texttt{hardware/CONEXIONES.md}. & \ref{sec:impl-comunicacion}, \ref{sec:anexos-reproducibilidad} \\
+¿Qué RSSI/SNR se obtuvo? & El RSSI llegó cerca de \RSSILejano{} en el recorrido posterior; no hay serie de SNR ni se deduce SNR desde RSSI. & Ensayo móvil posterior y limitación de la interfaz. & \ref{sec:resultados-alcance}, \ref{sec:anexos-calculos} \\
+¿Qué clase de PT100 se utilizó? & Sonda PT100 magnética de tres hilos; fabricante, referencia y clase verificable siguen incompletos. & BOM y límite de trazabilidad de componentes. & \ref{sec:impl-nodo}, \ref{sec:anexos-reproducibilidad} \\
+¿Qué demuestra el caso del rodamiento? & Una observación: serie térmica, contexto, imagen FLIR y asociación posterior durante inspección. No prueba causalidad, anticipación ni detección predictiva. & Historial, imagen térmica y ausencia de datos etiquetados/controlados. & \ref{sec:resultados-succionador}, \ref{cap:discusion} \\
+¿Por qué no se denomina mantenimiento predictivo? & No existe algoritmo validado ni métricas de predicción; el aporte es monitoreo de condición y soporte a revisión. & Alcance conceptual y límites del caso. & \ref{cap:problema}, \ref{cap:discusion} \\
+¿SmartSense es superior cuantitativamente al WISE-2410? & No se demuestra superioridad global. La comparación identifica ventajas y desventajas según característica y condiciones no igualadas. & Tabla normalizada: PT100/apertura/localidad frente a vibración, IP66 y autonomía especificada del WISE. & \ref{tab:wise-smartsense} \\
+¿Qué significa “long-term” en este trabajo? & Se usa piloto o despliegue de 32 días; no se extrapola a operación indefinida ni a vida útil de batería. & Ventana común y límites energéticos. & \ref{sec:resultados-despliegue}, \ref{sec:resultados-autonomia} \\
+¿Qué sucede después de 30 días de almacenamiento? & Se eliminan las fechas más antiguas al superar 30; el estudio preservó un CSV antes de rotar. & Constante de firmware y explicación de persistencia. & \ref{sec:impl-almacenamiento} \\
+¿Puede reproducirse exactamente el sistema? & Parcialmente: hay código, esquemas, STL, BOM y scripts, pero faltan datos primarios, configuración final e identificación completa de componentes. & Mapa de artefactos y limitaciones. & \ref{sec:anexos-reproducibilidad} \\
+¿Dónde están los archivos y existe DOI? & Las rutas están en la tabla de reproducibilidad dentro del repositorio. No hay DOI de Zenodo en la copia revisada. & Inventario de recursos y estado de publicación. & \ref{tab:anexos-reproducibilidad} \\
+¿Dónde se consultan cálculos y evidencia? & Métodos, resultados y este anexo separan cálculo, dato observado e inferencia; cada ecuación y tabla tiene su fuente. & Ecuaciones de muestreo, energía y PDR; tablas de resultados. & \ref{sec:anexos-calculos}, \ref{cap:metodologia}, \ref{cap:resultados} \\
+¿Qué función cumplen gateway y dashboard? & El gateway identifica, fecha y persiste datos; pantalla/dashboard permiten consulta local. La exportación web CSV no está verificada. & Implementación, captura y limitación funcional. & \ref{sec:impl-almacenamiento}, \ref{cap:implementacion} \\
+\end{longtable}
+\endgroup
