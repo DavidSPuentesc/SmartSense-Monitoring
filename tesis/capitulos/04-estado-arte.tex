@@ -1,2 +1,81 @@
 \chapter{Estado del arte}
-Este capítulo revisa soluciones relacionadas con redes inalámbricas, monitoreo térmico y plataformas de operación local.
+\label{cap:estado-arte}
+
+\section{Criterios de revisión}
+La revisión parte de las referencias utilizadas durante el desarrollo y las organiza en tres grupos: fundamentos de redes inalámbricas, sistemas de adquisición y antecedentes de monitoreo de condición. Se consultan publicaciones originales y documentación de fabricantes para distinguir resultados experimentales de especificaciones. Se trata de una revisión focalizada que fundamenta las decisiones del prototipo, sin pretender una búsqueda sistemática exhaustiva de todas las soluciones disponibles.
+
+Para comparar sistemas se consideran la variable medida, el medio de comunicación, el lugar de almacenamiento, la disponibilidad de archivos de diseño y la validación reportada. La apertura se evalúa por la documentación y los archivos publicados; la operación local, por el lugar donde se presta el servicio. Son propiedades diferentes: un sistema puede usar un protocolo abierto y software comercial, o conservar datos localmente con componentes de radio propietarios.
+
+\section{Redes de sensores y comunicaciones de baja potencia}
+Las revisiones de \citet{akyildiz2002} y \citet{yick2008} muestran que la red no puede diseñarse al margen de sus restricciones de energía, procesamiento y despliegue. Su pertinencia para SmartSense reside en tratar conjuntamente la adquisición y el transporte de información, y no en suponer que una tecnología inalámbrica garantiza continuidad de servicio.
+
+\citet{centenaro2016} presentan el enfoque de comunicaciones de baja tasa y largo alcance para aplicaciones de Internet de las cosas. \citet{augustin2016} estudian el funcionamiento y desempeño de LoRa y LoRaWAN mediante pruebas y simulaciones, mientras \citet{bor2016} examinan los límites de escalabilidad. Estos antecedentes apoyan la elección de radio para mensajes breves y periódicos; también muestran que la carga del canal, la configuración y el escenario deben formar parte de la evaluación. Sus resultados no se trasladan numéricamente al enlace E220 de SmartSense, que utiliza su propio formato de aplicación y un número limitado de nodos.
+
+\section{Sistemas de adquisición relacionados}
+\citet{polonelli2019} desarrollan una red LoRaWAN alimentada por batería para observar temperatura y humedad en un centro de datos. Reportan una operación de seis meses y más de seis millones de puntos de datos. El gateway puede integrar el servidor, por lo que este antecedente no debe describirse como una solución necesariamente dependiente de la nube. Su interés es la evaluación prolongada de una red térmica; su escenario de medición ambiental difiere del contacto sobre la carcasa de una máquina.
+
+HIGROTERM, de \citet{higroterm2021}, es un registrador abierto para laboratorio basado en sensores DHT22, con canales cableados, pantalla y almacenamiento en tarjeta SD. Publica componentes, código y documentación de construcción. Constituye un antecedente directo de adquisición local reproducible, aunque no aborda una red de sondas RTD sobre equipos industriales. El trabajo de \citet{mois2017} añade un antecedente de análisis de sensores inalámbricos para monitoreo ambiental; su variable y escenario deben distinguirse igualmente de la temperatura superficial.
+
+\citet{jakobsen2024} presentan un sensor abierto de monitoreo de condición con acelerómetros, micrófono y sensor de temperatura. Combina BLE para datos y LoRaWAN para características procesadas, y se evalúa con excitación mecánica y un banco con rodamiento defectuoso. Este trabajo evidencia que los dispositivos abiertos también pueden abordar variables de maquinaria: no es correcto agruparlo como un simple sensor ambiental DHT. Frente a él, SmartSense se concentra en el historial térmico obtenido con una PT100 externa y en una interfaz local de consulta.
+
+\section{Comparación normalizada}
+La Tabla~\ref{tab:estado-arte-comparacion} resume únicamente características respaldadas por las fuentes citadas. ``No especificado'' indica que no se atribuye esa propiedad con la documentación examinada; no equivale a afirmar que el sistema carezca de ella. La limitación se expresa respecto del problema de este trabajo y no como una descalificación general del antecedente.
+
+\begingroup
+\small
+\setstretch{1.05}
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.1cm}>{\raggedright\arraybackslash}p{2cm}>{\raggedright\arraybackslash}p{2.1cm}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{1.7cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{2.25cm}@{}}
+\caption{Comparación de sistemas de adquisición y monitoreo relacionados.}\label{tab:estado-arte-comparacion}\\
+\toprule
+Sistema & Sensor / variable & Comunicación & Almacenamiento local / nube & Apertura & Validación & Limitación \\
+\midrule
+\endfirsthead
+\multicolumn{7}{l}{Tabla~\thetable{} (continuación)}\\
+\toprule
+Sistema & Sensor / variable & Comunicación & Almacenamiento local / nube & Apertura & Validación & Limitación \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Polonelli et al. (2019) & Temperatura y humedad ambiental & LoRaWAN & Gateway con opción de servidor local & Diseño descrito; licencia integral no especificada & Seis meses en centro de datos & No evalúa contacto térmico en motores. \\
+\addlinespace
+HIGROTERM (2021) & DHT22: temperatura y humedad & Sensores cableados & SD local & Código y diseño publicados & Ensayos de laboratorio & No incorpora enlace inalámbrico RTD. \\
+\addlinespace
+Jakobsen (2024) & Vibración, sonido y temperatura & BLE y LoRaWAN & Datos hacia receptor; historial local/nube no especificado & Archivos de diseño publicados & Excitación mecánica y rodamiento defectuoso & Su evaluación se centra en señales mecánicas. \\
+\addlinespace
+WISE-2410 & Acelerómetro triaxial y temperatura & LoRaWAN & Servidor de aplicación según infraestructura & Producto comercial; protocolo estándar & Especificación del fabricante & Historial y acceso dependen de la integración. \\
+\addlinespace
+SmartSense & PT100 externa: temperatura superficial & LoRa punto a punto & microSD / LittleFS; dashboard local & Diseño, firmware y software del proyecto & Piloto: \NumeroNodos{} nodos, \DuracionComunDias{} días & Concordancia de campo; energía y PDR estimados. \\
+\end{longtable}
+\endgroup
+
+\section{Comparación con WISE-2410}
+El WISE-2410 es una referencia comercial pertinente por su orientación al monitoreo de maquinaria. La ficha de \citet{wise2410} especifica vibración triaxial, cálculo de indicadores, sensor de temperatura y carcasa IP66. La Tabla~\ref{tab:wise-smartsense} contrasta esas prestaciones con el alcance documentado del prototipo. Se compara la arquitectura y la funcionalidad; no se dispone de un ensayo controlado que permita establecer superioridad metrológica o energética entre ambos sistemas.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparación técnica de SmartSense y WISE-2410.}
+\label{tab:wise-smartsense}
+\small
+\begin{tabularx}{\textwidth}{@{}p{3cm}XX@{}}
+\toprule
+Criterio & SmartSense & WISE-2410 \\
+\midrule
+Variable y montaje & PT100 externa de tres hilos en superficie. & Temperatura integrada y vibración triaxial. \\
+Comunicación & LoRa punto a punto; gateway propio. & LoRaWAN; gateway y servidor de aplicación. \\
+Historial y consulta & Archivos locales y dashboard modificable. & Funciones dependientes de la plataforma integrada. \\
+Apertura & Fuentes, conexiones y diseño disponibles en el proyecto. & Producto comercial con interfaces documentadas. \\
+Protección física & Prototipo; sin clasificación IP demostrada. & Carcasa IP66 especificada. \\
+Energía & Autonomía estimada desde \DuracionDescarga{} de descarga parcial; periodo nominal \PeriodoNominal{}. & Hasta dos años especificados con actualización una vez por hora. \\
+Alcance experimental & Piloto térmico y pruebas complementarias. & Prestaciones de ficha; comparación de planta limitada a la configuración disponible. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+La autonomía declarada por el fabricante utiliza un intervalo distinto del ensayado en SmartSense. Una comparación cuantitativa exigiría igualar carga de trabajo, condiciones ambientales y criterio de fin de descarga. Del mismo modo, disponer de un dashboard propio facilita adaptar la consulta, pero no demuestra que todas las plataformas compatibles con WISE-2410 carezcan de históricos locales.
+
+\section{Síntesis y contribución del trabajo}
+Los antecedentes muestran soluciones tanto abiertas como comerciales, con almacenamiento local o infraestructura de servidor. La oportunidad abordada es integrar una sonda RTD externa, radio punto a punto, alimentación por batería e histórico local en un conjunto reproducible y ajustado al piloto. No se sostiene que cada componente sea novedoso ni que la combinación sea universalmente superior.
+
+La literatura de mantenimiento describe métodos que van más allá de adquirir datos, incluyendo procesamiento, diagnóstico y pronóstico \citep{jardine2006,cinar2020}. SmartSense se ubica en la adquisición y presentación de información térmica. Su evaluación debe juzgarse por la cadena funcional, la utilidad del historial y los límites declarados de la evidencia, sin atribuirle una validación de mantenimiento predictivo.

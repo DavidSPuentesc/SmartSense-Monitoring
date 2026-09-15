@@ -1,2 +1,93 @@
 \chapter{Marco de referencia}
-Este capítulo presenta los conceptos y fundamentos técnicos que sustentan la solución propuesta.
+\label{cap:marco-referencia}
+
+\section{Temperatura superficial y monitoreo de condición}
+El mensurando de SmartSense es la temperatura superficial en el lugar de contacto de la sonda. Debe distinguirse de la temperatura del aire, del devanado y de otros puntos del mismo equipo. El montaje, la transferencia de calor hacia la sonda y el ambiente condicionan su lectura y su tiempo de respuesta. En consecuencia, comparar dos registros requiere conservar la ubicación y documentar cambios de montaje o de operación.
+
+El monitoreo de condición utiliza observaciones del equipo para estudiar su estado. El diagnóstico busca identificar una condición o falla; el pronóstico intenta anticipar su evolución. Esta separación evita confundir la disponibilidad de una serie con la demostración de una causa o una predicción \citep{jardine2006}. Una alarma por umbral compara la lectura con un límite configurado. En este proyecto no incorpora un modelo entrenado, una clasificación validada de fallas ni una estimación de vida útil restante.
+
+\section{RTD, PT100 y referencia normativa}
+\label{sec:marco-rtd}
+Un detector resistivo de temperatura (RTD) aprovecha la variación de resistencia de un material con la temperatura. La designación PT100 corresponde a un elemento de platino con resistencia nominal de \SI{100}{\ohm} a \SI{0}{\celsius}. La norma IEC~60751 establece la relación resistencia--temperatura y requisitos para sensores y termómetros industriales de platino \citep{iec60751}. La relación no es exactamente lineal; el algoritmo de conversión debe corresponder al elemento utilizado y al intervalo de trabajo.
+
+La referencia normativa no certifica una sonda particular. La clase de tolerancia, el rango utilizable y el encapsulado deben respaldarse con la identificación y documentación del componente adquirido. Como la evidencia disponible no identifica de manera completa al fabricante y modelo de la sonda instalada, este trabajo no convierte la mención de una PT100 o de la norma en una conformidad documental de Clase~B. Tampoco asigna a todo el conjunto el rango teórico del elemento de platino: el cable, el montaje y la electrónica pueden imponer límites menores.
+
+\subsection{Conexión de tres hilos}
+La resistencia de los cables se suma a la del elemento en una conexión de dos hilos. La conexión de tres hilos permite compensar parte de esa contribución al asumir resistencias similares en los conductores compensados. Un desequilibrio deja un término residual, por lo que la compensación no equivale a eliminar todos los errores del montaje \citep{max31865}.
+
+Para SmartSense interesa mantener longitud, sección y uniones consistentes y revisar contactos defectuosos. Además, el contacto térmico de una sonda magnética con una carcasa introduce efectos distintos de la resistencia eléctrica del cable. Una corrección eléctrica no elimina el retardo térmico ni una diferencia espacial entre el punto de contacto y el punto observado por otro instrumento.
+
+\subsection{Conversión MAX31865}
+El MAX31865 convierte la razón entre la resistencia RTD y una resistencia de referencia externa mediante un convertidor de 15 bits. Admite configuraciones de dos, tres y cuatro hilos, interfaz SPI y detección de fallas de conexión \citep{max31865}. Para un código RTD válido $n$, excluido el bit de falla, la relación nominal es
+\begin{equation}
+R_{\mathrm{RTD}}=\frac{n}{2^{15}}R_{\mathrm{ref}}.
+\label{eq:marco-rtd-digital}
+\end{equation}
+El firmware convierte luego esa resistencia a temperatura. El valor de $R_{\mathrm{ref}}$ y su estabilidad afectan la conversión; la resolución digital no debe confundirse con la exactitud del sistema. El estado de falla debe comprobarse antes de aceptar la lectura.
+
+\section{Microcontrolador y operación local}
+La placa XIAO ESP32-C6 integra un microcontrolador y las interfaces necesarias para enlazar periféricos; su documentación describe conexiones, alimentación y modos de bajo consumo \citep{xiaoc6}. En la arquitectura implementada, SPI enlaza el acondicionador y UART enlaza el radio. El nodo identifica la medición y organiza su ciclo de actividad. El gateway cumple una función distinta: recibe, conserva y presenta datos, además de atender clientes por Wi-Fi local.
+
+El almacenamiento local conserva la información cerca de la fuente, en consonancia con el concepto de procesamiento en el borde \citep{shi2016}. Esto reduce la dependencia de un servicio remoto para consultar el historial, pero deja al gateway, su reloj y su medio de almacenamiento como elementos de los que depende el registro. Un archivo persistente puede consultarse después de que un nodo aparezca desconectado; el estado actual del enlace no describe retroactivamente todas las muestras de ese archivo.
+
+\section{LoRa y LoRaWAN}
+\label{sec:marco-lora}
+LoRa es una técnica de modulación por espectro ensanchado mediante señales de frecuencia variable. Sus parámetros físicos establecen compromisos entre tasa de datos, tiempo de transmisión y capacidad de recepción \citep{semtech2015}. LoRaWAN añade reglas de acceso y una arquitectura con dispositivos, gateways y servidor de red sobre esa capa física \citep{augustin2016}. Un enlace que utiliza LoRa no es automáticamente una red LoRaWAN.
+
+SmartSense utiliza radios E220 por UART y comunicación punto a punto hacia un gateway, con identificadores y mensajes de aplicación propios. El manual de la familia describe modos de operación e interfaces \citep{e220manual}. La referencia consultada corresponde a un modelo de la familia y se usa para esos conceptos; no acredita la variante exacta del módulo de 433~MHz identificado de forma abreviada en la lista de materiales del proyecto. Las condiciones de radio efectivamente usadas deben obtenerse del firmware y de los registros del ensayo.
+
+En una red con varios emisores, compartir el canal puede ocasionar superposición de transmisiones. Por ello, el resultado con \NumeroNodos{} nodos no demuestra capacidad para un número arbitrario de equipos. La carga y la selección de parámetros forman parte del problema de escalabilidad estudiado por \citet{bor2016}.
+
+\subsection{PDR y disponibilidad}
+\label{sec:marco-pdr-disponibilidad}
+La tasa de entrega de paquetes (PDR, por sus siglas en inglés) compara los paquetes válidos recibidos con los enviados dentro de una misma ventana:
+\begin{equation}
+\mathrm{PDR}=\frac{N_{\mathrm{recibidos}}}{N_{\mathrm{enviados}}}\times100\text{\%}.
+\label{eq:marco-pdr}
+\end{equation}
+Es necesario definir cómo se tratan duplicados, reinicios y retransmisiones. Un contador de secuencia puede aportar evidencia directa si se conoce su comportamiento ante esos eventos. Cuando solo se tienen marcas de llegada, el número de envíos se infiere de un periodo supuesto. El resultado debe denominarse PDR estimado: un intervalo largo puede obedecer a pérdida, apagado o cambio de cadencia, y el archivo de recepción por sí solo no separa todas esas causas.
+
+La disponibilidad describe en qué medida el servicio o los datos estuvieron accesibles en una ventana. En el análisis de SmartSense, la disponibilidad de datos se operacionaliza como muestras recibidas frente a muestras esperadas según el periodo de referencia:
+\begin{equation}
+A_{\mathrm{datos}}=\frac{N_{\mathrm{muestras}}}{N_{\mathrm{esperadas}}}\times100\text{\%}.
+\label{eq:marco-disponibilidad}
+\end{equation}
+La disponibilidad cruda utiliza toda la ventana observada. La disponibilidad del enlace durante periodos activos excluye intervalos clasificados como paradas del gateway; depende de ese criterio de exclusión. Aunque dos expresiones puedan parecer similares, sus denominadores y poblaciones responden a preguntas distintas. Un valor alto condicionado al gateway activo no significa que el historial esté disponible durante toda la operación calendario. La identificación de paradas mediante huecos simultáneos debe declararse como inferencia y confrontarse, cuando sea posible, con registros de alimentación o de planta.
+
+\subsection{RSSI, SNR y alcance}
+RSSI representa un indicador de potencia recibida, normalmente expresado en dBm. SNR expresa la relación entre la potencia de señal y de ruido en dB. Son magnitudes diferentes: no puede obtenerse SNR a partir de RSSI sin información adicional sobre el ruido. El análisis físico de LoRa distingue estos parámetros y su relación con la recepción \citep{augustin2016}.
+
+La instrumentación debe indicar qué magnitud entrega el módulo y cómo se convierte su código. Un valor registrado de RSSI no acredita una serie de SNR; tampoco permite calcular un alcance universal. Antenas, obstáculos, orientación y posición afectan el resultado. Si la comunicación sigue operativa al terminar una prueba de distancia, el último punto proporciona una cota inferior experimental de alcance, no el máximo del enlace.
+
+\section{Sueño profundo, ciclo de trabajo y energía}
+\label{sec:marco-energia}
+El sueño profundo reduce la actividad del microcontrolador entre adquisiciones. El consumo total del nodo también incluye radio, acondicionador, reguladores, divisor y corrientes de fuga: no puede deducirse únicamente de la corriente de reposo de la placa \citep{xiaoc6}. La estrategia energética debe abarcar qué periféricos quedan alimentados y cuánto dura cada estado.
+
+Si $t_a$ es el tiempo activo y $T$ el periodo completo, el ciclo de trabajo del nodo se expresa como $D=t_a/T$. Para un modelo de dos estados, una corriente media aproximada es
+\begin{equation}
+I_{\mathrm{media}}=D I_a+(1-D)I_s,
+\label{eq:marco-corriente-media}
+\end{equation}
+donde $I_a$ e $I_s$ representan las corrientes medias activa y de reposo. Deben medirse sobre el nodo completo. El ciclo activo del microcontrolador no es el ciclo de ocupación del canal: este último depende solo del tiempo de emisión radioeléctrica. Por ello, el porcentaje de actividad del nodo no demuestra por sí mismo conformidad con un límite de uso de espectro.
+
+Una aproximación de autonomía divide la capacidad utilizable entre la corriente media, con unidades compatibles. Requiere conocer la capacidad efectiva, el corte de tensión, las pérdidas y las condiciones de descarga. Inferir meses de funcionamiento desde una disminución de tensión durante pocos días exige además un modelo de estado de carga; no constituye una prueba hasta agotamiento. En SmartSense, la evidencia energética se mantiene como \EstadoAutonomia{}.
+
+\section{Concordancia de campo, error e incertidumbre}
+\label{sec:marco-metrologia}
+Según el vocabulario metrológico, calibrar establece relaciones entre indicaciones y valores de referencia con sus incertidumbres; ajustar modifica la respuesta de un instrumento. Error de medición e incertidumbre son conceptos diferentes: el primero es una diferencia respecto de un valor de referencia y la segunda caracteriza la dispersión atribuible al mensurando \citep{jcgm2012}.
+
+En una comparación pareada de campo puede calcularse
+\begin{equation}
+\Delta T_i=T_{\mathrm{SS},i}-T_{\mathrm{ref},i},
+\qquad
+\mathrm{MAE}_{\mathrm{ref}}=\frac{1}{n}\sum_{i=1}^{n}|\Delta T_i|.
+\label{eq:marco-concordancia}
+\end{equation}
+Estas diferencias describen concordancia con el instrumento utilizado. Cuando ese mismo instrumento intervino en el ajuste del offset, la comparación posterior no es una validación independiente de la exactitud absoluta. En particular, una referencia infrarroja y una PT100 de contacto pueden observar áreas distintas y responder de forma diferente a emisividad, montaje y transitorios. Una diferencia pequeña entre ambas no elimina esas contribuciones.
+
+Un presupuesto de incertidumbre necesita un modelo de medición e información sobre las fuentes que influyen en el resultado. Para entradas independientes $x_j$, la forma básica de combinación es
+\begin{equation}
+u_c^2(y)=\sum_j\left(\frac{\partial f}{\partial x_j}\right)^2u^2(x_j),
+\label{eq:marco-incertidumbre}
+\end{equation}
+con términos de covarianza adicionales si las entradas están correlacionadas \citep{jcgm2008}. En este caso sería necesario caracterizar, entre otras contribuciones, la referencia, la resistencia de referencia eléctrica, los conductores, la repetibilidad y el montaje térmico. Una tolerancia de catálogo o la dispersión de unas pocas parejas no sustituyen ese presupuesto. Como no se dispone de dicha caracterización trazable, el resultado térmico del proyecto se presenta como \EstadoTemperatura{}.

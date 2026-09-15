@@ -1,2 +1,35 @@
 \chapter{Objetivos}
-Este capítulo establece el objetivo general y los objetivos específicos que orientan el trabajo.
+\label{cap:objetivos}
+
+\section{Objetivo general}
+Diseñar, implementar y evaluar SmartSense Monitoring como una red inalámbrica abierta y de operación local para adquirir, transmitir, almacenar y visualizar la temperatura superficial de equipos industriales, conservando un historial que apoye el análisis de su comportamiento térmico y el monitoreo de condición en una planta piloto.
+
+\section{Objetivos específicos}
+\begin{enumerate}
+  \item Integrar la cadena de adquisición PT100 de tres hilos, MAX31865 y ESP32-C6, verificando la obtención de lecturas identificadas por nodo y el manejo de lecturas inválidas o fallas de conexión.
+  \item Implementar la comunicación LoRa punto a punto mediante módulos E220, verificando la recepción e identificación de las tramas y documentando la configuración utilizada y la cadencia de recepción.
+  \item Desarrollar el gateway y el dashboard local para almacenar muestras por sensor y fecha, consultar históricos, comparar temperaturas y configurar compensaciones y alarmas, comprobando estas funciones sobre registros disponibles.
+  \item Construir e integrar \NumeroNodos{} nodos alimentados por batería, documentando sus conexiones, componentes, montaje y ciclo de adquisición, transmisión y sueño profundo para permitir su reproducción.
+  \item Evaluar el comportamiento térmico, el desempeño del enlace y la operación energética mediante el despliegue piloto y pruebas complementarias, calculando indicadores de concordancia de campo, disponibilidad, entrega estimada de paquetes y autonomía estimada, e identificando sus supuestos y limitaciones.
+\end{enumerate}
+
+\section{Criterios de verificación de los objetivos}
+La Tabla~\ref{tab:objetivos-verificacion} define los productos observables con los que se examina cada objetivo. Estos criterios organizan la evidencia; el grado de cumplimiento se establece a partir de los resultados y no se presume por la sola existencia del diseño.
+
+\begin{table}[htbp]
+\centering
+\caption{Evidencias previstas para verificar los objetivos específicos.}
+\label{tab:objetivos-verificacion}
+\small
+\begin{tabularx}{\textwidth}{@{}p{1.4cm}XX@{}}
+\toprule
+Objetivo & Producto o indicador verificable & Condición de interpretación \\
+\midrule
+1. Adquisición & Lecturas de temperatura y manejo de fallas de la cadena sensora. & La lectura funcional no demuestra exactitud trazable. \\
+2. Radio & Tramas recibidas, identificación del emisor y distribución de intervalos. & Distinguir recepción observada de conteo directo de enviados. \\
+3. Plataforma & Archivos históricos, consultas y evidencias de interfaz y alarmas. & Verificar la función en la versión de software documentada. \\
+4. Nodos & \NumeroNodos{} unidades, lista de materiales, conexiones y montaje. & No extender el piloto a una capacidad de red no ensayada. \\
+5. Evaluación & Series térmicas, disponibilidad, entrega estimada y modelo energético. & Informar periodo, población, método y límites de cada indicador. \\
+\bottomrule
+\end{tabularx}
+\end{table}
