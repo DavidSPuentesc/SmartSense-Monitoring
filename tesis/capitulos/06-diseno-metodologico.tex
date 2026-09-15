@@ -1,2 +1,167 @@
 \chapter{Diseño metodológico}
-Este capítulo describe el método de diseño, implementación y evaluación empleado en el proyecto.
+\label{cap:metodologia}
+
+\section{Enfoque, unidad de análisis y alcance}
+Se desarrolló una investigación aplicada mediante construcción de un prototipo y evaluación experimental de sus funciones, complementada con observación de su operación en planta. La unidad de adquisición fue un nodo con una sonda de temperatura superficial; la unidad de análisis fue la serie temporal identificada por su dirección MAC. El piloto comprendió \NumeroNodos{} nodos y un gateway. Su propósito fue obtener un histórico consultable y valorar adquisición, comunicación y persistencia bajo las condiciones disponibles, sin establecer causalidad entre temperatura y una falla mecánica.
+
+Se separaron tres clases de evidencia: verificaciones funcionales de la cadena implementada, registros observacionales del despliegue y ensayos complementarios de campo. Los cálculos de disponibilidad, concordancia y autonomía conservan las limitaciones expuestas en el capítulo~\ref{cap:marco-referencia}. Este capítulo define procedimientos y cálculos; los indicadores obtenidos y su interpretación corresponden al capítulo de resultados. La presencia de un protocolo o de una función en el firmware no se considera, por sí sola, evidencia de que un ensayo se ejecutó.
+
+\section{Etapas del trabajo y productos verificables}
+La tabla~\ref{tab:metodo-etapas} relaciona las entradas, procedimientos, variables y salidas de cada etapa. Permite distinguir la construcción del sistema de la evaluación de los datos que produjo.
+
+\begingroup
+\small\singlespacing
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.05cm}>{\raggedright\arraybackslash}p{2.65cm}>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{3.1cm}@{}}
+\caption{Secuencia metodológica y trazabilidad de sus productos.}\label{tab:metodo-etapas}\\
+\toprule
+\textbf{Etapa} & \textbf{Entrada} & \textbf{Procedimiento} & \textbf{Variable registrada} & \textbf{Salida} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Etapa} & \textbf{Entrada} & \textbf{Procedimiento} & \textbf{Variable registrada} & \textbf{Salida} \\
+\midrule\endhead
+\bottomrule\endfoot
+Requisitos & Necesidad de histórico superficial y consulta local. & Traducir el uso en funciones de adquisición, envío, conservación, consulta y alarmas. & Periodo, identificación, retención y funciones requeridas. & Requisitos para contrastar con el prototipo. \\
+Selección & Requisitos y documentación técnica disponible. & Comparar componentes por interfaces, montaje, energía y operación local. & Compatibilidad y limitaciones de cada alternativa. & Matriz de selección, tabla~\ref{tab:seleccion-componentes}. \\
+Construcción & Componentes, esquemas y firmware. & Integrar PT100, conversor, nodo, radio, alimentación y gateway. & Conexiones, parámetros de conversión y radio. & Prototipo y esquemas reproducibles. \\
+Verificación funcional & Prototipo integrado. & Revisar lectura, recepción por MAC, escritura, consulta diaria, offset y alarmas. & Lectura, trama, archivo y respuesta de interfaz. & Evidencia funcional de cada eslabón. \\
+Ventana de 60 min & CSV histórico con los tres nodos. & Extraer una hora con cobertura simultánea y contar registros en $[t_0,t_0+1\,\mathrm{h})$. & Tiempo, temperatura y conteo por nodo. & Ejemplo de continuidad; no PDR directo. \\
+Despliegue & Nodos sobre equipos y gateway local. & Registrar marcha y parada, exportar históricos y ordenar por MAC y fecha. & Temperatura, marcas temporales y huecos. & Series del piloto de \DuracionComunDias{} días y cobertura por nodo. \\
+Alcance & Nodo móvil, gateway y registro instrumentado. & Alejar el nodo y regresar en recorrido urbano con obstáculos. & Recepción, RSSI, batería y punto más lejano. & Cota inferior de alcance en ese recorrido. \\
+Comparación térmica & PT100 instalada y Fluke 62 MAX. & Tomar cinco parejas cercanas en tiempo y ubicación superficial. & Lecturas SmartSense y referencia de campo. & Diferencias pareadas y límites de la comparación. \\
+Descarga parcial & Nodo y celda de \SI{1000}{\milli\ampere\hour}. & Operar durante \SI{120}{\hour} y registrar tensión inicial y final. & Tensión y duración; tiempo activo por separado. & Dos extrapolaciones condicionadas, no vida útil medida. \\
+\end{longtable}
+\endgroup
+
+\section{Requisitos y selección de componentes}
+Los requisitos centrales fueron medir por contacto sin tendido de cable de datos hasta cada máquina, identificar cada punto de adquisición, conservar el histórico por fecha y consultar la información sin Internet. La selección buscó compatibilidad entre esas funciones y los medios disponibles. La tabla~\ref{tab:seleccion-componentes} expresa razones de ingeniería; no presenta una comparación experimental exhaustiva de todos los componentes alternativos.
+
+\begingroup
+\small\singlespacing
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{4.65cm}>{\raggedright\arraybackslash}p{4.65cm}@{}}
+\caption{Matriz de selección de componentes y limitaciones reconocidas.}\label{tab:seleccion-componentes}\\
+\toprule
+\textbf{Requisito} & \textbf{Selección} & \textbf{Razón de ingeniería} & \textbf{Limitación} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Requisito} & \textbf{Selección} & \textbf{Razón de ingeniería} & \textbf{Limitación} \\
+\midrule\endhead
+\bottomrule\endfoot
+Contacto superficial desmontable & PT100 magnética de tres hilos, frente a DS18B20. & Montaje disponible para carcasa y cadena RTD compatible con compensación de conductores \citep{iec60751,max31865}. & Requiere conversor y buen contacto térmico. Sin identificación completa no se atribuyen clase de tolerancia ni rango certificado a la sonda. \\
+Conversión resistiva & MAX31865. & Interfaz SPI, modo de tres hilos y registro de fallas; se parametrizan resistencia nominal y de referencia \citep{max31865}. & La exactitud depende también de referencia, cableado y montaje. La resolución no acredita exactitud. \\
+Control compacto y operación intermitente & XIAO ESP32-C6. & Integra SPI, UART, ADC, temporización y sueño profundo en una placa apta para el nodo \citep{xiaoc6}. & El consumo del conjunto incluye periféricos; la corriente del microcontrolador no representa todo el nodo. \\
+Tramas pequeñas y enlace distribuido & E220 con LoRa, frente a Wi-Fi/BLE para el enlace nodo--gateway. & Prioriza transmisión de baja tasa entre puntos separados; UART simplifica la integración. Wi-Fi se conserva para consulta local \citep{centenaro2016}. & Canal compartido y tasa aérea limitada. No se efectuó un ensayo comparativo equivalente de las tres radios ni se identificó documentalmente la variante exacta del E220. \\
+Alimentación sin cable de red & Batería LiPo. & Permite instalar el nodo y recargarlo; se combina con adquisición intermitente. & Capacidad útil, tensión de corte, envejecimiento y consumo de periféricos condicionan la duración. La celda del ensayo fue de \SI{1000}{\milli\ampere\hour}. \\
+Histórico local & microSD y LittleFS alternativo. & Archivos diarios por sensor; microSD ofrece un medio extraíble y LittleFS permite registrar cuando no está montada. & No constituye duplicación automática. Se depende del reloj, de la integridad del medio y de exportar antes de la rotación. \\
+Consulta junto al equipo & Pantalla del gateway, controlador ST7789. & Ofrece lectura local y estado sin abrir un navegador; el panel táctil facilita interacción. & Área limitada y dependencia de alimentación del gateway; el análisis histórico amplio se realiza en el dashboard. \\
+\end{longtable}
+\endgroup
+
+\section{Periodo de adquisición y carga de datos}
+\label{sec:metodo-muestreo}
+Se adoptó un periodo nominal de \PeriodoNominal{} para el piloto. La evolución térmica superficial de los equipos observados es lenta frente a las oscilaciones que se estudian mediante vibración. Por ello, una serie térmica espaciada permite seguir calentamientos y enfriamientos sin pretender capturar vibraciones ni transitorios más breves que su cadencia. No se midió una constante de tiempo universal del conjunto sonda--máquina.
+
+Para operación continua, el volumen nominal por nodo se calcula como
+\begin{equation}
+N_{\text{día}}=\frac{86\,400~\mathrm{s}}{120~\mathrm{s}}=720
+\quad\text{muestras por nodo y día}.
+\label{eq:metodo-muestras-dia}
+\end{equation}
+Con \NumeroNodos{} nodos corresponde a 2160 muestras diarias, antes de considerar interrupciones. Una retención de 30 días representa 21\,600 registros por nodo o 64\,800 para los tres; son conteos de diseño, no tamaños en bytes ni muestras efectivamente recibidas. Acortar el periodo aumenta aproximadamente en proporción inversa el número de conversiones, envíos y escrituras. También aumenta la actividad energética y la probabilidad de concurrencia en un canal compartido \citep{bor2016}.
+
+El intervalo de 120~s es un compromiso de diseño validado funcionalmente para este piloto, no un óptimo universal. Una aplicación con cambios térmicos más rápidos o exigencias de alarma distintas necesita otra evaluación. Además, el firmware usa el parámetro como duración del sueño y añade actividad al despertar; el periodo nominal no garantiza recepciones separadas exactamente 120~s. La mediana observada de \PeriodoMediano{} se conserva como dato del registro, sin sustituir el periodo nominal empleado en los cálculos publicados.
+
+\section{Protocolo de despliegue y evaluación de comunicación}
+\label{sec:metodo-enlace}
+La instalación fijó las sondas sobre las superficies de interés y vinculó cada MAC con un nodo y un equipo. La puesta en marcha comprendió comprobar recepción, configurar la hora local del gateway, revisar escritura diaria y confirmar acceso al dashboard. Se mantuvieron registros separados por sensor para estudiar los ciclos de operación y los huecos. El archivo analizado se conservó mediante exportación previa a la rotación de históricos; el procedimiento de almacenamiento se desarrolla en la sección~\ref{sec:impl-almacenamiento}.
+
+El análisis del piloto de \DuracionComunDias{} días debe declarar la ventana de cada comparación. El archivo fuente contiene cobertura desigual y una extensión temporal del Nodo B; no se asume que toda fila de todos los nodos pertenezca a una ventana común idéntica. Para comparar simultáneamente equipos se recorta a fechas compartidas, mientras que una estadística individual debe identificar sus fechas inicial y final. Las interrupciones no se rellenan como si fueran mediciones.
+
+\subsection{Indicadores y exclusiones}
+Se aplican las definiciones del marco de referencia a ventanas y poblaciones explícitas:
+\begin{equation}
+\mathrm{PDR}=\frac{N_{\mathrm{recibidos}}}{N_{\mathrm{enviados}}}\times100\%,
+\qquad
+A_{\mathrm{datos}}=\frac{N_{\mathrm{muestras\ disponibles}}}{N_{\mathrm{muestras\ esperadas}}}\times100\%.
+\label{eq:metodo-indicadores}
+\end{equation}
+La disponibilidad cruda compara lo disponible con lo esperado durante toda la ventana calendario. La disponibilidad condicionada a periodos activos excluye los tramos clasificados como gateway apagado. Las dos medidas responden a preguntas distintas y no deben intercambiarse con el PDR, cuyo denominador ideal cuenta envíos reales.
+
+El histórico no contenía secuencia de envío. El script \texttt{analisis/perdida\_paquetes.py} ordena las llegadas por MAC y obtiene $\Delta t_i=t_{i+1}-t_i$. Para intervalos de hasta 1800~s calcula
+\begin{equation}
+k_i=\operatorname{round}\!\left(\frac{\Delta t_i}{120~\mathrm{s}}\right),
+\qquad
+\widehat{N}_{\mathrm{faltantes},i}=\max(0,k_i-1).
+\label{eq:metodo-perdida-inferida}
+\end{equation}
+Así, un intervalo próximo a $kT$ implica $k-1$ tramas faltantes bajo el supuesto de cadencia estable. El denominador inferido es el número recibido más la suma de faltantes. Los huecos mayores de 30~min se excluyen de esa suma y se contabilizan separadamente. Su coincidencia entre nodos respalda la interpretación de paradas compartidas, pero el umbral temporal por sí solo no demuestra que el gateway estuviera apagado ni descarta una falla común. Sin bitácora de alimentación, la atribución continúa siendo una inferencia. El método tampoco observa pérdidas anteriores a la primera recepción o posteriores a la última de cada tramo.
+
+\subsection{Ventana representativa y protocolo instrumentado}
+\label{sec:metodo-60min}
+La ventana ilustrativa de una hora se extrae del despliegue con \texttt{analisis/prueba\_60min.py}. El script busca, desde el comienzo compartido y avanzando en pasos de 30~min, la primera hora con al menos 25 registros de cada nodo. Emplea un intervalo semiabierto para no contar dos veces el extremo final. A la cadencia nominal se esperan $3600/120=30$ muestras por nodo. La ventana presentada en el artículo corresponde al 10 de mayo de 2026, de 00:00 a 01:00. Esta selección favorece una hora con buena cobertura: ilustra funcionamiento y no es una muestra aleatoria representativa de todas las paradas del despliegue. La razón recibido/esperado describe cobertura nominal, no un conteo directo de paquetes enviados.
+
+Los documentos \texttt{analisis/PROTOCOLO\_PDR.md} y \texttt{analisis/PROTOCOLO\_PRUEBA\_60MIN.md} especifican una repetición instrumentada distinta: cargar y registrar el voltaje inicial, programar los tres nodos y el gateway, capturar el monitor serie durante 60~min y anotar inicio, duración y distancia. La trama añade \texttt{SEQ}, \texttt{VBAT} y \texttt{UP}; el gateway puede registrar RSSI cuando recibe el byte válido del radio. Antes de usarlo se debe comprobar recepción normal y que \texttt{rssi\_raw} sea distinto de $-1$, como prescribe el protocolo. La salida se procesa mediante \texttt{analisis/analizar\_prueba.py}.
+
+La secuencia conservada durante sueño profundo permite estimar envíos entre el primer y el último contador observados. Para una medición controlada deben delimitarse reinicios, duplicados y extremos de sesión; la lógica publicada no prueba por sí misma que esos casos estén resueltos. Estos protocolos no agregan retroactivamente secuencias o RSSI al CSV histórico, ni convierten la hora seleccionada en un nuevo ensayo ejecutado. El tiempo \texttt{UP} es tiempo encendido del nodo hasta formar la trama y no latencia extremo a extremo: esta requiere relojes sincronizados y marcas de envío y recepción.
+
+\subsection{Ensayo de alcance con obstrucciones}
+La evaluación complementaria del 20 de agosto de 2026 empleó la configuración de 433~MHz descrita en el proyecto y un recorrido urbano sin línea de vista directa (NLOS), con edificios interpuestos. Se alejó un nodo del gateway y se regresó, registrando recepción, RSSI y batería frente al tiempo. No se trataron las muestras móviles como una curva calibrada de RSSI frente a distancia fija.
+
+El recorrido llegó aproximadamente a \DistanciaDemostrada{} con el enlace operativo y terminó voluntariamente. Por ello, ese punto define una cota inferior experimental para las condiciones ensayadas; no establece el alcance máximo, una cobertura garantizada en planta ni el comportamiento de otra configuración. No se calcula margen de enlace a partir de una sensibilidad genérica: falta identificar de forma completa la variante de radio y sus parámetros físicos. No se obtuvo una serie de SNR del despliegue.
+
+\section{Comparación térmica de campo}
+La comparación utilizó un Fluke 62 MAX como referencia de campo, sin certificado vigente de calibración disponible para el estudio. Se registraron cinco parejas sobre el motor del succionador, procurando simultaneidad y proximidad al punto de contacto de la PT100, en la zona caliente aproximada de 65 a \SI{71}{\celsius}. Para cada pareja se calcula $\Delta T_i=T_{\mathrm{SS},i}-T_{\mathrm{ref},i}$ y se resume el valor absoluto medio mediante la ecuación~\ref{eq:marco-concordancia}.
+
+La salida del procedimiento es concordancia local con el instrumento empleado, no calibración trazable \citep{jcgm2012,jcgm2008}. La comparación está limitada por el número de parejas, un único nodo y el intervalo térmico estrecho. La referencia infrarroja y la sonda de contacto no observan exactamente la misma área ni responden igual a emisividad y montaje. Además, el mismo instrumento intervino en el ajuste del offset; la comparación posterior no es independiente. Para evaluar exactitud absoluta harían falta una referencia calibrada, un presupuesto de incertidumbre y varios puntos térmicos en los tres nodos.
+
+\section{Diseño energético y estimación de autonomía}
+\label{sec:metodo-autonomia}
+El tiempo activo se obtuvo del registro de arranques del nodo, hasta completar adquisición y transmisión antes del sueño. El valor de referencia de \TiempoActivo{} y el periodo nominal dan
+\begin{equation}
+D=\frac{t_{\mathrm{activo}}}{T}=\frac{2.279}{120}=0.01899\approx1.9\,\text{\%}.
+\label{eq:metodo-duty}
+\end{equation}
+Esta aproximación usa 120~s como periodo total de diseño; la duración efectiva incluye los tiempos del firmware. El valor describe actividad del nodo, no tiempo de emisión de radio ni recuperación probada frente a bloqueo del enlace.
+
+El modelo energético de dos estados permite expresar corriente media y autonomía ideal como
+\begin{equation}
+I_{\mathrm{media}}=D I_{\mathrm{activo}}+(1-D)I_{\text{sueño}},
+\qquad
+t_{\mathrm{aut}}=\frac{C_{\text{útil}}}{I_{\mathrm{media}}}.
+\label{eq:metodo-autonomia-corriente}
+\end{equation}
+Con capacidad en mAh y corriente en mA, el cociente se expresa en horas. La ecuación requiere la corriente del conjunto y capacidad útil a las condiciones del ensayo, no únicamente valores nominales del microcontrolador.
+
+\subsection{Entradas de la descarga parcial y dos extrapolaciones}
+El script \texttt{analisis/autonomia\_bateria.py} utiliza una celda de \SI{1000}{\milli\ampere\hour} y dos lecturas: \SI{4.112}{\volt} el 13 de agosto y \SI{4.089}{\volt} el 18 de agosto de 2026, separadas por \SI{120}{\hour}. La caída observada de \SI{0.023}{\volt} se convierte en pendiente mediante
+\begin{equation}
+r_V=\frac{V_0-V_1}{\Delta t}=\frac{4.112-4.089}{120}
+\approx 0.000192~\mathrm{V/h},
+\qquad
+\widehat{t}_{\mathrm{lineal}}=\frac{V_0-V_{\mathrm{corte}}}{r_V}.
+\label{eq:metodo-lineal}
+\end{equation}
+Hasta \SI{3.30}{\volt}, la estimación lineal resulta en \AutonomiaLinealEstimada{}. El script la denomina cota inferior conservadora al compararla con su modelo de curva LiPo; no es un límite físico garantizado bajo cualquier temperatura, carga o envejecimiento.
+
+El segundo cálculo interpola una tabla típica de tensión en circuito abierto frente a estado de carga (OCV--SoC). Si $s(V)$ es la fracción de carga interpolada, se supone descarga a ritmo constante:
+\begin{equation}
+r_s=\frac{s(V_0)-s(V_1)}{120~\mathrm{h}},
+\qquad
+\widehat{t}_{\mathrm{LiPo}}=\frac{s(V_0)-s(V_{\mathrm{corte}})}{r_s}.
+\label{eq:metodo-lipo}
+\end{equation}
+El intervalo de \AutonomiaModeloEstimada{} corresponde a cortes de 3.30 y \SI{3.00}{\volt}. Son salidas del modelo parametrizado con los dos puntos, no duraciones observadas. La tabla es típica, no una caracterización de esa celda; tampoco se documenta relajación suficiente para asegurar tensión de circuito abierto. La caída pequeña vuelve el cálculo sensible a resolución, temperatura y condiciones de lectura. Ninguna extrapolación demuestra meses de funcionamiento. No se infiere automáticamente la vida de otra batería duplicando su capacidad nominal.
+
+\subsection{Instrumentación para caracterizar corriente}
+La figura~\ref{fig:metodo-montaje-corriente} conserva el montaje documentado para observar el pulso activo: un shunt de \SI{1}{\ohm} en el retorno de la batería y un osciloscopio permiten obtener $I(t)=V_{\mathrm{shunt}}(t)/R_{\mathrm{shunt}}$. Es un esquema de medición, no un oscilograma registrado. El repositorio también incluye un programa con INA219 para estimar la corriente activa. Sus valores de ejemplo son ilustrativos y la corriente de sueño asumida de \SI{15}{\micro\ampere} no es una medición del nodo completo. En particular, el perfil dibujado por el script de autonomía usa una corriente activa inferida del propio modelo; no valida de manera independiente la extrapolación de tensión.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.70\textwidth]{montaje-corriente.pdf}
+\caption{Montaje documentado para medir corriente a partir de la caída en un shunt de lado bajo. Explica la conexión y conversión tensión--corriente; no acredita una captura experimental del pulso ni la corriente total de sueño. Fuente: diagrama del repositorio.}
+\label{fig:metodo-montaje-corriente}
+\end{figure}
+
+\section{Trazabilidad y límites de reproducción}
+Para reproducir el análisis se deben conservar el CSV exportado, las fechas y MAC seleccionadas y la configuración usada. Varios scripts buscan el CSV en la carpeta de descargas del equipo de desarrollo; el código no garantiza que los datos estén disponibles en otra máquina. También se requieren registros serie para los ensayos complementarios. Debe distinguirse cada dato medido de una transformación o estimación.

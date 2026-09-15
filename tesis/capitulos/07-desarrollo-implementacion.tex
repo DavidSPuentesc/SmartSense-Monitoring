@@ -1,2 +1,148 @@
 \chapter{Desarrollo e implementación}
-Este capítulo documenta la construcción de los nodos, el gateway, el almacenamiento y el dashboard local.
+\label{cap:implementacion}
+
+\section{Arquitectura y responsabilidades}
+La implementación distribuye la adquisición entre \NumeroNodos{} nodos y concentra recepción, persistencia y consulta en un gateway. La cadena funcional es PT100 $\rightarrow$ MAX31865 $\rightarrow$ ESP32-C6 $\rightarrow$ E220 $\rightarrow$ gateway $\rightarrow$ microSD/LittleFS $\rightarrow$ pantalla/dashboard. El gateway también actualiza la lectura reciente de la interfaz al recibir datos: la pantalla no necesita volver a leer el histórico para cada actualización. La figura~\ref{fig:impl-arquitectura} muestra la separación entre adquisición, enlace radio y acceso local.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{arquitectura-detalle.pdf}
+\caption{Arquitectura de adquisición y consulta local. Los tres nodos comparten el gateway, que identifica las tramas, conserva series por sensor y presenta lecturas por pantalla y Wi-Fi. El diagrama describe responsabilidades e interfaces; no representa una prueba de alcance ni capacidad máxima. Fuente: diseño del proyecto.}
+\label{fig:impl-arquitectura}
+\end{figure}
+
+El enlace entre nodos y gateway utiliza LoRa punto a punto con mensajes propios. No se implementa una red LoRaWAN ni un servidor de red de ese protocolo. El acceso por Wi-Fi es la vía entre navegador y gateway y no sustituye el enlace de los sensores. Esta separación permite consultar datos sin Internet, siempre que el gateway esté alimentado, su almacenamiento esté disponible y su reloj sea válido.
+
+\section{Construcción del nodo sensor}
+\label{sec:impl-nodo}
+Cada nodo combina una placa XIAO ESP32-C6, una PT100 magnética de tres hilos, el MAX31865, un E220 y una batería LiPo. La conexión RTD se configura como \texttt{MAX31865\_3WIRE}; el firmware define $R_{\mathrm{nominal}}=\SI{100}{\ohm}$ y $R_{\mathrm{ref}}=\SI{421.1}{\ohm}$. Este último es el valor empleado en la conversión y descrito como caracterizado en la documentación del proyecto; no reemplaza un certificado ni un presupuesto de incertidumbre de la cadena.
+
+El MAX31865 se conecta por SPI implementado en software; la alimentación del acondicionador se conmuta desde un pin para reducir su actividad entre lecturas. El E220 se conecta por UART y dispone de líneas de selección de modo. La figura~\ref{fig:impl-esquematico-nodo} documenta las conexiones y la figura~\ref{fig:impl-nodo-montado} muestra el montaje físico. Las denominaciones abreviadas que aparezcan en los esquemas no identifican documentalmente la variante completa del radio ni la clase de la sonda, conforme a las limitaciones de la sección~\ref{sec:marco-rtd}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{esquematico-nodo.pdf}
+\caption{Conexiones del nodo: SPI hacia el MAX31865, UART y líneas de modo hacia E220, alimentación y divisor de batería. Permite seguir la integración eléctrica; los rótulos de componentes no certifican la tolerancia de la PT100 ni la variante exacta del radio instalado. Fuente: esquema del proyecto.}
+\label{fig:impl-esquematico-nodo}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.62\textwidth,height=8cm,keepaspectratio]{evidencias/nodo-instalado.jpg}
+\caption{Evidencia del nodo ensamblado e instalado sobre un equipo. Permite reconocer la disposición física del prototipo y su uso en campo; una fotografía no demuestra exactitud, grado de protección ni vida útil de batería. Fuente: registro fotográfico del proyecto.}
+\label{fig:impl-nodo-montado}
+\end{figure}
+
+\subsection{Ciclo de adquisición y control de fallas}
+El archivo \texttt{Nodo\_Lora.ino} de la versión con LoRa y página local inicia interfaces, carga configuración persistida, alimenta el acondicionador y revisa su registro de fallas. En condiciones normales intenta cuatro conversiones, descarta valores no numéricos y valores fuera de los límites programados, y promedia las lecturas aceptadas. El registro de fallas del MAX31865 permite identificar problemas eléctricos \citep{max31865}; esos límites de software no constituyen el rango calibrado de la sonda.
+
+Si todas las conversiones fallan, se intenta una lectura adicional. La versión revisada devuelve 0.0 cuando tampoco obtiene una lectura válida; al ser un número finito, ese valor podría llegar al histórico. Por tanto, consultar el registro de fallas por serie y revisar valores anómalos sigue siendo necesario: no se afirma que todos los errores de sensor queden codificados de manera inequívoca en la trama. Incorporar un indicador explícito de validez sería una mejora posterior.
+
+Tras medir temperatura y batería, el nodo forma y transmite la trama, atiende brevemente mensajes y programa el temporizador de sueño profundo. El parámetro de sueño se guarda mediante \texttt{Preferences} y se limita entre 5 y 7200~s. El código fuente revisado tiene 60~s como valor por defecto; los \PeriodoNominal{} del piloto corresponden a la configuración operativa persistida, que debe verificarse al reproducirlo. Durante los primeros 30 ciclos tras un arranque no causado por el temporizador, el firmware habilita solicitudes de configuración remota; no permanece continuamente escuchando mientras duerme.
+
+\subsection{Lectura de batería}
+El ADC lee un divisor resistivo. En la versión revisada se definen $R_1=344\,800~\Omega$, $R_2=994\,300~\Omega$, ganancia $K=1$ y corrección $B=\SI{0.090}{\volt}$. La operación programada es
+\begin{equation}
+V_{\mathrm{bat}}=K V_{\mathrm{ADC}}\frac{R_1+R_2}{R_2}+B.
+\label{eq:impl-bateria}
+\end{equation}
+Se transforma luego la tensión en un porcentaje lineal entre 3.30 y \SI{4.10}{\volt}, saturado entre 0 y 100. Es un indicador orientativo para la interfaz; no es medición de capacidad remanente por conteo de carga ni la curva OCV--SoC utilizada en la sección~\ref{sec:metodo-autonomia}. Los parámetros reproducen el cálculo del código, sin acreditar por sí solos la exactitud del canal ADC.
+
+\section{Comunicación y formato de mensajes}
+\label{sec:impl-comunicacion}
+El proyecto documenta operación en 433~MHz, direccionamiento fijo, UART a 9600~bit/s y tasa aérea de 2.4~kbit/s. El código usa un canal común, identificado como 23, y dirección de destino maestro 1. La equivalencia entre código de canal y frecuencia concreta depende de la variante; no se deduce de un manual de otro E220 \citep{e220manual}. La configuración automática al arrancar está deshabilitada en el nodo revisado, de modo que las constantes del programa no sustituyen comprobar la configuración retenida por el radio.
+
+Para transmitir en modo fijo, el nodo antepone los bytes alto y bajo de la dirección del gateway y el canal al mensaje textual terminado en salto de línea. La dirección radio encamina la trama; la MAC identifica de forma persistente el sensor para el almacenamiento y la interfaz. La tabla~\ref{tab:impl-identidad-nodos} fija la correspondencia empleada por los scripts del piloto, sin confundir la dirección 13 del ejemplo de firmware con la dirección de los tres dispositivos.
+
+\begin{table}[htbp]
+\centering
+\caption{Identificadores de los nodos en los scripts de análisis.}
+\label{tab:impl-identidad-nodos}
+\begin{tabular}{ll}
+\toprule
+\textbf{Nombre en el análisis} & \textbf{MAC} \\
+\midrule
+Nodo A & \texttt{58:E6:C5:13:A3:C0} \\
+Nodo B & \texttt{58:E6:C5:13:A9:20} \\
+Nodo C & \texttt{58:E6:C5:19:28:20} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La trama histórica contiene tipo \texttt{DATA}, \texttt{ID}, \texttt{TEMP}, \texttt{BAT} y \texttt{MAC}. La instrumentación posterior amplía el formato con los campos de la tabla~\ref{tab:impl-campos}. En el firmware se construye como la siguiente secuencia de claves, con valores separados por comas:
+\begin{quote}\small\ttfamily
+DATA,ID=...,SEQ=...,TEMP=...,VBAT=...,\\
+BAT=...,UP=...,MAC=...
+\end{quote}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Campos de aplicación y significado en la versión instrumentada.}
+\label{tab:impl-campos}
+\begin{tabularx}{\textwidth}{@{}p{1.7cm}Xp{4.5cm}@{}}
+\toprule
+\textbf{Campo} & \textbf{Contenido} & \textbf{Alcance} \\
+\midrule
+\texttt{ID} & Dirección lógica del nodo. & No reemplaza la MAC del archivo. \\
+\texttt{TEMP} & Temperatura calculada en el nodo, en \textdegree C. & El gateway puede aplicar offset. \\
+\texttt{BAT} & Porcentaje aproximado por tensión. & Indicador, no capacidad medida. \\
+\texttt{MAC} & Identificación persistente del dispositivo. & Clave para asociar serie y configuración. \\
+\texttt{SEQ} & Contador incrementado en cada envío. & Añadido después del histórico; retenido en sueño profundo. \\
+\texttt{VBAT} & Tensión calculada por ADC y divisor. & Añadida para ensayos instrumentados. \\
+\texttt{UP} & Milisegundos encendido hasta construir la trama. & No mide recepción ni latencia de red. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El intercambio de configuración utiliza \texttt{CFG\_REQ}, \texttt{CFG} y \texttt{CFG\_ACK}; también existen mensajes de consulta y estado. Estos mensajes no deben contarse como muestras térmicas. El contador \texttt{SEQ} se incrementa para \texttt{DATA}, sobrevive al sueño profundo y puede reiniciarse por corte de alimentación. El gateway publicado cuenta recepciones entre secuencias observadas, pero no elimina explícitamente duplicados y su detección de reinicio no cubre todos los escenarios. La prueba directa de PDR exige controlar esos casos y conservar el registro completo, conforme a la sección~\ref{sec:metodo-60min}.
+
+La instrumentación de RSSI intenta habilitar un byte adicional en el E220 y registra un indicador de ausencia cuando no está disponible. El protocolo exige comprobar su funcionamiento con el módulo instalado y permite desactivar el intento si interfiere en la recepción. Su presencia en el código actual no demuestra que existiera RSSI en el histórico de planta; los registros de alcance pertenecen a un ensayo posterior.
+
+\section{Gateway, reloj y persistencia}
+El gateway utiliza ESP32-C6, radio E220, pantalla táctil con controlador ST7789 y microSD. Las conexiones añadidas se presentan en la figura~\ref{fig:impl-esquematico-gateway}. Al recibir una trama, el programa identifica la MAC, actualiza su última recepción, separa temperatura cruda de corregida y actualiza el estado mostrado. La lógica de alarma se ejecuta con la temperatura del nodo disponible en el gateway.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.90\textwidth]{esquematico-gateway.pdf}
+\caption{Conexiones externas del gateway con el radio UART y la salida de alarma crítica. La pantalla, el panel táctil y la ranura microSD forman parte de la placa; el esquema permite distinguir sus funciones de las conexiones agregadas. No certifica una función de seguridad de máquina. Fuente: esquema del proyecto.}
+\label{fig:impl-esquematico-gateway}
+\end{figure}
+
+La hora se sincroniza desde el navegador y se aplica la zona UTC--5 para nombrar archivos y ubicar muestras dentro del día. La rutina de guardado no escribe mientras el reloj no sea válido; una recepción visible no garantiza por sí misma persistencia histórica. Por ello, verificar hora y escritura forma parte de la puesta en marcha. La ausencia de Internet no elimina la necesidad de una referencia temporal correcta.
+
+\subsection{Archivos diarios y ventana móvil}
+\label{sec:impl-almacenamiento}
+La función de selección de almacenamiento utiliza microSD cuando está montada y LittleFS en caso contrario. LittleFS también contiene recursos web y configuración auxiliar. Este respaldo significa un medio alternativo de registro, no una réplica simultánea ni una migración automática entre medios. El fallo de apertura de un archivo en una tarjeta ya montada tampoco implica, por sí solo, conmutación automática a LittleFS.
+
+Por cada MAC se crea un directorio y por cada fecha un archivo de texto. Las líneas contienen segundo del día y temperatura multiplicada por diez, almacenada como entero; por ejemplo, la resolución de representación es \SI{0.1}{\celsius}, sin que ello constituya exactitud. La rutina revisada guarda temperatura corregida y evita dos escrituras para el mismo segundo del mismo sensor. No conserva en esas líneas la secuencia, batería o RSSI: los campos añadidos para pruebas se capturan aparte en la salida serie.
+
+La constante \texttt{MAX\_DAYS\_HISTORY} vale 30. La limpieza ordena los archivos diarios por fecha y elimina los más antiguos cuando existen más de 30. En operación diaria esto produce una ventana móvil de 30 días; si hay días sin archivo, la implementación conserva hasta 30 fechas con datos, no necesariamente 30 días calendario consecutivos.
+
+El dataset analizado se preservó mediante exportación previa a la eliminación por rotación, como documenta el artículo fuente. Así, el periodo de estudio de \DuracionComunDias{} días no equivale a una retención simultánea de todas sus fechas dentro del gateway. La existencia del CSV usado por los scripts acredita una fuente de análisis conservada; no acredita por sí sola un botón de exportación automática cuya operación se haya ensayado. Para repetir el piloto se necesita programar la extracción antes de que se eliminen los archivos requeridos y conservar la copia fuera del dispositivo.
+
+\section{Pantalla local y dashboard}
+El gateway publica el punto de acceso \texttt{Sensores\_Temp} y la página local en \texttt{192.168.4.1}. El navegador recibe actualizaciones mediante eventos enviados por el servidor, aproximadamente cada segundo. Esa actualización de interfaz no es una nueva adquisición a 1~Hz: entre envíos del nodo se presenta su última lectura y el estado de conexión calculado.
+
+Las funciones implementadas incluyen temperatura y batería recientes, consulta por fecha, gráfica de 24~horas, mínimo, máximo y promedio, agrupación por máquina y comparación entre sensores. También permiten asignar nombres, configurar el periodo, ajustar la compensación y fijar umbrales. La figura~\ref{fig:impl-dashboard} ilustra estas funciones. Los nueve registros visibles en la captura no deben confundirse con los \NumeroNodos{} nodos del conjunto experimental analizado ni con una prueba de escalabilidad.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{dashboard-principal.png}
+\caption{Dashboard con agrupación por máquina, lectura reciente, batería, conectividad y tendencia. La captura muestra la organización de nueve registros de interfaz; el análisis experimental de este trabajo corresponde a tres nodos. Fuente: captura del proyecto.}
+\label{fig:impl-dashboard}
+\end{figure}
+
+\subsection{Compensación progresiva de temperatura}
+El gateway permite ajustar un offset por sensor a partir de una referencia fría y un punto caliente. Para temperatura cruda $T_r$, base fría $T_f$, punto caliente $T_c$ y offset $O$, el comportamiento nominal dentro de una configuración válida se expresa como
+\begin{equation}
+T_{\mathrm{corr}}=T_r+O\,\min\!\left(1,\max\!\left(0,\frac{T_r-T_f}{T_c-T_f}\right)\right),
+\qquad T_c>T_f.
+\label{eq:impl-offset}
+\end{equation}
+Por debajo de $T_f$ no se aplica el ajuste y por encima de $T_c$ se aplica completo. El programa comprueba referencias y separación antes de interpolar; si faltan referencias válidas o la separación es insuficiente, aplica el offset completo como suma constante. Deben conservarse los parámetros usados para interpretar una serie corregida; un cambio de offset puede producir cambios en el registro que no provienen de la máquina. Este ajuste operacional no acredita calibración metrológica ni independencia respecto al instrumento usado para establecerlo \citep{jcgm2012}.
+
+\subsection{Alarmas y alcance de la supervisión}
+Los umbrales por nodo distinguen advertencia y condición crítica. La interfaz utiliza señalización visual y puede emitir sonido en el navegador; el gateway dispone además de una salida digital de alarma crítica. Estas funciones facilitan atención a una condición térmica configurada. No identifican por sí mismas la causa mecánica ni constituyen un sistema certificado de parada de seguridad. La observación del succionador y su asociación posterior con rodamientos se evalúan como evidencia de campo en resultados, sin atribuir al firmware un diagnóstico automático.
+
+\section{Relación entre implementación y evidencia}
+La implementación hace posible adquirir y conservar series, mientras los procedimientos del capítulo~\ref{cap:metodologia} determinan qué puede afirmarse a partir de ellas. Es necesario distinguir firmware revisado, configuración efectivamente desplegada y registros de cada ensayo. En particular, la instrumentación añadida no completa los campos ausentes del histórico, la presencia de un archivo no demuestra continuidad durante una parada y los cálculos de autonomía no sustituyen una descarga hasta corte. Esta distinción conserva la trazabilidad entre diseño, funcionamiento observado y evaluación cuantitativa.
