@@ -11,6 +11,10 @@
 \newcommand{\DiferenciaTermicaMedia}{0.1~\textdegree C}
 \newcommand{\DuracionDescarga}{5~días}
 \newcommand{\AutonomiaLinealEstimada}{177~días}
+% Source of truth: analisis/autonomia_bateria.py, LiPo OCV--SoC interpolation
+% calibrated to V0=4.112 V and V5=4.089 V over H=120 h. Its output is
+% 291 days at the 3.30 V cutoff and 307 days at the 3.00 V cutoff.
+% The accepted 291-day lower endpoint therefore supersedes rounded article prose.
 \newcommand{\AutonomiaModeloEstimada}{291--307~días}
 \newcommand{\DistanciaDemostrada}{688~m}
 \newcommand{\RSSILejano}{-98~dBm}
