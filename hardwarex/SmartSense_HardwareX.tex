@@ -49,7 +49,7 @@ Open-source hardware; LoRa; PT100; RTD; MAX31865; ESP32-C6; industrial temperatu
 \textbf{Specifications table}\\
 \vskip 0.2cm
 \tabulinesep=1ex
-\begin{tabu} to \linewidth {|X|X[3,l]|}
+\begin{tabu} to \linewidth {|X[l]|X[3,l]|}
 \hline \textbf{Hardware name} & SmartSense Monitoring \\
 \hline \textbf{Subject area} &
   \begin{itemize}[noitemsep, topsep=0pt]
@@ -207,7 +207,7 @@ The following steps describe the construction of one sensor node and the gateway
 
 \begin{enumerate}[noitemsep]
 \item Power the gateway. It creates a Wi-Fi access point (\texttt{Sensores\_Temp}) and serves the dashboard at \texttt{http://192.168.4.1}.
-\item Power each node. On first boot it transmits periodically (default configurable between 5 and 7200~s; 120~s in the pilot). The gateway registers each node by its MAC address.
+\item Power each node. The reviewed firmware defaults to 60~s of sleep, configurable between 5 and 7200~s; the pilot used 120~s. Activity after waking adds to this sleep duration. Verify the retained setting before replication. The gateway registers each node by its MAC address.
 \item In the dashboard, assign names to sensors, group them by machine, set the sampling interval, apply a per-node temperature offset, and configure warning and critical thresholds.
 \item Monitor the live values (temperature, battery, connectivity) and consult the per-day 24-hour history, including minimum, maximum and average, and compare sensors of the same machine.
 \item Preserve copies of the per-sensor stored history before the 30-day rotation removes older dates. The project analysed exported CSVs and the software replica can import them; direct web CSV download is not verified in the reviewed gateway firmware and is not claimed as a demonstrated interface function.
@@ -259,7 +259,7 @@ Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 \label{fig:prueba60}
 \end{figure}
 
-\textbf{Temperature field comparison.} The purpose was to assess consistency of the installed node with a field reference on the suction-fan motor. Five simultaneous paired readings were recorded near the same surface point in the 65--71~$^{\circ}$C interval against a Fluke 62 MAX infrared thermometer (Table~\ref{tab:thermal-pairs}). Their mean absolute difference is 0.06~$^{\circ}$C (approximately 0.1~$^{\circ}$C rounded) and their maximum absolute difference is 0.1~$^{\circ}$C; the signed mean is 0.02~$^{\circ}$C. The project summary separately reports a maximum of 0.4~$^{\circ}$C. That reported value is retained as a provenance limitation: it cannot be reconstructed from the five transcribed pairs, and resolving it requires the original measurement record.
+\textbf{Temperature field comparison.} The purpose was to assess consistency of the installed node with a field reference on the suction-fan motor. Five paired readings were taken close in time and near the same surface point in the 65--71~$^{\circ}$C interval against a Fluke 62 MAX infrared thermometer (Table~\ref{tab:thermal-pairs}); synchronized acquisition was not documented. Their mean absolute difference is 0.06~$^{\circ}$C (approximately 0.1~$^{\circ}$C rounded) and their maximum absolute difference is 0.1~$^{\circ}$C; the signed mean is 0.02~$^{\circ}$C. The project summary separately reports a maximum of 0.4~$^{\circ}$C. That reported value is retained as a provenance limitation: it cannot be reconstructed from the five transcribed pairs, and resolving it requires the original measurement record.
 
 \begin{table}[h]
 \centering
@@ -344,7 +344,7 @@ This work did not involve human subjects or animal experiments.
 The authors thank the partner company that provided access to the pilot plant. This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
 
 \noindent
-\textbf{References}\\
+\textbf{References}\par
 \begin{enumerate}[label={[\arabic*]}, noitemsep]
 \item I. F. Akyildiz, W. Su, Y. Sankarasubramaniam, and E. Cayirci, ``Wireless sensor networks: A survey,'' \textit{Computer Networks}, vol. 38, no. 4, pp. 393--422, 2002.
 \item J. Yick, B. Mukherjee, and D. Ghosal, ``Wireless sensor network survey,'' \textit{Computer Networks}, vol. 52, no. 12, pp. 2292--2330, 2008.

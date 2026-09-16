@@ -2,14 +2,17 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[spanish,es-nodecimaldot]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}\renewcommand{\listtablename}{Índice de tablas}}
 \usepackage{newtxtext,newtxmath}
 \usepackage[top=2.8cm,bottom=2.35cm,left=2.54cm,right=2.54cm]{geometry}
 \usepackage{setspace,graphicx,booktabs,tabularx,array,longtable}
 % Tectonic's current newtxmath and amssymb packages both define \Bbbk.
 \let\Bbbk\relax
 \usepackage{amsmath,amssymb,siunitx,xcolor,url}
-\usepackage[hidelinks]{hyperref}
+% Absolute page anchors stay unique across title pages and numbering changes.
+\usepackage[hidelinks,hypertexnames=false]{hyperref}
 \usepackage[round,authoryear]{natbib}
+\renewcommand{\bibsection}{\chapter*{Referencias bibliográficas}\addcontentsline{toc}{chapter}{Referencias bibliográficas}}
 \graphicspath{{figuras/}}
 \sisetup{output-decimal-marker={,}}
 \input{tesis/datos-evidencia}

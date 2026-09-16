@@ -12,11 +12,11 @@ Las revisiones de \citet{akyildiz2002} y \citet{yick2008} muestran que la red no
 \citet{centenaro2016} presentan el enfoque de comunicaciones de baja tasa y largo alcance para aplicaciones de Internet de las cosas. \citet{augustin2016} estudian el funcionamiento y desempeño de LoRa y LoRaWAN mediante pruebas y simulaciones, mientras \citet{bor2016} examinan los límites de escalabilidad. Estos antecedentes apoyan la elección de radio para mensajes breves y periódicos; también muestran que la carga del canal, la configuración y el escenario deben formar parte de la evaluación. Sus resultados no se trasladan numéricamente al enlace E220 de SmartSense, que utiliza su propio formato de aplicación y un número limitado de nodos.
 
 \section{Sistemas de adquisición relacionados}
-\citet{polonelli2019} desarrollan una red LoRaWAN alimentada por batería para observar temperatura y humedad en un centro de datos. Reportan una operación de seis meses y más de seis millones de puntos de datos. El gateway puede integrar el servidor, por lo que este antecedente no debe describirse como una solución necesariamente dependiente de la nube. Su interés es la evaluación prolongada de una red térmica; su escenario de medición ambiental difiere del contacto sobre la carcasa de una máquina.
+\citet{polonelli2019} desarrollan una red LoRaWAN alimentada por batería para observar temperatura y humedad en un centro de datos. Reportan una operación de seis meses y más de seis millones de puntos de datos. El gateway puede integrar el servidor y ofrecer operación local. Su interés es la evaluación prolongada de una red térmica; su escenario de medición ambiental difiere del contacto sobre la carcasa de una máquina.
 
 HIGROTERM, de \citet{higroterm2021}, es un registrador abierto para laboratorio basado en sensores DHT22, con canales cableados, pantalla y almacenamiento en tarjeta SD. Publica componentes, código y documentación de construcción. Constituye un antecedente directo de adquisición local reproducible, aunque no aborda una red de sondas RTD sobre equipos industriales. El trabajo de \citet{mois2017} añade un antecedente de análisis de sensores inalámbricos para monitoreo ambiental; su variable y escenario deben distinguirse igualmente de la temperatura superficial.
 
-\citet{jakobsen2024} presentan un sensor abierto de monitoreo de condición con acelerómetros, micrófono y sensor de temperatura. Combina BLE para datos y LoRaWAN para características procesadas, y se evalúa con excitación mecánica y un banco con rodamiento defectuoso. Este trabajo evidencia que los dispositivos abiertos también pueden abordar variables de maquinaria: no es correcto agruparlo como un simple sensor ambiental DHT. Frente a él, SmartSense se concentra en el historial térmico obtenido con una PT100 externa y en una interfaz local de consulta.
+\citet{jakobsen2024} presenta un sensor abierto de monitoreo de condición con acelerómetros, micrófono y sensor de temperatura. Combina BLE para datos y LoRaWAN para características procesadas, y se evalúa con excitación mecánica y un banco con rodamiento defectuoso. Este trabajo aborda variables mecánicas de maquinaria con un dispositivo abierto. Frente a él, SmartSense se concentra en el historial térmico obtenido con una PT100 externa y en una interfaz local de consulta.
 
 \section{Comparación normalizada}
 La Tabla~\ref{tab:estado-arte-comparacion} resume únicamente características respaldadas por las fuentes citadas. ``No especificado'' indica que no se atribuye esa propiedad con la documentación examinada; no equivale a afirmar que el sistema carezca de ella. La limitación se expresa respecto del problema de este trabajo y no como una descalificación general del antecedente.
@@ -58,7 +58,7 @@ El WISE-2410 es una referencia comercial pertinente por su orientación al monit
 \caption{Comparación técnica de SmartSense y WISE-2410.}
 \label{tab:wise-smartsense}
 \small
-\begin{tabularx}{\textwidth}{@{}p{3cm}XX@{}}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3cm}XX@{}}
 \toprule
 Criterio & SmartSense & WISE-2410 \\
 \midrule
@@ -74,6 +74,8 @@ Alcance experimental & Piloto térmico y pruebas complementarias. & Prestaciones
 \end{table}
 
 La autonomía declarada por el fabricante utiliza un intervalo distinto del ensayado en SmartSense. Una comparación cuantitativa exigiría igualar carga de trabajo, condiciones ambientales y criterio de fin de descarga. Del mismo modo, disponer de un dashboard propio facilita adaptar la consulta, pero no demuestra que todas las plataformas compatibles con WISE-2410 carezcan de históricos locales.
+
+La BOM (\texttt{hardware/BOM.csv}), revisada el 15 de septiembre de 2026, suma 627\,000~COP para tres nodos, gateway y cableado compartido: 149\,000~COP por nodo en piezas específicas, 130\,000~COP de gateway y 50\,000~COP compartidos. Equivale aproximadamente a 157~USD en total y 37~USD por nodo con el supuesto de conversión del proyecto de 4000~COP/USD. No se dispone de fecha de compra ni cotización cambiaria verificada, y no se incluyen trabajo, envío o certificación. Tampoco hay una cotización comparable fechada del WISE-2410; por ello no se concluye superioridad económica cuantificada. La batería de 2000~mAh de la BOM se distingue de la celda de 1000~mAh del ensayo energético.
 
 \section{Síntesis y contribución del trabajo}
 Los antecedentes muestran soluciones tanto abiertas como comerciales, con almacenamiento local o infraestructura de servidor. La oportunidad abordada es integrar una sonda RTD externa, radio punto a punto, alimentación por batería e histórico local en un conjunto reproducible y ajustado al piloto. No se sostiene que cada componente sea novedoso ni que la combinación sea universalmente superior.

@@ -26,7 +26,7 @@ Selección & Requisitos y documentación técnica disponible. & Comparar compone
 Construcción & Componentes, esquemas y firmware. & Integrar PT100, conversor, nodo, radio, alimentación y gateway. & Conexiones, parámetros de conversión y radio. & Prototipo y esquemas reproducibles. \\
 Verificación funcional & Prototipo integrado. & Revisar lectura, recepción por MAC, escritura, consulta diaria, offset y alarmas. & Lectura, trama, archivo y respuesta de interfaz. & Evidencia funcional de cada eslabón. \\
 Ventana de 60 min & CSV histórico con los tres nodos. & Extraer una hora con cobertura simultánea y contar registros en $[t_0,t_0+1\,\mathrm{h})$. & Tiempo, temperatura y conteo por nodo. & Ejemplo de continuidad; no PDR directo. \\
-Despliegue & Nodos sobre equipos y gateway local. & Registrar marcha y parada, exportar históricos y ordenar por MAC y fecha. & Temperatura, marcas temporales y huecos. & Series del piloto de \DuracionComunDias{} días y cobertura por nodo. \\
+Despliegue & Nodos sobre equipos y gateway local. & Observar marcha y parada sin bitácora sincronizada, exportar históricos y ordenar por MAC y fecha. & Temperatura, marcas temporales y huecos. & Series del piloto y cobertura individual: A/C, \DuracionComunDias{} días; B, periodo extendido. \\
 Alcance & Nodo móvil, gateway y registro instrumentado. & Alejar el nodo y regresar en recorrido urbano con obstáculos. & Recepción, RSSI, batería y punto más lejano. & Cota inferior de alcance en ese recorrido. \\
 Comparación térmica & PT100 instalada y Fluke 62 MAX. & Tomar cinco parejas cercanas en tiempo y ubicación superficial. & Lecturas SmartSense y referencia de campo. & Diferencias pareadas y límites de la comparación. \\
 Descarga parcial & Nodo y celda de \SI{1000}{\milli\ampere\hour}. & Operar durante \SI{120}{\hour} y registrar tensión inicial y final. & Tensión y duración; tiempo activo por separado. & Dos extrapolaciones condicionadas, no vida útil medida. \\
@@ -108,7 +108,7 @@ La secuencia conservada durante sueño profundo permite estimar envíos entre el
 \subsection{Ensayo de alcance con obstrucciones}
 La evaluación complementaria del 20 de agosto de 2026 empleó la configuración de 433~MHz descrita en el proyecto y un recorrido urbano sin línea de vista directa (NLOS), con edificios interpuestos. Se alejó un nodo del gateway y se regresó, registrando recepción, RSSI y batería frente al tiempo. No se trataron las muestras móviles como una curva calibrada de RSSI frente a distancia fija.
 
-El recorrido llegó aproximadamente a \DistanciaDemostrada{} con el enlace operativo y terminó voluntariamente. Por ello, ese punto define una cota inferior experimental para las condiciones ensayadas; no establece el alcance máximo, una cobertura garantizada en planta ni el comportamiento de otra configuración. No se calcula margen de enlace a partir de una sensibilidad genérica: falta identificar de forma completa la variante de radio y sus parámetros físicos. No se obtuvo una serie de SNR del despliegue.
+El recorrido llegó aproximadamente a \DistanciaDemostrada{} con el enlace operativo y terminó voluntariamente. Por ello, ese punto define una cota inferior experimental para las condiciones ensayadas; no establece un límite superior de distancia, una cobertura garantizada en planta ni el comportamiento de otra configuración. No se calcula margen de enlace a partir de una sensibilidad genérica: falta identificar de forma completa la variante de radio y sus parámetros físicos. No se obtuvo una serie de SNR del despliegue.
 
 \section{Comparación térmica de campo}
 La comparación utilizó un Fluke 62 MAX como referencia de campo, sin certificado vigente de calibración disponible para el estudio. Se registraron cinco parejas sobre el motor del succionador, procurando simultaneidad y proximidad al punto de contacto de la PT100, en la zona caliente aproximada de 65 a \SI{71}{\celsius}. Para cada pareja se calcula $\Delta T_i=T_{\mathrm{SS},i}-T_{\mathrm{ref},i}$ y se resume el valor absoluto medio mediante la ecuación~\ref{eq:marco-concordancia}.
@@ -117,12 +117,12 @@ La salida del procedimiento es concordancia local con el instrumento empleado, n
 
 \section{Diseño energético y estimación de autonomía}
 \label{sec:metodo-autonomia}
-El tiempo activo se obtuvo del registro de arranques del nodo, hasta completar adquisición y transmisión antes del sueño. El valor de referencia de \TiempoActivo{} y el periodo nominal dan
+El intervalo de actividad se obtuvo del registro instrumentado del firmware. La variable \texttt{bootMs} se fija después de inicializar el puerto serie y de una pausa inicial de 200~ms; la duración se calcula antes del sueño, tras adquisición y transmisión. Por ello excluye la actividad anterior a esa marca y no mide todo el tiempo físico desde energización. El valor de referencia de \TiempoActivo{} y el periodo nominal dan
 \begin{equation}
 D=\frac{t_{\mathrm{activo}}}{T}=\frac{2.279}{120}=0.01899\approx1.9\,\text{\%}.
 \label{eq:metodo-duty}
 \end{equation}
-Esta aproximación usa 120~s como periodo total de diseño; la duración efectiva incluye los tiempos del firmware. El valor describe actividad del nodo, no tiempo de emisión de radio ni recuperación probada frente a bloqueo del enlace.
+Esta aproximación usa 120~s como periodo total de diseño; la duración efectiva incluye los tiempos del firmware. El valor describe actividad dentro del intervalo instrumentado, no tiempo de emisión de radio ni recuperación probada frente a bloqueo del enlace.
 
 El modelo energético de dos estados permite expresar corriente media y autonomía ideal como
 \begin{equation}
@@ -158,10 +158,10 @@ La figura~\ref{fig:metodo-montaje-corriente} conserva el montaje documentado par
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.70\textwidth]{montaje-corriente.pdf}
-\caption{Montaje documentado para medir corriente a partir de la caída en un shunt de lado bajo. Explica la conexión y conversión tensión--corriente; no acredita una captura experimental del pulso ni la corriente total de sueño. Fuente: diagrama del repositorio.}
+\includegraphics[width=0.60\textwidth]{montaje-corriente.pdf}
+\caption[Montaje propuesto para medición de corriente con shunt.]{Montaje documentado para medir corriente a partir de la caída en un shunt de lado bajo. Explica la conexión y conversión tensión--corriente; no acredita una captura experimental del pulso ni la corriente total de sueño. Fuente: diagrama del repositorio.}
 \label{fig:metodo-montaje-corriente}
 \end{figure}
 
 \section{Trazabilidad y límites de reproducción}
-Para reproducir el análisis se deben conservar el CSV exportado, las fechas y MAC seleccionadas y la configuración usada. Varios scripts buscan el CSV en la carpeta de descargas del equipo de desarrollo; el código no garantiza que los datos estén disponibles en otra máquina. También se requieren registros serie para los ensayos complementarios. Debe distinguirse cada dato medido de una transformación o estimación.
+Reproducir el análisis requiere CSV, fechas, MAC, configuración y registros serie de los ensayos. Varios scripts usan rutas personales; su publicación no aporta los datos ausentes. Cada resultado debe distinguir medición, transformación y estimación.

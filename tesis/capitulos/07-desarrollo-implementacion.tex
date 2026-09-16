@@ -7,7 +7,7 @@ La implementación distribuye la adquisición entre \NumeroNodos{} nodos y conce
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{arquitectura-detalle.pdf}
-\caption{Arquitectura de adquisición y consulta local. Los tres nodos comparten el gateway, que identifica las tramas, conserva series por sensor y presenta lecturas por pantalla y Wi-Fi. El diagrama describe responsabilidades e interfaces; no representa una prueba de alcance ni capacidad máxima. Fuente: diseño del proyecto.}
+\caption[Arquitectura de adquisición y consulta local.]{Arquitectura de adquisición y consulta local. Los tres nodos comparten el gateway, que identifica las tramas, conserva series por sensor y presenta lecturas por pantalla y Wi-Fi. El diagrama describe responsabilidades e interfaces; no representa una prueba de alcance ni capacidad máxima. Fuente: diseño del proyecto.}
 \label{fig:impl-arquitectura}
 \end{figure}
 
@@ -22,14 +22,14 @@ El MAX31865 se conecta por SPI implementado en software; la alimentación del ac
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{esquematico-nodo.pdf}
-\caption{Conexiones del nodo: SPI hacia el MAX31865, UART y líneas de modo hacia E220, alimentación y divisor de batería. Permite seguir la integración eléctrica; los rótulos de componentes no certifican la tolerancia de la PT100 ni la variante exacta del radio instalado. Fuente: esquema del proyecto.}
+\caption[Conexiones eléctricas del nodo sensor.]{Conexiones del nodo: SPI hacia el MAX31865, UART y líneas de modo hacia E220, alimentación y divisor de batería. Permite seguir la integración eléctrica; los rótulos de componentes no certifican la tolerancia de la PT100 ni la variante exacta del radio instalado. Fuente: esquema del proyecto.}
 \label{fig:impl-esquematico-nodo}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.62\textwidth,height=8cm,keepaspectratio]{evidencias/nodo-instalado.jpg}
-\caption{Evidencia del nodo ensamblado e instalado sobre un equipo. Permite reconocer la disposición física del prototipo y su uso en campo; una fotografía no demuestra exactitud, grado de protección ni vida útil de batería. Fuente: registro fotográfico del proyecto.}
+\caption[Nodo ensamblado e instalado sobre un equipo.]{Evidencia del nodo ensamblado e instalado sobre un equipo. Permite reconocer la disposición física del prototipo y su uso en campo; una fotografía no demuestra exactitud, grado de protección ni vida útil de batería. Fuente: registro fotográfico del proyecto.}
 \label{fig:impl-nodo-montado}
 \end{figure}
 
@@ -79,7 +79,7 @@ BAT=...,UP=...,MAC=...
 \centering\small
 \caption{Campos de aplicación y significado en la versión instrumentada.}
 \label{tab:impl-campos}
-\begin{tabularx}{\textwidth}{@{}p{1.7cm}Xp{4.5cm}@{}}
+\begin{tabularx}{\textwidth}{@{}p{1.7cm}X>{\raggedright\arraybackslash}p{4.5cm}@{}}
 \toprule
 \textbf{Campo} & \textbf{Contenido} & \textbf{Alcance} \\
 \midrule
@@ -104,7 +104,7 @@ El gateway utiliza ESP32-C6, radio E220, pantalla táctil con controlador ST7789
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.90\textwidth]{esquematico-gateway.pdf}
-\caption{Conexiones externas del gateway con el radio UART y la salida de alarma crítica. La pantalla, el panel táctil y la ranura microSD forman parte de la placa; el esquema permite distinguir sus funciones de las conexiones agregadas. No certifica una función de seguridad de máquina. Fuente: esquema del proyecto.}
+\caption[Conexiones externas del gateway.]{Conexiones externas del gateway con el radio UART y la salida de alarma crítica. La pantalla, el panel táctil y la ranura microSD forman parte de la placa; el esquema permite distinguir sus funciones de las conexiones agregadas. No certifica una función de seguridad de máquina. Fuente: esquema del proyecto.}
 \label{fig:impl-esquematico-gateway}
 \end{figure}
 
@@ -128,7 +128,7 @@ Las funciones implementadas incluyen temperatura y batería recientes, consulta 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{dashboard-principal.png}
-\caption{Dashboard con agrupación por máquina, lectura reciente, batería, conectividad y tendencia. La captura muestra la organización de nueve registros de interfaz; el análisis experimental de este trabajo corresponde a tres nodos. Fuente: captura del proyecto.}
+\caption[Dashboard local y organización de registros por máquina.]{Dashboard con agrupación por máquina, lectura reciente, batería, conectividad y tendencia. La captura muestra la organización de nueve registros de interfaz; el análisis experimental de este trabajo corresponde a tres nodos. Fuente: captura del proyecto.}
 \label{fig:impl-dashboard}
 \end{figure}
 
