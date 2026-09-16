@@ -112,7 +112,7 @@ def main():
     ax.set_yticklabels([anon[m] for m in reversed(macs)])
     ax.set_ylim(0.3, len(macs) + 0.7)
     ax.set_xlabel("Date")
-    ax.set_title("Data coverage — outages are simultaneous across nodes (gateway down)")
+    ax.set_title("Data coverage — simultaneous intervals without reception (possible gateway unavailability)")
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
     ax.grid(True, axis="x", lw=0.3, alpha=0.5)
     guardar(fig, "val-cobertura")
