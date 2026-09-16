@@ -40,7 +40,7 @@ Electronic Engineering Program, Faculty of Engineering, Universidad ECCI, Bogota
 davids.puentesc@ecci.edu.co
 
 \textbf{Abstract}\\
-SmartSense Monitoring is an open-source wireless system for measuring and logging the surface temperature of industrial equipment. Each battery-powered node combines a Seeed Studio XIAO ESP32-C6 microcontroller, a three-wire PT100 probe, a MAX31865 RTD front-end and an Ebyte E220 LoRa radio at 433~MHz. A gateway based on a second ESP32-C6 with an integrated touch display receives the frames, stores a per-sensor daily history on a microSD card (with LittleFS as a fallback) and serves a local web dashboard over Wi-Fi, requiring no cloud service or permanent Internet connection. Unlike a handheld spot measurement, the system preserves the continuous 24-hour thermal behaviour of each machine, enabling the detection of trends and anomalies. Over a 32-day pilot deployment with three nodes (51{,}338 samples), the LoRa link availability exceeded 97\% once scheduled plant stoppages were excluded, and the continuous history revealed a temperature rise on a suction-fan motor later associated with a bearing anomaly. All design files, firmware and the bill of materials are released under open-source licenses.
+SmartSense Monitoring is an open-source wireless PT100 node and gateway for industrial surface-temperature monitoring. Each battery-powered node combines a XIAO ESP32-C6, a three-wire PT100 probe, a MAX31865 front-end and an Ebyte E220 LoRa radio at 433~MHz. The gateway stores a rolling 30-day history locally and serves a Wi-Fi dashboard without a cloud service. A three-node evaluation includes a 32-day pilot deployment and an extended Node B record, totalling 51{,}338 samples across the individual recording windows. Raw availability was 76.0\%, 32.3\% and 75.1\%; link availability conditioned on inferred gateway-active periods was 97.8--98.4\%. Arrival intervals support an inferred PDR of 95.3--96.6\%. Five paired temperature readings provide field agreement after offset adjustment, without establishing absolute accuracy. A five-day partial discharge supports estimated autonomy of 177 days by linear extrapolation and 291--307 days using a LiPo-curve model, not demonstrated service lifetime. A temperature rise was later associated with a bearing anomaly during inspection, supporting condition monitoring without validated diagnosis or prediction. Hardware, firmware, software and analysis artifacts are versioned in a public repository; absent primary CSV files and incomplete component identification limit full replication of the evaluation.
 
 \textbf{Keywords}\\
 Open-source hardware; LoRa; PT100; RTD; MAX31865; ESP32-C6; industrial temperature monitoring; condition monitoring
@@ -64,8 +64,8 @@ Open-source hardware; LoRa; PT100; RTD; MAX31865; ESP32-C6; industrial temperatu
   \end{itemize} \\
 \hline \textbf{Closest commercial analog} & Industrial wireless RTD/condition-monitoring loggers such as the Advantech WISE-2410 and commercial PT100 wireless data loggers. \\
 \hline \textbf{Open source license} & Hardware: CERN-OHL-S v2. Firmware and software: MIT License. Documentation: CC-BY 4.0. \\
-\hline \textbf{Cost of hardware} & Approximately 170~USD for three nodes and one gateway (see Bill of materials). Approximately 35~USD per additional node. \\
-\hline \textbf{Source file repository} & Available in the article (to be deposited at Zenodo with a DOI upon acceptance). \\
+\hline \textbf{Cost of hardware} & Itemized total: 627{,}000~COP ($\approx$157~USD at the project conversion assumption of 4{,}000~COP/USD). Node-specific parts: 149{,}000~COP ($\approx$37~USD), before shared wiring; see Bill of materials. \\
+\hline \textbf{Source file repository} & \href{https://github.com/jesusabojacal-commits/SmartSense-Monitoring}{SmartSense-Monitoring on GitHub}; source-artifact snapshot identified in Design files. No archived DOI is documented. \\
 \hline
 \end{tabu}
 \end{flushleft}
@@ -75,9 +75,9 @@ Open-source hardware; LoRa; PT100; RTD; MAX31865; ESP32-C6; industrial temperatu
 
 Continuous temperature monitoring of motors and other industrial equipment helps identify conditions associated with friction, overload, poor ventilation or mechanical degradation. In a manual inspection, an operator obtains only the value at the instant of measurement; if that value is not systematically recorded, the thermal evolution of the equipment cannot be reconstructed or related to its operating and stop cycles.
 
-Wireless sensor networks distribute measurement points without installing communication cabling at each location [1,2,6]. For low-data-rate applications, LoRa provides a long-range, low-power alternative suited to battery-powered nodes, whose range and scalability have been characterised experimentally [3,7,8]. LoRa has been used for temperature and condition monitoring in industrial and infrastructure settings [9,10]; continuous temperature monitoring supports condition-based maintenance in Industry 4.0 [4,11]. This work provides the acquisition and monitoring platform and does not implement or validate a predictive-maintenance algorithm. However, published open-source temperature nodes typically target ambient or DHT-class humidity/temperature sensors [12] and rely on a cloud back-end. SmartSense Monitoring differs in three respects relevant to industrial surface monitoring: (i) it uses an industrial-grade three-wire PT100 with a MAX31865 front-end rather than a low-cost ambient sensor; (ii) it stores a per-sensor daily history locally and serves the dashboard from the gateway itself, so it operates without Internet; and (iii) the design targets replication and customization, releasing the schematics, firmware and bill of materials under open-source licenses.
+Wireless sensor networks distribute measurement points without installing communication cabling at each location [1,2,6]. For low-data-rate applications, LoRa provides a long-range, low-power alternative suited to battery-powered nodes, whose range and scalability have been characterised experimentally [3,7,8]. Relevant precedents include LoRaWAN temperature monitoring with a local-server option [9], an open condition-monitoring sensor with vibration and acoustic measurements [10], and the local SD-based HIGROTERM logger [12]. SmartSense contributes the integration of an external three-wire PT100 and MAX31865, point-to-point radio, battery operation and a gateway-hosted daily history and dashboard. Its contribution is this documented platform and pilot evaluation, rather than invention of its constituent technologies or superiority over all existing systems. It supports condition-based maintenance [4,11] but does not implement or validate a predictive-maintenance algorithm.
 
-A PT100 RTD was chosen over a digital sensor such as the DS18B20 for several reasons: the PT100 is the industrial standard (IEC~60751) with excellent long-term stability and low drift; its resistive nature allows precise analog conditioning through the MAX31865, a purpose-built RTD-to-digital converter for two-, three- and four-wire PT100 with lead-resistance compensation; it offers a far wider range ($-200$ to $850~^{\circ}$C) than the DS18B20 ($-55$ to $125~^{\circ}$C), suitable for industrial surfaces that may exceed the digital sensor's limit; and it is available in surface-mount and magnetic probe forms appropriate for mounting on motors.
+A PT100 RTD was selected for its established industrial use, three-wire lead compensation with the MAX31865 and availability in a magnetic surface probe suitable for motor housings. The installed probe is identified only as a magnetic three-wire PT100 in the bill of materials: manufacturer, exact reference, tolerance class and rated assembly range are not documented. The generic RTD conversion range therefore cannot be assigned to the complete installed probe, cable or enclosure. The field comparison below characterises agreement in a narrow temperature interval, not the full measurement range or inter-node repeatability.
 
 Compared with proprietary industrial loggers such as the Advantech WISE-2410, SmartSense Monitoring trades integrated vibration sensing for full openness and local-first operation. Table~\ref{tab:comparison} contrasts both systems by capability rather than price alone, making it suitable for pilot plants and educational settings where flexibility and reproducibility matter more than a turnkey platform.
 
@@ -87,17 +87,18 @@ Compared with proprietary industrial loggers such as the Advantech WISE-2410, Sm
 \begin{tabu} to \linewidth {|X|X[c]|X[c]|}
 \hline
 \textbf{Feature} & \textbf{SmartSense} & \textbf{WISE-2410} \\\hline
-Open hardware & Yes & No \\\hline
-Primary sensor & 3-wire PT100 (RTD) & Integrated (vibration + temp.) \\\hline
+Open hardware & Project schematics and enclosure files, CERN-OHL-S v2 & Commercial design; no open hardware release identified \\\hline
+External PT100 & Yes, three-wire surface probe & Integrated temperature sensor; no external PT100 specified \\\hline
 Communication & LoRa 433~MHz (point-to-point) & LoRaWAN \\\hline
 Vibration sensing & No & Yes \\\hline
-Local storage & Yes (microSD, 30 days) & Cloud / ecosystem \\\hline
-Cloud dependency & No (local dashboard) & Commercial ecosystem \\\hline
-IP rating & To be characterised & IP66 \\\hline
-Battery autonomy & $\approx$ months (measured) & $\approx$2 years (specified) \\\hline
-Cost & $\approx$USD 35 per node & Commercial \\\hline
+Local history & microSD or LittleFS; rolling 30-day store & Depends on gateway/application integration \\\hline
+Cloud dependency & None for local dashboard & LoRaWAN gateway/server required; cloud is not inherently mandatory \\\hline
+IP rating & Not demonstrated & IP66 specified \\\hline
+Autonomy evidence & Estimated from 5-day partial discharge: 177 or 291--307 days; 1000~mAh, 120~s cycle & Up to 2 years specified; hourly updates [5] \\\hline
+Software openness & MIT node/gateway firmware and software & WISE Studio utility; open firmware not identified \\\hline
+Cost basis & 149{,}000~COP per node in listed parts ($\approx$37~USD); excludes shared wiring & No comparable dated quotation available \\\hline
 \end{tabu}
-\caption{Feature comparison between SmartSense and a commercial condition-monitoring logger (Advantech WISE-2410).}
+\caption{Functional comparison with Advantech WISE-2410 [5]. WISE-2410 retains advantages in vibration, IP66 protection and specified lifetime. Autonomy uses different update intervals and evidence types; no controlled superiority claim follows. SmartSense cost uses the project BOM and a 4{,}000~COP/USD conversion assumption.}
 \label{tab:comparison}
 \end{table}
 
@@ -105,60 +106,68 @@ Cost & $\approx$USD 35 per node & Commercial \\\hline
 
 SmartSense Monitoring consists of one or more battery-powered sensor nodes and a gateway/visualizer. Each node acquires the surface temperature of a machine with a magnetic PT100 probe and a MAX31865 RTD front-end, estimates its battery state, and transmits the reading over a 433~MHz LoRa link before entering deep sleep. The gateway receives the frames, identifies each node by its MAC address, applies a configurable offset, stores the samples locally and presents them on an integrated touch display and a Wi-Fi web dashboard.
 
+The documented radio configuration uses 9600~bit/s UART (8N1), 2.4~kbit/s air rate, channel 23 in the stated 433~MHz band and fixed addressing. These settings are available in the project connection guide and firmware; the exact radio variant and final pilot transmit power are not verified. A 120~s nominal cycle provides 720 expected samples per node per day, balancing thermal-history resolution with traffic, storage and battery demand for this pilot.
+
 \begin{itemize}
-\item[$\bullet$] It provides continuous, unattended surface-temperature logging of industrial equipment at a fraction of the cost of commercial wireless RTD loggers, using widely available modules.
+\item[$\bullet$] It provides automatic periodic surface-temperature logging using commercially available modules and an itemized bill of materials.
 \item[$\bullet$] It operates fully offline: the gateway serves its own dashboard over a local Wi-Fi access point, so no cloud account or Internet connection is required.
 \item[$\bullet$] It preserves a per-sensor daily history, enabling the study of thermal trends, transients and machine on/off cycles that a spot measurement cannot capture.
 \item[$\bullet$] It is a modular basis for further work: additional nodes, alternative RTD probes, or extra variables (e.g. current, vibration) can be integrated by reusing the node design.
-\item[$\bullet$] It is suitable as a teaching platform for wireless sensor networks, RTD signal conditioning, embedded firmware and edge data handling, since every layer is open and documented.
+\item[$\bullet$] Published project schematics and source code support teaching wireless sensor networks, RTD acquisition and local data handling; the purchased modules retain their manufacturer-specific internals.
 \end{itemize}
 
 \section*{\textit{Design files}}
 
-The complete design files (KiCad schematics, firmware, bill of materials) are provided with the article and will be deposited in an open repository (Zenodo) with a DOI upon acceptance. The schematics are provided in editable KiCad format; the firmware source is fully included and commented.
+The public source-artifact snapshot is \href{https://github.com/jesusabojacal-commits/SmartSense-Monitoring/tree/5641bcd89d9026c39ccc62ce8c738ba5ee37781b}{GitHub commit 5641bcd89d9026c39ccc62ce8c738ba5ee37781b}, reviewed on 15 September 2026. It includes editable KiCad schematics, node/gateway firmware, software, BOM, enclosure files, analysis scripts, figures and licenses. It does not contain the later local thesis and article corrections described here. No Zenodo deposit or DOI is documented in the reviewed repository. The corrected manuscript branch still requires publication as an identified release.
+
+Primary historical and range-test CSV files referenced by the scripts are not included in the reviewed copy; the final pilot configuration and complete PT100/E220 part identification are also absent. Thus the repository supports inspection and reconstruction of the documented design, but does not yet permit exact replication of every reported experiment. Historical results below are retained from project records and figures, not newly recomputed from primary CSVs.
 
 \section{Design files summary}
 \vskip 0.1cm
+\begingroup\small
 \tabulinesep=1ex
-\begin{tabu} to \linewidth {|X|X|X[1.5,1]|X[1.5,1]|}
+\begin{tabu} to \linewidth {|X[1.4,l]|X[1,l]|X[1,l]|X[1.5,l]|}
 \hline
 \textbf{Design filename} & \textbf{File type} & \textbf{Open source license} & \textbf{Location of the file} \\\hline
-Node schematic (nodo\_sensor) & KiCad schematic (.kicad\_sch) + PDF/SVG & CERN-OHL-S v2 & Available with the article \\\hline
-Gateway schematic (gateway) & KiCad schematic (.kicad\_sch) + PDF/SVG & CERN-OHL-S v2 & Available with the article \\\hline
-smartsense.kicad\_sym & KiCad symbol library & CERN-OHL-S v2 & Available with the article \\\hline
-Node firmware (Nodo\_Lora) & Arduino C++ (.ino) & MIT & Available with the article \\\hline
-Gateway firmware (maestro\_Lora\_pantalla) & Arduino C++ (.ino) + web assets & MIT & Available with the article \\\hline
-Bill of materials (BOM.csv) & CSV spreadsheet & CC-BY 4.0 & Available with the article \\\hline
-Enclosure (node, gateway, lids) & 3D print files (STL + 3MF) & CERN-OHL-S v2 & Available with the article \\\hline
+Node schematic (nodo\_sensor) & KiCad schematic + PDF/SVG & CERN-OHL-S v2 & \texttt{hardware/kicad/} in identified snapshot \\\hline
+Gateway schematic (gateway) & KiCad schematic + PDF/SVG & CERN-OHL-S v2 & \texttt{hardware/kicad/} in identified snapshot \\\hline
+\nolinkurl{smartsense.kicad_sym} & KiCad symbol library & CERN-OHL-S v2 & \texttt{hardware/kicad/} \\\hline
+Node firmware (Nodo\_Lora) & Arduino C++ (.ino) & MIT & Firmware directory specified below \\\hline
+Gateway firmware (\nolinkurl{maestro_Lora_pantalla}) & Arduino C++ (.ino) + web assets & MIT & Firmware directory specified below \\\hline
+Bill of materials (BOM.csv) & CSV spreadsheet & CC-BY 4.0 & \texttt{hardware/BOM.csv} \\\hline
+Enclosure (node, gateway, lids) & STL + zipped 3MF & CERN-OHL-S v2 & \texttt{hardware/carcasa/} \\\hline
 \end{tabu}
+\endgroup
 
 \vskip 0.3cm
-The node and gateway schematics document every external connection (SPI to the MAX31865, UART to the E220, switched sensor power, and the battery divider), verified against the firmware. The firmware files contain the node acquisition/transmission loop and the gateway reception, storage and dashboard logic. The bill of materials lists every purchasable component. The enclosure design files (PLA, 3D-printed) will be added to the repository.
+The schematics document SPI, UART, switched sensor power and the battery divider. Both firmware folders are under \texttt{sensores espnow lora/version con lora y pagina local/}; they contain acquisition, reception, storage and dashboard logic. The BOM and existing PLA enclosure STL/3MF files are in the paths above. These project files do not replace missing probe specifications or a frozen record of the pilot configuration.
 
 \section*{\textit{Bill of materials}}
 
-Costs are given in Colombian pesos (COP) with an approximate US dollar (USD) equivalent at the mid-2026 exchange rate (1~USD~$\approx$~4{,}000~COP), based on the actual procurement prices of the project. The per-item breakdown (node microcontroller, gateway board, LoRa module, PT100 probe, MAX31865, battery, charge module, enclosure and wiring) is listed in the table below, which covers three nodes and one gateway. Prices vary by supplier and availability.
+Costs reproduce the project BOM, reviewed on 15 September 2026, in Colombian pesos (COP). USD equivalents use the project's approximate conversion assumption of 1~USD~=~4{,}000~COP, not a verified dated exchange-rate quotation. Supplier invoices and purchase dates are not included. The table covers three nodes and one gateway; prices are historical project entries rather than current market quotations.
 
 \section{Bill of materials summary}
 \vskip 0.2cm
+\begingroup\small
 \tabulinesep=1ex
-\begin{tabu} to \linewidth {|X[1.1,1]|X|X[0.6,1]|X[0.9,1]|X[0.9,1]|X|X[1.1,1]|}
+\begin{tabu} to \linewidth {|X[0.8,l]|X[1.6,l]|X[0.4,c]|X[0.9,r]|X[0.9,r]|X[1.2,l]|X[1.1,l]|}
 \hline
-\textbf{Designator} & \textbf{Component} & \textbf{Number} & \textbf{Cost per unit (COP)} & \textbf{Total (COP)} & \textbf{Source of materials} & \textbf{Material type} \\\hline
-U1 & Seeed Studio XIAO ESP32-C6 (node) & 3 & 30{,}000 & 90{,}000 & \href{https://www.seeedstudio.com/}{seeedstudio.com} & Semiconductor \\\hline
+\textbf{ID} & \textbf{Component} & \textbf{Qty.} & \textbf{Unit cost (COP)} & \textbf{Total (COP)} & \textbf{Source} & \textbf{Material} \\\hline
+U1 & Seeed Studio XIAO ESP32-C6 (node) & 3 & 30{,}000 & 90{,}000 & \href{https://www.seeedstudio.com/}{Seeed Studio} & Semiconductor \\\hline
 U2 & ESP32-C6 Touch LCD 1.47 board (gateway) & 1 & 90{,}000 & 90{,}000 & Local distributor & Semiconductor \\\hline
-U3 & Ebyte E220-433 LoRa module + antenna & 4 & 30{,}000 & 120{,}000 & \href{https://ebyteiot.com/}{ebyteiot.com} & Semiconductor \\\hline
+U3 & Ebyte E220-433 LoRa module + antenna & 4 & 30{,}000 & 120{,}000 & \href{https://ebyteiot.com/}{Ebyte} & Semiconductor \\\hline
 RT1 & Magnetic three-wire PT100 probe & 3 & 30{,}000 & 90{,}000 & Local distributor & Metal \\\hline
-U4 & MAX31865 RTD front-end module & 3 & 14{,}000 & 42{,}000 & \href{https://www.sigmaelectronica.net/}{sigmaelectronica.net} & Semiconductor \\\hline
-BT1 & LiPo battery 3.7~V 2000~mAh & 3 & 30{,}000 & 90{,}000 & \href{https://www.didacticaselectronicas.com/}{didacticaselectronicas.com} & Other \\\hline
-U5 & LiPo charge/protection module (TP4056 or equiv.) & 3 & 5{,}000 & 15{,}000 & Local distributor & Semiconductor \\\hline
+U4 & MAX31865 RTD front-end module & 3 & 14{,}000 & 42{,}000 & \href{https://www.sigmaelectronica.net/}{Sigma Electr\'onica} & Semiconductor \\\hline
+BT1 & LiPo battery 3.7~V 2000~mAh & 3 & 30{,}000 & 90{,}000 & \href{https://www.didacticaselectronicas.com/}{Did\'acticas Electr\'onicas} & Other \\\hline
+U5 & LiPo charge and protection module (TP4056 or equiv.) & 3 & 5{,}000 & 15{,}000 & Local distributor & Semiconductor \\\hline
 R1 & Resistor 344.8~k$\Omega$ (battery divider) & 3 & -- & -- & Local distributor & Other \\\hline
 R2 & Resistor 994.3~k$\Omega$ (battery divider) & 3 & -- & -- & Local distributor & Other \\\hline
 MEC1 & 3D-printed PLA enclosure & 4 & 10{,}000 & 40{,}000 & Self-printed & Polymer \\\hline
 W1 & Wires, connectors, headers, hardware, adhesives & 1 & 50{,}000 & 50{,}000 & Local distributor & Other \\\hline
-\end{tabu}\\
+\end{tabu}
+\endgroup
 \vskip 0.2cm
-Approximate total: 627{,}000~COP ($\approx$ 155~USD) plus a contingency allowance. The battery-divider resistors are drawn from a general parts kit and are accounted for in the wiring line item.
+Itemized total: 627{,}000~COP ($\approx$157~USD at the stated conversion). Node-specific parts sum to 149{,}000~COP per node, including the 2000~mAh cell and enclosure; gateway board, radio and enclosure sum to 130{,}000~COP. Shared wiring/hardware contributes 50{,}000~COP, including battery-divider resistors. These entries do not establish a labor, shipping or certification cost. The battery-characterization test instead used a 1000~mAh cell.
 
 \section{Build instructions}
 
@@ -166,7 +175,7 @@ The following steps describe the construction of one sensor node and the gateway
 
 \textbf{Sensor node}
 \begin{enumerate}[noitemsep]
-\item Use a three-wire magnetic PT100 probe, tolerance Class~B per IEC~60751 ($\pm$0.3~$^{\circ}$C at 0~$^{\circ}$C; the exact manufacturer reference is given in the bill of materials). Solder the MAX31865 module in three-wire mode (bridge the 2/3-wire jumper), and connect the PT100 leads: the two leads from the same probe end to F+ and RTD+, and the remaining lead to RTD-, bridged to F-.
+\item Use a three-wire magnetic PT100 probe and document its manufacturer, reference, tolerance and rated assembly temperature before replication; these fields are missing for the pilot probe. Configure the MAX31865 module in three-wire mode (bridge the 2/3-wire jumper), and connect the PT100 leads: the two leads from the same probe end to F+ and RTD+, and the remaining lead to RTD-, bridged to F-.
 \item Wire the MAX31865 SPI bus to the XIAO ESP32-C6: CLK\,$\rightarrow$\,D6 (GPIO16), SDO\,$\rightarrow$\,D5 (GPIO23), SDI\,$\rightarrow$\,D4 (GPIO22), CS\,$\rightarrow$\,D3 (GPIO21). Power the module VIN from D2 (GPIO2) so the firmware can switch it off during deep sleep.
 \item Connect the E220 LoRa module by UART: E220 TXD\,$\rightarrow$\,D7 (GPIO17), RXD\,$\rightarrow$\,D8 (GPIO19), M0\,$\rightarrow$\,D10 (GPIO18), M1\,$\rightarrow$\,D9 (GPIO20); power VCC/GND from 3V3/GND.
 \item Build the battery divider: VBAT\,--\,R1 (344.8~k$\Omega$)\,--\,A0 (GPIO0)\,--\,R2 (994.3~k$\Omega$)\,--\,GND. Connect the LiPo cell through the TP4056 charge/protection module to the XIAO battery pads.
@@ -176,7 +185,7 @@ The following steps describe the construction of one sensor node and the gateway
 
 \textbf{Gateway}
 \begin{enumerate}[noitemsep]
-\item Connect the E220 module to the ESP32-C6 Touch LCD board: E220 TXD\,$\rightarrow$\,GPIO7, RXD\,$\rightarrow$\,GPIO8, and both M0 and M1 to GPIO9; power VCC/GND from 3V3/GND.
+\item Connect the E220 module to the ESP32-C6 Touch LCD board: E220 TXD\,$\rightarrow$\,GPIO8 (gateway RX), RXD\,$\rightarrow$\,GPIO7 (gateway TX), and both M0 and M1 to GPIO9; power VCC/GND from 3V3/GND.
 \item Optionally wire a critical-alarm output (LED, buzzer or relay driver) to GPIO16.
 \item Flash the gateway firmware (\texttt{maestro\_Lora\_pantalla.ino}) and upload the web dashboard assets to the on-board storage (LittleFS). Insert a microSD card for the history.
 \end{enumerate}
@@ -201,7 +210,7 @@ The following steps describe the construction of one sensor node and the gateway
 \item Power each node. On first boot it transmits periodically (default configurable between 5 and 7200~s; 120~s in the pilot). The gateway registers each node by its MAC address.
 \item In the dashboard, assign names to sensors, group them by machine, set the sampling interval, apply a per-node temperature offset, and configure warning and critical thresholds.
 \item Monitor the live values (temperature, battery, connectivity) and consult the per-day 24-hour history, including minimum, maximum and average, and compare sensors of the same machine.
-\item To analyse data off-line or export figures, download the per-sensor history; the accompanying software replica can bulk-import the exported CSV.
+\item Preserve copies of the per-sensor stored history before the 30-day rotation removes older dates. The project analysed exported CSVs and the software replica can import them; direct web CSV download is not verified in the reviewed gateway firmware and is not claimed as a demonstrated interface function.
 \end{enumerate}
 
 \begin{figure}[h]\centering
@@ -214,89 +223,110 @@ The following steps describe the construction of one sensor node and the gateway
 
 \section{Validation and characterization}
 
-The system was validated in a pilot plant with three nodes over a 32-day deployment, producing 51{,}338 stored samples with a median sampling interval of 121~s.
+The three-node evaluation includes a 32-day pilot deployment (8 May--9 June 2026 for Nodes A and C), with Node B recorded from 10 May to 20 July 2026. The 51{,}338 samples are the sum of these individual files, not a count over 32 complete days common to all three nodes. Figures comparing nodes use their overlapping interval. The nominal cycle was 120~s and the documented median inter-arrival interval was 121~s. Separate partial-discharge and radio-range tests were performed in August.
 
-\textbf{Availability.} Data outages were found to occur \emph{simultaneously} across all three nodes, with identical start times (Fig.~\ref{fig:cobertura}). This pattern indicates that the interruptions were periods with the gateway powered off (plant and power stoppages) rather than LoRa link failures, which would affect a single node at a time. Accordingly, Table~\ref{tab:avail} distinguishes two metrics: the \emph{raw (system-level) availability} over the full deployment (which includes the gateway-off periods) and the \emph{link availability} over the active intervals only (i.e. excluding the documented gateway-off periods). The link availability exceeded 97\% for all three nodes; the lower raw figures reflect the gateway being switched off during plant stoppages, not link failures.
+\textbf{Availability.} Table~\ref{tab:avail} separates raw system-level data availability from link availability conditioned on inferred gateway-active periods. The generator \texttt{analisis/figuras\_validacion.py} uses 121~s as the expected cadence. Raw availability divides received samples by the expected count across each node's first-to-last-record span. Conditioned availability removes the entire duration of each inter-arrival gap exceeding 363~s before computing the expected count. Simultaneous gaps in Fig.~\ref{fig:cobertura} support a common-cause interpretation, including gateway power interruptions during plant stoppages; they do not independently prove the power state or distinguish reception, clock and storage failures. Thus 97.8--98.4\% describes classified active periods, not overall system availability, and the excluded hours cannot all be asserted to be confirmed power-off hours.
 
 \begin{table}[h]
 \centering
 \tabulinesep=1ex
 \begin{tabu} to \linewidth {|X|X[c]|X[c]|X[c]|X[c]|X[c]|}
 \hline
-\textbf{Node} & \textbf{Samples} & \textbf{Raw avail.} & \textbf{Link avail.} & \textbf{Stoppages} & \textbf{Hours off} \\\hline
+\textbf{Node} & \textbf{Samples} & \textbf{Raw avail.} & \textbf{Conditioned link avail.} & \textbf{Gaps} & \textbf{Hours excluded} \\\hline
 Node A & 17{,}537 & 76.0\% & 98.4\% & 66 & 176 \\\hline
 Node B & 16{,}487 & 32.3\% & 98.3\% & 73 & 1154 \\\hline
 Node C & 17{,}314 & 75.1\% & 97.8\% & 81 & 180 \\\hline
 \end{tabu}
-\caption{Availability per node. Link availability excludes gateway-off periods, identified by their simultaneity across nodes. Node B includes a prolonged $\sim$33-day stoppage.}
+\caption{Documented availability in the individual recording windows. Node B's longer file includes a gap of approximately 33 days; its raw availability is not a comparison over the same calendar span as A and C. Gap counts and excluded hours are temporal classifications, not a direct power log.}
 \label{tab:avail}
 \end{table}
 
-\textbf{Reception cadence and packet loss.} During active intervals the frame inter-arrival time was tightly concentrated around the 121~s median (Fig.~\ref{fig:intervalos}), confirming a stable reception cadence. Estimating losses from the arrival intervals (a gap of $k$ times the cycle implies $k-1$ missing frames), the packet loss during active operation was 3.5--4.7\% across the three nodes, i.e. a packet delivery ratio of 95--97\%.
+\textbf{Reception cadence and inferred packet delivery.} Retained short intervals cluster near a 121~s median (Fig.~\ref{fig:intervalos}). The separate generator \texttt{analisis/perdida\_paquetes.py} uses a 120~s nominal cycle and excludes intervals longer than 1800~s. For retained gaps it rounds the interval divided by 120~s to $k$, infers $k-1$ missing frames when $k\geq2$, and computes received/(received + inferred missing). The documented inferred PDR is 96.55\%, 96.07\% and 95.32\% for A, B and C, respectively: 95.3--96.6\% rounded, with inferred loss of 3.5--4.7\%. Each estimate uses its individual node file, including Node B's extension. These filters and denominators differ from availability; neither metric is a direct sent-versus-received count. Without a historical sequence counter and send log, cadence assumptions cannot distinguish radio loss from absent acquisition or persistence.
 
-\textbf{Representative 60-minute test.} A representative one-hour window with the three nodes active (Fig.~\ref{fig:prueba60}) illustrates a continuous test: at a 120~s cycle, 30 frames are expected per node in 60~min; 29, 30 and 30 were received (PDR 96.7\%, 100\%, 100\%). Temperature and PDR are captured in this window; battery is characterised separately (Fig.~\ref{fig:autonomia}) and recovery after a reset is 2.279~s. RSSI was later enabled in the firmware and measured in the range test below; SNR is not exposed by the E220 module, and end-to-end latency requires node--gateway clock synchronisation, so both are declared as future work. The node frame now carries a sequence counter, enabling a fully instrumented sent-vs-received PDR in a repeated test.
+\textbf{Representative 60-minute window.} The historical window of 10 May 2026, 00:00--01:00 (Fig.~\ref{fig:prueba60}), contains 29, 30 and 30 records for A, B and C against 30 nominally expected at a 120~s cycle: received/expected ratios of 96.7\%, 100\% and 100\%. The denominator is a schedule, not an observed transmission count. The script selects a window with at least 25 records per node, so this is a coverage-selected illustration, not an independent test or an unbiased estimate for all hours. RSSI was enabled later for the range test; the interface used did not expose SNR. A sequence counter added after the deployment supports future direct PDR testing but cannot recover historical sends. End-to-end latency and service recovery require synchronized node/gateway measurements.
 
-\textbf{Range test.} A range test on 20 August 2026 was carried out in an urban setting with buildings between the node and the gateway (non-line-of-sight). The node moved to about 688~m away and back (Fig.~\ref{fig:distancia}). The RSSI dropped from about $-15$~dBm near the gateway to $\approx-98$~dBm at the farthest point (20:44--20:54), where the link still delivered valid packets with margin relative to the LoRa sensitivity floor (typically below $-120$~dBm). The test was stopped voluntarily rather than by a link failure, so 688~m is a lower bound on range --- notable given the obstructed path. The battery stayed at $\approx$94\% throughout the 2.6-hour test, consistent with the low duty cycle. As the node was moving (not held at fixed distances), the trace reflects the walk; a controlled fixed-distance RSSI--distance curve is future work.
+\textbf{Range test.} On 20 August 2026 a node moved away from the gateway and back in an urban non-line-of-sight path with buildings in between (Fig.~\ref{fig:distancia}). Valid packets were received at the farthest observed distance, approximately 688~m, with RSSI near $-98$~dBm at 20:44--20:54, compared with approximately $-15$~dBm nearby. The test ended voluntarily with the link still operational: at least 688~m is a demonstrated lower bound in this geometry. No numerical sensitivity margin is claimed because the exact E220 variant and final physical configuration are incompletely documented. The recorded battery indicator stayed near 94\% during 2.6~h; this voltage-derived indication does not measure charge consumption. Motion and changing obstacles prevent a controlled RSSI--distance characterization; fixed positions and repeated trials remain future work.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.92\linewidth]{prueba-distancia.pdf}
-\caption{Range test with obstructions (20 August 2026, buildings in between): per-packet RSSI (blue) and battery (green) versus time as the node moved away from the gateway and back. At the farthest point ($\approx$688~m) the RSSI reached $\approx-98$~dBm with the link still operational and with margin.}
+\caption{Urban obstructed-path test of 20 August 2026: per-packet RSSI (blue) and voltage-derived battery indication (green) against time during a mobile outward and return route. The link remained operational near 688~m at approximately $-98$~dBm; distance was not a controlled fixed-position sweep.}
 \label{fig:distancia}
 \end{figure}
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.9\linewidth]{prueba-60min.pdf}
-\caption{Representative 60-minute window (three nodes active) showing temperature versus time during a night-time cool-down of the machines.}
+\caption{Temperature during a coverage-selected historical hour with three nodes. The original plot label ``test'' identifies this illustrative window, not a separate trial with a transmission counter.}
 \label{fig:prueba60}
 \end{figure}
 
-\textbf{Temperature agreement.} Five paired readings were taken simultaneously at the same surface point of the suction-fan motor, in the 65--71~$^{\circ}$C range, against a Fluke 62 MAX infrared thermometer (accuracy $\pm$1.5~$^{\circ}$C or $\pm$1.5\%, fixed 0.95 emissivity, used as a field reference without a current calibration certificate). The SmartSense readings were \emph{consistent} with the Fluke within $\pm$0.4~$^{\circ}$C (mean difference $\approx$0.1~$^{\circ}$C), and the independent FLIR C8 thermal camera ($\pm$2~$^{\circ}$C) corroborated the same hotspot at $\approx$71~$^{\circ}$C. To avoid over-claiming, we report this as \emph{consistency} rather than metrological accuracy: the per-node offset was tuned using the same Fluke, and both infrared instruments have uncertainties ($\pm$1.5 and $\pm$2~$^{\circ}$C) larger than the $\leq$1~$^{\circ}$C target. A metrological accuracy figure (MAE/RMSE against a traceable reference) is therefore \emph{not yet established}; it requires a calibrated contact reference (thermocouple or reference RTD), measured at several temperatures across the three nodes, and is identified as the priority next step.
+\textbf{Temperature field comparison.} The purpose was to assess consistency of the installed node with a field reference on the suction-fan motor. Five simultaneous paired readings were recorded near the same surface point in the 65--71~$^{\circ}$C interval against a Fluke 62 MAX infrared thermometer (Table~\ref{tab:thermal-pairs}). Their mean absolute difference is 0.06~$^{\circ}$C (approximately 0.1~$^{\circ}$C rounded) and their maximum absolute difference is 0.1~$^{\circ}$C; the signed mean is 0.02~$^{\circ}$C. The project summary separately reports a maximum of 0.4~$^{\circ}$C. That reported value is retained as a provenance limitation: it cannot be reconstructed from the five transcribed pairs, and resolving it requires the original measurement record.
 
-\textbf{Field observation (case study).} As a field observation --- not a predictive-detection claim --- the continuous history captured a surface-temperature rise on a suction-fan motor, reaching a maximum of 70.0~$^\circ$C (Fig.~\ref{fig:serie}). A thermal image taken with a FLIR C8 camera confirmed the hotspot on the motor housing at $\approx$71~$^\circ$C (Fig.~\ref{fig:termica}), consistent with the PT100 and infrared-thermometer readings. The rising segments coincided with periods when the machine stopped while the fan motor kept spinning unloaded; the pattern was afterwards associated with a bearing anomaly during inspection. This illustrates the value of continuous logging over spot measurements, but does not by itself constitute validated predictive detection.
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrr}
+\hline
+Time & SmartSense ($^{\circ}$C) & Fluke ($^{\circ}$C) & $|\Delta T|$ ($^{\circ}$C) \\
+\hline
+06:40 & 71.0 & 71.0 & 0.0 \\
+07:06 & 70.6 & 70.6 & 0.0 \\
+07:58 & 69.7 & 69.6 & 0.1 \\
+08:09 & 69.5 & 69.4 & 0.1 \\
+09:49 & 65.1 & 65.2 & 0.1 \\
+\hline
+\end{tabular}
+\caption{Five transcribed field-comparison pairs for one node. The maximum of these rows differs from the 0.4~$^{\circ}$C maximum communicated in the project summary.}
+\label{tab:thermal-pairs}
+\end{table}
+
+The FLIR image (Fig.~\ref{fig:termica}), attributed in the field record to a C8 camera, corroborates the location and approximate 70--71~$^{\circ}$C magnitude of the hotspot; it is not documented as synchronized to every paired reading. The result is field consistency, not traceable calibration. The Fluke was also used to adjust the offset, so the comparison is not independent. The project cites instrument specifications of $\pm$1.5~$^{\circ}$C for the Fluke and $\pm$2~$^{\circ}$C for the FLIR, with no current Fluke calibration certificate. These limits exceed the order of the 1~$^{\circ}$C target and are not a combined uncertainty budget for the installed system. Emissivity and viewed area affect infrared readings; contact and mounting affect the PT100. Complementary characterization must use a calibrated contact reference, separate adjustment from verification, compare the three nodes at multiple temperatures and account for reference, conversion, lead, mounting and repeatability contributions. Absolute accuracy and inter-node repeatability remain unestablished.
+
+\textbf{Field observation (case study).} The suction-fan motor history includes rises and falls and a recorded maximum of 70.0~$^{\circ}$C (Fig.~\ref{fig:serie}). Plant observations associated rising segments with periods when the machine stopped while the fan continued spinning unloaded; no synchronized machine-state log establishes the timing or lag of each transition. The thermal image then provides spatial context for the hotspot (Fig.~\ref{fig:termica}). Subsequent inspection associated the case with a bearing anomaly. This sequence---thermal history, operational context, thermal image and later inspection association---illustrates the use of historical data in condition monitoring. It does not establish diagnosis, prediction, lead time, causality, sensitivity or false-alarm performance; load, ventilation, mounting and other factors were not controlled.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.7\linewidth]{evidencias/termica-succionador.jpg}
-\caption{Thermal image (FLIR C8) of the suction-fan motor, showing the hotspot at $\approx$70--71~$^{\circ}$C, consistent with the PT100 node and infrared-thermometer readings.}
+\caption{Thermal image of the suction-fan motor, attributed to a FLIR C8 in the field record, locating a hotspot near 70--71~$^{\circ}$C. It supplies spatial context without proving a bearing cause or the PT100's absolute accuracy.}
 \label{fig:termica}
 \end{figure}
 
-\textbf{Recovery and temperature range.} After a node reset, the node boots, samples and transmits its first frame in about 2.279~s (measured from the firmware), well within one sampling cycle and far below any practical requirement. Across the three nodes, the recorded surface temperature spanned 15.3--70.0~$^{\circ}$C, with per-node mean values of 39.5--45.4~$^{\circ}$C.
+\textbf{Instrumented activity and temperature range.} A firmware-instrumented interval was 2.279~s in eight of ten documented starts, with small variations reported for the remaining two. Instrumentation begins after initial serial setup and delay, so this is not total physical power-on-to-service time or synchronized network latency. Dividing by the 120~s cycle gives approximately 1.9\% instrumented duty cycle; complete reset recovery remains to be measured through reception and persistence at the gateway. Across the individual historical files, surface temperature spanned 15.3--70.0~$^{\circ}$C, with per-node means of 39.5--45.4~$^{\circ}$C. These statistics describe recorded thermal behaviour, not calibrated range or measurement uncertainty.
 
-\textbf{Battery autonomy.} A discharge test with a 1000~mAh cell (node in normal operation) showed the voltage dropping from 4.112~V to 4.089~V over 5 days (0.19~mV/h). Because the LiPo discharge is non-linear, autonomy was estimated two ways (Fig.~\ref{fig:autonomia}): a linear extrapolation gives a conservative lower bound of $\approx$177 days, whereas modelling the typical LiPo voltage--state-of-charge curve (calibrated to the measured points) gives $\approx$290--307 days ($\approx$10 months). The implied average current is 0.13--0.24~mA, consistent with the measured 1.9\% duty cycle (deep sleep $\approx$15~$\mu$A for 98.1\% of the time plus a 2.279~s active pulse). With the 2000~mAh battery of the prototype the autonomy would roughly double.
+\textbf{Estimated battery autonomy.} A controlled five-day partial discharge under the nominal 120~s operating cycle used a 1000~mAh cell from 13 to 18 August 2026. Two voltage readings, 4.112~V and 4.089~V over 120~h, give a slope of approximately 0.19~mV/h. The generator \texttt{analisis/autonomia\_bateria.py} extrapolates that slope to 3.30~V for a conservative linear estimate of 177 days. Its assumed typical LiPo open-circuit-voltage/state-of-charge curve, fitted to the same two points, gives 291--307 days at cutoffs of 3.30 and 3.00~V, respectively (Fig.~\ref{fig:autonomia}). This range expresses two cutoffs under one model, not a statistical confidence interval. The curve is a project modeling assumption without a documented primary cell characterization.
+
+Both values are estimated autonomy, not experimentally demonstrated lifetime. The linear result is conservative relative to the LiPo model but is not a guaranteed physical lower bound. Temperature, load, relaxation, ADC resolution, aging and self-discharge can alter the projection from this small voltage drop. Model-implied average current is approximately 0.13--0.24~mA; neither it nor the assumed microcontroller sleep current is an integrated measurement of the complete node. The 1.9\% instrumented duty cycle does not establish energy consumption. A full discharge to a specified cutoff and current logging by operating state are needed; no automatic doubling is claimed for the 2000~mAh BOM cell.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.9\linewidth]{autonomia-descarga.pdf}
-\caption{Battery discharge test (1000~mAh cell): measured points, non-linear LiPo discharge model (voltage--state-of-charge curve) and a linear extrapolation as a conservative lower bound. The model estimates an autonomy of about 10 months.}
+\caption{Two measured voltage points over five days with a 1000~mAh cell and extrapolated curves. Estimated autonomy is 177 days (linear, 3.30~V cutoff) or 291--307 days (assumed LiPo curve, 3.30/3.00~V cutoffs). The original plot's lower-bound label compares models; it does not guarantee service lifetime.}
 \label{fig:autonomia}
 \end{figure}
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.9\linewidth]{val-serie-evento.pdf}
-\caption{Surface temperature of one node over the 32-day deployment, showing the maximum associated with the suction-fan case.}
+\caption{Node A surface-temperature history during the 32-day pilot deployment. The 70.0~$^{\circ}$C peak is a historical observation; its annotation does not identify a mechanical cause.}
 \label{fig:serie}
 \end{figure}
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.9\linewidth]{val-cobertura.pdf}
-\caption{Data coverage of the three nodes. Outages are simultaneous across nodes, corresponding to gateway-off periods rather than LoRa link failures.}
+\caption{Data coverage in the three-node overlapping interval. White gaps retain missing data. The original ``gateway down'' plot label is an interpretation compatible with simultaneous interruptions, not an independently verified power-state record.}
 \label{fig:cobertura}
 \end{figure}
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.6\linewidth]{val-intervalos.pdf}
-\caption{Inter-arrival interval distribution during active intervals (log scale); most frames arrive near the 121~s median.}
+\caption{Short inter-arrival intervals retained after excluding gaps longer than 363~s, with logarithmic frame-count axis. The plotted range concentrates around the 121~s median and does not represent the full outage distribution.}
 \label{fig:intervalos}
 \end{figure}
 
 \textbf{Capabilities and limitations.}
 \begin{itemize}[noitemsep]
-\item Measures surface temperature with a three-wire PT100 over the MAX31865 range; per-node configurable offset.
-\item LoRa link availability $>$97\% (active intervals) at a 121~s cadence over 32 days.
-\item Local operation with a rolling per-sensor history (30 days on-device; oldest days are overwritten beyond that) and no Internet dependency. The 32-day dataset was exported from the gateway before rotation.
-\item Temperature readings were consistent with two independent infrared references (Fluke $\pm$1.5~$^{\circ}$C, FLIR C8 $\pm$2~$^{\circ}$C) within their uncertainty; a metrological accuracy figure ($\leq$1~$^{\circ}$C) is not yet established and requires a calibrated contact reference (planned).
-\item Battery autonomy on the order of months (a 5-day discharge test gives $\approx$177 days conservatively and $\approx$10 months from the LiPo-curve model on a 1000~mAh cell; $\approx$0.13--0.24~mA average at a 1.9\% duty cycle), far exceeding typical requirements.
+\item Acquires periodic surface-temperature readings with a three-wire PT100 and configurable per-node offset; probe class, rated assembly range and full part identification remain undocumented.
+\item Raw availability is 76.0\%, 32.3\% and 75.1\% in the individual windows; conditioned link availability is 97.8--98.4\% and PDR is inferred at 95.3--96.6\%, using different gap filters.
+\item Operates locally with a rolling 30-day per-sensor store; older dates are removed after rotation. Pre-rotation exports preserved the records analysed beyond 30 days, including Node B's longer history. LittleFS is an alternative storage medium, not a mirrored backup. Direct web CSV export is unverified and primary CSVs are absent from the reviewed repository.
+\item Five pairs support field agreement after adjustment to the same Fluke reference. The project-reported 0.4~$^{\circ}$C maximum is not reconstructible from those pairs. Absolute accuracy requires an independent calibrated contact reference and an uncertainty budget.
+\item A five-day partial discharge supports estimated autonomy of 177 days or 291--307 days under the stated model and cutoff assumptions; extended lifetime and complete-node current consumption were not experimentally demonstrated.
 \item LoRa range of at least $\approx$688~m in a non-line-of-sight urban path, with the link operating down to $\approx-98$~dBm RSSI (test stopped voluntarily, not by link failure).
-\item Limitations: absolute temperature accuracy depends on PT100 tolerance, mounting and per-node calibration; SNR is not exposed by the E220 module and end-to-end latency was not measured (no node--gateway clock synchronization).
+\item The exact E220 variant and final pilot transmit power are not verified. The interface used did not expose SNR, and synchronized end-to-end latency and complete service recovery were not measured. Three deployed nodes do not constitute controlled inter-node repeatability or a network-capacity test.
 \end{itemize}
 
 \FloatBarrier
@@ -320,7 +350,7 @@ The authors thank the partner company that provided access to the pilot plant. T
 \item J. Yick, B. Mukherjee, and D. Ghosal, ``Wireless sensor network survey,'' \textit{Computer Networks}, vol. 52, no. 12, pp. 2292--2330, 2008.
 \item M. Centenaro, L. Vangelista, A. Zanella, and M. Zorzi, ``Long-range communications in unlicensed bands: the rising stars in the IoT and smart city scenarios,'' \textit{IEEE Wireless Communications}, vol. 23, no. 5, pp. 60--67, 2016.
 \item A. K. S. Jardine, D. Lin, and D. Banjevic, ``A review on machinery diagnostics and prognostics implementing condition-based maintenance,'' \textit{Mechanical Systems and Signal Processing}, vol. 20, no. 7, pp. 1483--1510, 2006.
-\item Advantech Co., Ltd., ``WISE-2410 LoRaWAN wireless condition monitoring sensor,'' Data Sheet, 2024.
+\item Advantech Co., Ltd., ``WISE-2410 LoRaWAN wireless condition monitoring sensor,'' Data Sheet, 23 October 2024. \href{https://advdownload.advantech.com/productfile/PIS/WISE-2410/file/WISE-2410_DS\%28102324\%2920241023133301.pdf}{Manufacturer datasheet}, accessed 15 September 2026.
 \item G. Mois, S. Folea, and T. Sanislav, ``Analysis of three IoT-based wireless sensors for environmental monitoring,'' \textit{IEEE Trans. Instrum. Meas.}, vol. 66, no. 8, pp. 2056--2064, 2017.
 \item A. Augustin, J. Yi, T. Clausen, and W. M. Townsley, ``A study of LoRa: Long range \& low power networks for the Internet of Things,'' \textit{Sensors}, vol. 16, no. 9, art. 1466, 2016.
 \item M. Bor, U. Roedig, T. Voigt, and J. M. Alonso, ``Do LoRa low-power wide-area networks scale?'' in \textit{Proc. 19th ACM MSWiM}, 2016, pp. 59--67.
