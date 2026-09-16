@@ -30,3 +30,7 @@ Thumbs.db
 .DS_Store
 ~$*
 
+# Caché local de Python
+__pycache__/
+*.py[cod]
+
