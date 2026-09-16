@@ -25,6 +25,10 @@ docker/data/
 # El PDF de trabajo se regenera al compilar
 /SmartSense_IEEE.pdf
 
+# Copias históricas locales; no forman parte de la entrega versionada
+/PDF_Para_Compartir/Articulo_SmartSense_HardwareX.pdf
+/PDF_Para_Compartir/Tesis_SmartSense_Monitoring.pdf
+
 # Archivos temporales del sistema y de Office
 Thumbs.db
 .DS_Store

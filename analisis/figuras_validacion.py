@@ -1,8 +1,9 @@
 """Genera las figuras de validación del artículo a partir del export real de planta.
 
-Honesto por diseño: los huecos NO se ocultan. Se demuestra que son simultáneos
-en los tres sensores (gateway apagado por paradas de planta) y la disponibilidad
-del enlace se reporta excluyendo esos periodos, declarándolos.
+Honesto por diseño: los huecos NO se ocultan. Se observan intervalos simultáneos
+sin recepción en los tres sensores, compatibles con una posible indisponibilidad
+de la pasarela. La disponibilidad del enlace se reporta excluyendo esos periodos,
+declarándolos.
 
 Salida en figuras/ (PDF vectorial + PNG), rótulos en inglés para HardwareX.
 Uso: python figuras_validacion.py [ruta_csv]
@@ -149,19 +150,19 @@ def main():
         # cruda: recibidas / esperadas en todo el span
         esp_bruta = span / SAMPLE_S
         disp_bruta = 100 * n / esp_bruta
-        # del enlace: excluye los huecos (gateway apagado); esperadas solo en tramos activos
+        # del enlace: excluye intervalos sin recepción; esperadas solo en tramos con recepción
         t_activo = span - t_hueco
         esp_link = t_activo / SAMPLE_S
         disp_link = min(100 * n / esp_link, 100) if esp_link > 0 else 0
         print(f"{anon[mac]:8s} ({meta[mac][0] or '-'}): "
               f"cruda {disp_bruta:5.1f} % | enlace {disp_link:5.1f} % | "
-              f"{len(hs)} paradas, {t_hueco/3600:.0f} h fuera")
+              f"{len(hs)} intervalos sin recepción, {t_hueco/3600:.0f} h sin recepción")
         filas_tex.append(f"{anon[mac]} & {n} & {disp_bruta:.1f}\\% & {disp_link:.1f}\\% & "
                          f"{len(hs)} & {t_hueco/3600:.0f} \\\\")
-    print("\n--- filas LaTeX (Node, lecturas, disp. cruda, disp. enlace, #paradas, h fuera) ---")
+    print("\n--- filas LaTeX (Node, lecturas, disp. cruda, disp. enlace, #intervalos sin recepción, h sin recepción) ---")
     print("\n".join(filas_tex))
-    print("\nNota: la disponibilidad del enlace excluye los periodos de gateway apagado "
-          "(paradas de planta), identificados por ser simultaneos en los tres nodos.")
+    print("\nNota: la disponibilidad del enlace excluye los intervalos sin recepción, "
+          "simultáneos en los tres nodos y compatibles con una posible indisponibilidad de la pasarela.")
 
 
 if __name__ == "__main__":
