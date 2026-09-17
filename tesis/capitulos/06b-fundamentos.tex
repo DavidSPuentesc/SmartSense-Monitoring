@@ -1,0 +1,105 @@
+\chapter{Fundamentos y criterios de diseño}
+\label{cap:fundamentos}
+
+Este capítulo reúne las razones de ingeniería detrás de cada componente y los cálculos de dimensionamiento del prototipo: el divisor de batería, la resistencia de referencia del conversor, el periodo de muestreo y el almacenamiento, la energía, el enlace de radio y los umbrales de alarma. Cierra con un presupuesto de incertidumbre construido a partir de las especificaciones de la cadena de medición. Los métodos de evaluación están en el capítulo~\ref{cap:metodologia} y la construcción en el capítulo~\ref{cap:implementacion}.
+
+\section{Criterios de selección de componentes}
+\label{sec:fund-seleccion}
+Los requisitos que guiaron la selección fueron medir por contacto sin tender cable de datos hasta cada máquina, identificar cada punto de adquisición, conservar el histórico por fecha y consultarlo sin Internet. La tabla~\ref{tab:seleccion-componentes} recoge, para cada requisito, el componente elegido, la razón de ingeniería y la limitación que se acepta con esa elección. No es una comparación experimental entre alternativas; es el registro de las decisiones y de lo que cada una deja abierto.
+
+\begingroup
+\small\singlespacing
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{4.65cm}>{\raggedright\arraybackslash}p{4.65cm}@{}}
+\caption{Matriz de selección de componentes y limitaciones reconocidas.}\label{tab:seleccion-componentes}\\
+\toprule
+\textbf{Requisito} & \textbf{Selección} & \textbf{Razón de ingeniería} & \textbf{Limitación} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Requisito} & \textbf{Selección} & \textbf{Razón de ingeniería} & \textbf{Limitación} \\
+\midrule\endhead
+\bottomrule\endfoot
+Contacto superficial desmontable & PT100 magnética de tres hilos, frente a DS18B20. & Montaje disponible para carcasa y cadena RTD compatible con compensación de conductores \citep{iec60751,max31865}. & Requiere conversor y buen contacto térmico. Sin fabricante ni clase documentados, la tolerancia se asume de clase B en el presupuesto de incertidumbre. \\
+Conversión resistiva & MAX31865. & Interfaz SPI, modo de tres hilos y registro de fallas; se parametrizan resistencia nominal y de referencia \citep{max31865}. & La exactitud depende también de referencia, cableado y montaje. La resolución no acredita exactitud. \\
+Control compacto y operación intermitente & XIAO ESP32-C6. & Integra SPI, UART, ADC, temporización y sueño profundo en una placa apta para el nodo \citep{xiaoc6}. & El consumo del conjunto incluye periféricos; la corriente del microcontrolador no representa todo el nodo. \\
+Tramas pequeñas y enlace distribuido & E220-400T22D con LoRa, frente a Wi-Fi/BLE para el enlace nodo--gateway. & Prioriza transmisión de baja tasa entre puntos separados; UART simplifica la integración. Wi-Fi se conserva para consulta local \citep{centenaro2016}. & Canal compartido y tasa aérea limitada. No se efectuó un ensayo comparativo equivalente de las tres radios. \\
+Alimentación sin cable de red & Batería LiPo de 1000~mAh. & Permite instalar el nodo y recargarlo; se combina con adquisición intermitente. & Capacidad útil, tensión de corte, envejecimiento y consumo de periféricos condicionan la duración. \\
+Histórico local & microSD y LittleFS alternativo. & Archivos diarios por sensor; microSD ofrece un medio extraíble y LittleFS permite registrar cuando no está montada. & No constituye duplicación automática. Se depende del reloj, de la integridad del medio y de exportar antes de la rotación. \\
+Consulta junto al equipo & Pantalla táctil integrada en la placa del gateway, controlador ST7789. & Ofrece lectura local y estado sin abrir un navegador; el panel táctil facilita interacción. & Área limitada y dependencia de alimentación del gateway; el análisis histórico amplio se realiza en el dashboard. \\
+\end{longtable}
+\endgroup
+
+\section{Cálculos de diseño}
+\label{sec:fund-calculos}
+
+\subsection{Divisor de batería y canal del ADC}
+El nodo lee la tensión de la celda con un divisor resistivo hacia el canal A0 del XIAO. Con $R_1=344.8$~k$\Omega$ y $R_2=994.3$~k$\Omega$, la tensión que llega al ADC es
+\begin{equation}
+V_{\mathrm{ADC}}=V_{\mathrm{bat}}\frac{R_2}{R_1+R_2}=V_{\mathrm{bat}}\times0.7425,
+\label{eq:fund-divisor}
+\end{equation}
+de modo que una celda llena, a 4.2~V, produce 3.12~V, por debajo del fondo de escala de 3.3~V del canal con atenuación máxima. El divisor consume $4.2~\mathrm{V}/1.339~\mathrm{M}\Omega=3.1$~$\mu$A, despreciable frente a la corriente de sueño. El ADC del ESP32-C6 es de 12 bits y su hoja de datos declara un error total de hasta $\pm40$~mV en ese rango de atenuación, que sobre la celda equivale a unos $\pm54$~mV; por eso el firmware conserva una corrección aditiva ajustable ($B=0.090$~V) y el porcentaje de batería se trata como indicador orientativo (sección~\ref{sec:impl-nodo}).
+
+\subsection{Resistencia de referencia y resolución del conversor}
+El MAX31865 mide la razón entre la resistencia de la RTD y una resistencia de referencia externa con un convertidor de 15 bits, y su hoja de datos recomienda para una PT100 una referencia cercana a cuatro veces la resistencia nominal, típicamente 430~$\Omega$ \citep{max31865}. El módulo usado tiene $R_{\mathrm{ref}}=421.1$~$\Omega$, valor caracterizado y cargado en el firmware. La resolución resultante es
+\begin{equation}
+\Delta R=\frac{R_{\mathrm{ref}}}{2^{15}}=\frac{421.1}{32\,768}=0.0129~\Omega\approx0.033~\text{\textdegree C},
+\label{eq:fund-resolucion}
+\end{equation}
+con la sensibilidad de 0.385~$\Omega$/\textdegree C de la PT100. Es resolución, no exactitud: la hoja de datos del conversor declara una exactitud total de 0.5~\textdegree C sobre todas las condiciones de operación, y a ella se suman la tolerancia de la sonda y de la referencia (sección~\ref{sec:fund-incertidumbre}).
+
+\subsection{Periodo de muestreo y almacenamiento}
+Con el periodo nominal de \PeriodoNominal{}, cada nodo produce
+\begin{equation}
+N_{\text{día}}=\frac{86\,400~\mathrm{s}}{120~\mathrm{s}}=720\quad\text{muestras por día},
+\label{eq:fund-muestras}
+\end{equation}
+2160 para los tres nodos y 64\,800 en la ventana de 30 fechas que conserva el gateway. El archivo diario guarda cada muestra como el segundo del día y la temperatura multiplicada por diez, separados por coma y con salto de línea, entre 10 y 11 bytes por muestra. Eso da unos 7.5~kB por nodo y día, unos 680~kB para 30 días y tres nodos, más un clúster del sistema de archivos por cada uno de los 90 archivos. Cualquier microSD y la partición LittleFS de 4~MB de flash del XIAO lo alojan con holgura; el límite práctico no es el espacio sino la rotación de 30 fechas, que obliga a exportar antes (sección~\ref{sec:impl-almacenamiento}).
+
+La evolución térmica superficial de los equipos observados es lenta frente a los 120~s: los ciclos de calentamiento y enfriamiento del succionador duran horas (sección~\ref{sec:resultados-succionador}). Un periodo más corto multiplicaría en proporción inversa las conversiones, transmisiones y escrituras, y con ellas el consumo y la ocupación del canal; uno más largo perdería transitorios de arranque. El valor es un compromiso de este piloto, no un óptimo general.
+
+\subsection{Energía}
+El nodo alterna un intervalo activo, en el que lee, transmite y escucha brevemente, con el sueño profundo. Con el tiempo activo instrumentado de \TiempoActivo{} el ciclo de trabajo es $D=2.279/120\approx1.9\,\text{\%}$, y la corriente media de un modelo de dos estados es
+\begin{equation}
+I_{\mathrm{media}}=D\,I_{\mathrm{activo}}+(1-D)\,I_{\text{sueño}},\qquad t_{\mathrm{aut}}=\frac{C_{\text{útil}}}{I_{\mathrm{media}}}.
+\label{eq:fund-energia}
+\end{equation}
+Con 11.7~mA de corriente activa implicada por la descarga parcial y 15~$\mu$A de sueño, la corriente media es 0.237~mA y la autonomía de la celda de 1000~mAh, 176~días, coincidente con la extrapolación lineal de la sección~\ref{sec:resultados-autonomia}. El modelo por estados con valores de ficha de la sección~\ref{sec:resultados-modelo-consumo} desagrega ese intervalo activo componente por componente y muestra que las fichas, tomadas en su valor nominal, predicen más consumo del que la descarga observada implica.
+
+\subsection{Enlace de radio}
+El E220-400T22D transmite a 22~dBm y su hoja de datos declara una sensibilidad típica de $-127$~dBm a 2.4~kbps \citep{e220manual}. La pérdida en espacio libre a 433~MHz y 688~m es
+\begin{equation}
+L_{\mathrm{fs}}=20\log_{10}(688)+20\log_{10}(433)-27.55=81.9~\mathrm{dB},
+\label{eq:fund-fspl}
+\end{equation}
+y la caída observada entre el punto cercano ($-15$~dBm) y el más lejano ($-98$~dBm) fue de 83~dB, del mismo orden pese a los edificios interpuestos. El margen frente a la sensibilidad de ficha en el punto más lejano es de unos 29~dB. El fabricante declara 5~km de alcance de referencia en campo abierto con antena de 5~dBi a 2.5~m de altura; el ensayo urbano sin línea de vista no es comparable con esa condición y por eso 688~m se reporta como cota inferior (sección~\ref{sec:resultados-alcance}).
+
+\subsection{Umbrales de alarma}
+El gateway maneja dos umbrales por nodo, de advertencia y crítico, configurables desde el dashboard y guardados en su memoria. Los valores por defecto del firmware son 50 y 60~\textdegree C; en el piloto se ajustaron por equipo desde la interfaz. Además, si un nodo no envía tramas durante seis minutos, tres ciclos nominales, el gateway lo marca fuera de línea. Los umbrales son reglas de atención sobre la temperatura registrada, no un criterio de diagnóstico.
+
+\section{Presupuesto de incertidumbre por especificaciones}
+\label{sec:fund-incertidumbre}
+No se dispuso de una referencia de contacto calibrada, así que la incertidumbre de la cadena PT100, MAX31865 y firmware se acota por evaluación tipo B, a partir de las especificaciones de cada elemento y con distribución rectangular para cada tolerancia \citep{jcgm2008}. El punto de evaluación es 70~\textdegree C, donde se tomaron las parejas de campo y donde la resistencia de una PT100 es de 127.1~$\Omega$ según IEC~60751 \citep{iec60751}. Como la clase de la sonda instalada no está documentada, se asume clase B; la tabla~\ref{tab:fund-incertidumbre} muestra el resultado (\texttt{analisis/incertidumbre\_tipoB.py}).
+
+\begin{table}[htbp]
+\centering\small
+\caption{Presupuesto de incertidumbre tipo B de la medición de temperatura a 70~\textdegree C.}
+\label{tab:fund-incertidumbre}
+\begin{tabularx}{\textwidth}{@{}Xrlr@{}}
+\toprule
+\textbf{Contribución} & \textbf{Semiancho (\textdegree C)} & \textbf{Distribución} & $\boldsymbol{u}$ \textbf{(\textdegree C)} \\
+\midrule
+Tolerancia de la PT100, clase B: $\pm(0.30+0.005\,t)$ & 0.65 & rectangular & 0.375 \\
+Exactitud total del MAX31865 & 0.50 & rectangular & 0.289 \\
+Tolerancia de $R_{\mathrm{ref}}$, 0.1\,\% de 127.1~$\Omega$ & 0.33 & rectangular & 0.191 \\
+Desequilibrio residual de los tres hilos, 0.05~$\Omega$ & 0.13 & rectangular & 0.075 \\
+Resolución del conversor & 0.016 & rectangular & 0.009 \\
+Autocalentamiento (6~mA durante 0.3~s cada 120~s) & 0 & -- & 0 \\
+\midrule
+Combinada $u_c$ & & & 0.52 \\
+Expandida $U$, $k=2$ & & & 1.03 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+La incertidumbre expandida estimada es de \IncertidumbreTipoB{} ($k=2$), dominada por la tolerancia de la sonda; con una sonda de clase A sería de 0.78~\textdegree C. Quedan fuera del presupuesto, porque las especificaciones no las cubren, el contacto térmico entre la sonda magnética y la carcasa, el gradiente entre el punto de contacto y el punto que observa otro instrumento, y la deriva por tiempo o desmontaje. Este presupuesto acota lo que la cadena puede garantizar por diseño; no reemplaza la calibración con referencia trazable descrita como trabajo futuro (sección~\ref{sec:conclusiones-futuro}), ni convierte la concordancia de campo de la sección~\ref{sec:resultados-termica} en exactitud absoluta \citep{jcgm2012}.

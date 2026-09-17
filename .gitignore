@@ -38,3 +38,8 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 
+
+# Artefactos de planificacion y auxiliares LaTeX adicionales
+.superpowers/
+*.lof
+*.lot

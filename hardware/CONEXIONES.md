@@ -5,7 +5,7 @@ Estas tablas son el insumo directo para dibujar el esquemático en KiCad (ver `G
 
 ## 1. Nodo sensor (XIAO ESP32-C6)
 
-### 1.1 Módulo LoRa Ebyte E220-433 (UART)
+### 1.1 Módulo LoRa Ebyte E220-400T22D (UART)
 
 | E220 | XIAO ESP32-C6 | GPIO | Nota |
 |---|---|---|---|
@@ -43,7 +43,7 @@ Parámetros de firmware: `RREF = 421,1 Ω` (valor calibrado del módulo usado; e
 
 | Elemento | Conexión |
 |---|---|
-| Batería LiPo (3,7 V) | BAT+ / BAT− → pads de batería del XIAO (regulador a bordo) |
+| Batería LiPo (3,7 V, 1000 mAh) | BAT+ / BAT− → pads de batería del XIAO (regulador a bordo) |
 | Módulo de carga/protección (tipo TP4056) | Entre la celda y los pads BAT del XIAO |
 | Divisor resistivo | BAT+ → **R1 = 344,8 kΩ** → nodo A0 (GPIO0, `BAT_ADC_PIN`) → **R2 = 994,3 kΩ** → GND |
 
@@ -68,6 +68,12 @@ La pantalla ST7789, el táctil y la ranura microSD vienen **integrados en la pla
 |---|---|
 | UART | 9600 bps, 8N1 |
 | Tasa aérea | 2,4 kbps |
-| Canal | 23 (banda 433 MHz) |
+| Módulo | Ebyte E220-400T22D (LLCC68), 410,125 a 493,125 MHz, antena SMA |
+| Canal | 23 → 433,125 MHz (frecuencia = 410,125 MHz + canal × 1 MHz; valor de fábrica) |
+| Potencia | 22 dBm (código 0 de `AT+POWER`; valor de fábrica y máximo del módulo) |
+| Sensibilidad (ficha) | −127 dBm típ. a 2,4 kbps (−126 a −129) |
+| Consumo (ficha) | TX 110 mA típ. · RX 16,8 mA · sueño 5 µA |
 | Modo | Transmisión fija (fixed), paquete 200 bytes |
 | Direcciones | Maestro = 1 · Nodos = dirección propia (ej. 13) |
+
+La rutina `configureE220()` del firmware escribe estos valores con comandos AT (`AT+ADDR`, `AT+CHANNEL=23`, `AT+RATE=2`, `AT+TRANS=1`, `AT+PACKET=0`, `AT+POWER=0`). Está desactivada en el arranque normal (`AUTO_CONFIGURE_ON_BOOT = false`), así que el módulo trabaja con los parámetros que tiene guardados; al reproducir el sistema, leerlos desde el módulo. Ficha: *E220-400T22D User Manual* (Ebyte).

@@ -4,7 +4,7 @@
 \section{Resultados y nivel de evidencia}
 SmartSense produjo registros identificados de \NumeroNodos{} nodos, conservó series de temperatura superficial y permitió su consulta local. La evaluación combina el histórico de planta, comparaciones térmicas y ensayos complementarios de agosto de 2026. No todos esos resultados corresponden a la misma ventana temporal ni tienen el mismo alcance: un registro recibido es una observación; atribuir un hueco a un apagado es una inferencia; extrapolar la descarga es una estimación.
 
-La tabla~\ref{tab:resultados-evidencia} relaciona cada resultado con su método y su limitación. Las cifras centrales proceden del registro de evidencia del proyecto y se desarrollan en las secciones siguientes. Las estadísticas históricas se conservan como resultados documentados: los scripts identifican CSV externos que no están incluidos en la copia del repositorio examinada, por lo que esta redacción no constituye una nueva ejecución sobre los datos originales.
+La tabla~\ref{tab:resultados-evidencia} relaciona cada resultado con su método y su limitación; las cifras se desarrollan en las secciones siguientes. Las estadísticas del histórico provienen de los scripts del proyecto ejecutados sobre el CSV exportado del gateway, que no está en el repositorio (sección~\ref{sec:anexos-reproducibilidad}).
 
 \begingroup
 \footnotesize\singlespacing
@@ -28,7 +28,7 @@ Disponibilidad de enlace & Se excluyen intervalos mayores de 363~s. & \Disponibi
 PDR histórico & Estimado por intervalos, 120~s; exclusión sobre 1800~s. & \PDREstimado{}. & Inferencia temporal. & Entrega estimada durante periodos activos. & Sin contador de envíos; población distinta de disponibilidad. \\
 Ventana de 60 min & Recibidos frente a esperados en una hora seleccionada. & A: 29/30; B: 30/30; C: 30/30. & Conteo histórico con denominador nominal. & Cobertura de una hora con los tres nodos. & Seleccionada por cobertura; no es PDR directo ni ensayo independiente. \\
 Arranque y recuperación & Intervalo instrumentado en diez arranques. & \TiempoActivo{} en ocho registros. & Temporización de firmware documentada. & Actividad observada dentro del tramo instrumentado. & No garantiza tiempo físico total desde energización ni recuperación del enlace. \\
-Alcance y RSSI & Recorrido urbano móvil, NLOS. & Al menos \DistanciaDemostrada{}; cerca de \RSSILejano{}. & Ensayo de campo documentado. & Enlace operativo en el punto más lejano visitado. & Cota inferior; geometría variable y radio sin variante completa identificada. \\
+Alcance y RSSI & Recorrido urbano móvil, NLOS. & Al menos \DistanciaDemostrada{}; cerca de \RSSILejano{}. & Ensayo de campo documentado. & Enlace operativo en el punto más lejano visitado. & Cota inferior; geometría variable. \\
 Autonomía & Descarga parcial de \DuracionDescarga{} y dos modelos. & Lineal: \AutonomiaLinealEstimada{}; LiPo: \AutonomiaModeloEstimada{}. & Autonomía estimada. & Proyección bajo los supuestos del ensayo. & Sin descarga hasta corte ni corriente integral medida por estado. \\
 \end{longtable}
 \endgroup
@@ -36,7 +36,7 @@ Autonomía & Descarga parcial de \DuracionDescarga{} y dos modelos. & Lineal: \A
 \section{Despliegue de 32 días y cobertura real}
 \label{sec:resultados-despliegue}
 \subsection{Población y estadísticas por nodo}
-La documentación denomina piloto de \DuracionComunDias{} días al tramo del 8 de mayo al 9 de junio de 2026 cubierto por los nodos A y C. El Nodo B comienza el 10 de mayo y su archivo se extiende hasta el 20 de julio, aproximadamente 72 días. Por tanto, el solapamiento de los tres nodos comienza después del inicio de A y C; no deben presentarse los \DuracionComunDias{} días como \DuracionComunDias{} días completos de observación simultánea de los tres. La comparación gráfica se recorta al solapamiento, mientras la tabla~\ref{tab:resultados-estadisticas} conserva la ventana individual de cada sensor.
+El piloto de \DuracionComunDias{} días es el tramo del 8 de mayo al 9 de junio de 2026 que cubren los nodos A y C; el nodo B empieza el 10 de mayo y su archivo llega hasta el 20 de julio, unos 72 días. Las comparaciones gráficas se recortan al tramo común y la tabla~\ref{tab:resultados-estadisticas} conserva la ventana de cada sensor.
 
 \begin{table}[htbp]
 \centering\small
@@ -54,9 +54,9 @@ C & 8 mayo--9 junio & 17\,314 & 16.4 & 65.0 & 44.7 & 16.7 \\
 \end{tabularx}
 \end{table}
 
-La suma es \TotalMuestras{} registros, con una cadencia mediana de \PeriodoMediano{}. El rango conjunto de 15.3 a \SI{70.0}{\celsius} describe temperaturas registradas, no límites de medición certificados. La media más alta y el máximo mayor corresponden al Nodo A, asociado al succionador. Las desviaciones estándar describen variación de las series, compatible con calentamientos y enfriamientos durante la operación; no representan repetibilidad instrumental ni incertidumbre de cada lectura.
+En total son \TotalMuestras{} registros con una cadencia mediana de \PeriodoMediano{}. El rango de 15.3 a \SI{70.0}{\celsius} es el de las temperaturas registradas; la media y el máximo más altos son del nodo A, el del succionador. Las desviaciones estándar reflejan los calentamientos y enfriamientos de la operación, no la repetibilidad del instrumento.
 
-La figura~\ref{fig:resultados-comparacion} permite contrastar las trayectorias dentro del solapamiento. La figura~\ref{fig:resultados-serie} amplía la serie del Nodo A y ubica su máximo histórico de \SI{70.0}{\celsius}. Los segmentos que unen puntos en estas figuras no aportan mediciones dentro de los huecos: su cobertura debe leerse junto con la figura~\ref{fig:resultados-cobertura}.
+La figura~\ref{fig:resultados-comparacion} contrasta las trayectorias en el tramo común y la figura~\ref{fig:resultados-serie} amplía la serie del nodo A con su máximo de \SI{70.0}{\celsius}. Las líneas que unen los puntos no son mediciones dentro de los huecos; la cobertura real está en la figura~\ref{fig:resultados-cobertura}.
 
 \begin{figure}[htbp]
 \centering
@@ -72,9 +72,50 @@ La figura~\ref{fig:resultados-comparacion} permite contrastar las trayectorias d
 \label{fig:resultados-serie}
 \end{figure}
 
+\subsection{Qué ocurrió durante el piloto}
+\label{sec:resultados-cronologia}
+La tabla~\ref{tab:resultados-cronologia} y la figura~\ref{fig:resultados-cronologia} reconstruyen el piloto a partir del propio CSV (\texttt{analisis/cronologia.py}). Los días en que el succionador estuvo detenido se reconocen porque la media diaria del nodo A cae por debajo de 30~\textdegree C, con la sonda cerca de la temperatura ambiente; los periodos en que el gateway no registró se reconocen porque el hueco aparece a la misma hora en los tres nodos.
+
+\begin{table}[htbp]
+\centering\small
+\caption[Cronología del piloto y de los ensayos posteriores.]{Cronología del piloto reconstruida del CSV y ensayos posteriores. Todas las fechas son de 2026.}
+\label{tab:resultados-cronologia}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}X@{}}
+\toprule
+\textbf{Fecha} & \textbf{Evento} \\
+\midrule
+8 y 9 de mayo & Instalación de los nodos A y C (primer registro a las 14:07) y operación del succionador con máximos diarios de 64.6 y 65.0~\textdegree C. \\
+10 de mayo & Parada de un día del succionador (media 24.6~\textdegree C); inicio del registro del nodo B. \\
+11 y 12 de mayo & Operación, máximos diarios de 67.2 y 66.5~\textdegree C. \\
+13 al 19 de mayo & Gateway sin registrar en cuatro intervalos simultáneos en los tres nodos, de 13, 25, 17 y 88~h, atribuidos a paradas de planta. \\
+14 al 21 de mayo & Succionador detenido en los días con registro; la sonda marca entre 19 y 27~\textdegree C. \\
+22 de mayo & Reinicio de la operación; máximo diario 69.8~\textdegree C. \\
+23 de mayo & Máximo histórico del succionador: 70.0~\textdegree C a las 15:26. \\
+24 de mayo & Parada de un día (media 24.8~\textdegree C). \\
+25 al 29 de mayo & Operación, máximos diarios de 65 a 69~\textdegree C. \\
+30 y 31 de mayo & Parada desde la mañana del 30; el 31 la sonda marca entre 18 y 22~\textdegree C. \\
+1 al 5 de junio & Operación, máximos diarios de 65 a 68~\textdegree C. \\
+6 al 8 de junio & Parada desde la tarde del 6; el 7 y el 8 la sonda marca entre 17 y 26~\textdegree C. \\
+9 de junio & Último registro de los nodos A y C a las 21:12. \\
+17 de junio al 20 de julio & Nodo B con registro esporádico, con huecos de 185 y 792~h. \\
+13 al 18 de agosto & Descarga parcial de la celda de 1000~mAh: de 4.112 a 4.089~V en 120~h. \\
+20 de agosto & Prueba de alcance urbana: 688~m con RSSI de $-98$~dBm. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{cronologia.pdf}
+\caption[Cronología del nodo A e hitos del proyecto.]{Arriba: media y máximo diarios del nodo A, con los días de máquina detenida sombreados y los periodos sin registro del gateway rayados. Abajo: hitos del proyecto de mayo a agosto. Fuente: \texttt{analisis/cronologia.py} sobre el CSV exportado del gateway.}
+\label{fig:resultados-cronologia}
+\end{figure}
+
+La secuencia que importa para el caso del succionador es: operación con máximos crecientes, máximo histórico de 70.0~\textdegree C el 23 de mayo y paradas posteriores el 24, el 30 y 31 de mayo y del 6 al 8 de junio, en las que la sonda vuelve a la temperatura ambiente. Según el equipo de planta, en una de esas paradas se intervino el rodamiento del motor; la fecha exacta no quedó en el registro del sistema y debe tomarse de la bitácora de mantenimiento de la empresa. Las paradas de planta con el gateway apagado explican la disponibilidad cruda de la sección siguiente.
+
 \subsection{Disponibilidad cruda y disponibilidad durante actividad inferida}
 \label{sec:resultados-disponibilidad}
-La tabla~\ref{tab:resultados-disponibilidad} presenta conjuntamente las dos métricas para evitar que la exclusión de interrupciones oculte la cobertura efectiva del usuario. Su cálculo publicado procede de \texttt{analisis/figuras\_validacion.py}: utiliza $T=121$~s y marca como hueco un intervalo superior a $3T=363$~s. Para cada ventana individual, resta la duración completa de esos huecos al tiempo entre primera y última muestra para construir el denominador de disponibilidad de enlace. Esta definición operacional complementa la distinción del capítulo~\ref{cap:metodologia}; es diferente de la exclusión de 30 minutos aplicada al PDR.
+La tabla~\ref{tab:resultados-disponibilidad} presenta las dos métricas juntas para que la exclusión de interrupciones no oculte la cobertura que tuvo el usuario. El cálculo, de \texttt{analisis/figuras\_validacion.py}, usa $T=121$~s, marca como hueco todo intervalo mayor de $3T=363$~s y resta la duración de esos huecos al tiempo entre la primera y la última muestra para el denominador del enlace; es una exclusión distinta de la de 30 minutos que usa el PDR.
 
 \begin{table}[htbp]
 \centering\small
@@ -91,9 +132,9 @@ C & 75.1 & 97.8 & 81 & 180 \\
 \end{tabularx}
 \end{table}
 
-El Nodo B incluye un hueco prolongado de aproximadamente 33 días y una ventana mayor; su 32.3\,\% no es directamente comparable con el 76.0\,\% de A como si describieran el mismo calendario. La disponibilidad condicionada de \DisponibilidadEnlace{} indica buena cobertura en los tramos retenidos por el cálculo, pero no acredita una disponibilidad total del sistema de ese orden. Cuando el gateway no registra, el usuario carece de la serie aunque los nodos puedan seguir intentando transmitir.
+El nodo B tiene una ventana mayor y un hueco de unos 33 días, así que su 32.3\,\% no es comparable con el 76.0\,\% de A sobre el mismo calendario. La disponibilidad condicionada de \DisponibilidadEnlace{} describe los tramos en que el gateway registraba; cuando no registra, el usuario se queda sin serie aunque los nodos sigan transmitiendo.
 
-La coincidencia de varias interrupciones en los tres nodos, visible en la figura~\ref{fig:resultados-cobertura}, respalda la interpretación de gateway apagado durante paradas de planta o energía. Sin una bitácora de alimentación, no prueba la causa de todas las interrupciones: también puede existir una falla común de recepción, reloj o almacenamiento. Del mismo modo, un hueco no simultáneo no demuestra por sí solo una falla de radio; puede depender del nodo, su alimentación o la persistencia del dato. Por ello se conservan tanto la disponibilidad cruda como la clasificación utilizada para excluir periodos.
+Que varias interrupciones coincidan en los tres nodos, como se ve en la figura~\ref{fig:resultados-cobertura} y en la cronología, respalda la lectura de gateway apagado durante las paradas de planta; sin bitácora de alimentación no se descarta una falla común de recepción, reloj o almacenamiento, ni un hueco aislado prueba una falla de radio. Por eso se conservan las dos métricas y el criterio de exclusión.
 
 \begin{figure}[htbp]
 \centering
@@ -104,7 +145,7 @@ La coincidencia de varias interrupciones en los tres nodos, visible en la figura
 
 \section{Entrega estimada de paquetes y ventana de 60 minutos}
 \label{sec:resultados-pdr}
-El PDR del despliegue se presenta como \emph{estimado por intervalos}. Al aplicar el procedimiento de la ecuación~\ref{eq:metodo-perdida-inferida}, con periodo nominal de \PeriodoNominal{} y exclusión de intervalos superiores a 1800~s, se obtuvieron los valores documentados en la tabla~\ref{tab:resultados-pdr}. Cada uno se refiere al archivo de su nodo; el Nodo B conserva su extensión temporal. La estimación supone que el nodo mantuvo la cadencia entre recepciones y no conoce cuántos envíos ocurrieron realmente.
+El PDR del despliegue es estimado por intervalos con la ecuación~\ref{eq:metodo-perdida-inferida}, periodo nominal de \PeriodoNominal{} y exclusión de intervalos mayores de 1800~s (tabla~\ref{tab:resultados-pdr}). Cada valor corresponde al archivo de su nodo, y la estimación supone que el nodo mantuvo la cadencia; el número real de envíos no se conoce.
 
 \begin{table}[htbp]
 \centering
@@ -121,20 +162,20 @@ C & 4.68 & 95.32 \\
 \end{tabular}
 \end{table}
 
-El resumen redondeado es \PDREstimado{} de PDR y \PerdidaEstimada{} de pérdida. El resultado es compatible con los objetivos de PDR de al menos 95\,\% y pérdida de hasta 5\,\% bajo el estimador utilizado; no acredita esos límites mediante conteo directo. Tampoco contradice la disponibilidad de enlace de \DisponibilidadEnlace{}: difieren la cadencia usada, los huecos excluidos y el denominador. El contador \texttt{SEQ} añadido después del despliegue no permite reconstruir los envíos históricos ausentes.
+En resumen, \PDREstimado{} de PDR y \PerdidaEstimada{} de pérdida, que cumplen los criterios de al menos 95\,\% y hasta 5\,\% bajo este estimador. No contradicen la disponibilidad de enlace de \DisponibilidadEnlace{}: cambian la cadencia, los huecos excluidos y el denominador. El contador \texttt{SEQ} se añadió después del despliegue y no reconstruye los envíos históricos.
 
-La figura~\ref{fig:resultados-intervalos} muestra la concentración de llegadas cerca de \PeriodoMediano{}. Es una representación de intervalos cortos retenidos por el generador de cobertura, no la distribución completa de interrupciones ni una medición de latencia. La regularidad observada apoya el seguimiento de tendencias térmicas a esa cadencia, sin resolver qué sucedió durante los huecos.
+La figura~\ref{fig:resultados-intervalos} muestra las llegadas concentradas cerca de \PeriodoMediano{}: son los intervalos cortos, no la distribución de las interrupciones. Esa regularidad basta para seguir tendencias térmicas a esa cadencia.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.74\textwidth]{val-intervalos.pdf}
-\caption[Intervalos cortos entre recepciones y cadencia mediana.]{Histograma de intervalos cortos entre recepciones, con eje de conteo logarítmico. La selección excluye huecos mayores de 363~s y el eje mostrado se concentra alrededor de la mediana de 121~s; no representa todas las interrupciones. Fuente: figura existente de \texttt{analisis/figuras\_validacion.py}.}
+\caption[Intervalos cortos entre recepciones y cadencia mediana.]{Histograma de los intervalos entre recepciones consecutivas menores de 363~s, con eje de conteo logarítmico; la distribución se concentra alrededor de la mediana de 121~s. Los huecos mayores aparecen en la figura~\ref{fig:resultados-cobertura}. Fuente: figura de \texttt{analisis/figuras\_validacion.py}.}
 \label{fig:resultados-intervalos}
 \end{figure}
 
 \subsection{Hora representativa seleccionada por cobertura}
 \label{sec:resultados-60min}
-En la ventana del 10 de mayo de 2026 de 00:00 a 01:00 se contabilizaron 29, 30 y 30 registros para A, B y C. La tabla~\ref{tab:resultados-60min} expresa \emph{recibidos frente a esperados}: el denominador de 30 se obtiene de 3600/120, no de un registro de transmisiones. El déficit de una muestra en A tampoco demuestra por sí solo que se perdiera exactamente una trama por radio.
+En la hora del 10 de mayo de 2026, de 00:00 a 01:00, se contaron 29, 30 y 30 registros para A, B y C frente a los 30 esperados por nominal (tabla~\ref{tab:resultados-60min}). El déficit de una muestra en A no dice si fue una pérdida de radio o de otro tipo.
 
 \begin{table}[htbp]
 \centering\small
@@ -151,7 +192,7 @@ C & 30 & 30 & 100.0 \\
 \end{tabular}
 \end{table}
 
-La hora fue seleccionada mediante el criterio de al menos 25 registros por nodo descrito en la sección~\ref{sec:metodo-60min}. Es un ejemplo de continuidad con buena cobertura y no una selección aleatoria que represente todo el despliegue. La figura~\ref{fig:resultados-60min} conserva las temperaturas de esa ventana. No se midieron simultáneamente en ella corriente, RSSI o latencia; las pruebas energéticas y de alcance pertenecen a agosto.
+La hora se eligió con el criterio de al menos 25 registros por nodo (sección~\ref{sec:metodo-60min}), así que ilustra la continuidad con buena cobertura y no representa todo el despliegue. La figura~\ref{fig:resultados-60min} muestra las temperaturas de esa ventana; corriente, RSSI y latencia no se midieron en ella.
 
 \begin{figure}[htbp]
 \centering
@@ -183,9 +224,9 @@ La comparación de campo comprende cinco parejas de lecturas sobre el motor del 
 
 Aplicando la ecuación~\ref{eq:marco-concordancia} a esas cinco filas, la diferencia absoluta media es $(0+0+0.1+0.1+0.1)/5=\SI{0.06}{\celsius}$, aproximadamente \DiferenciaTermicaMedia{} al redondear a una cifra decimal, y su máximo es \SI{0.1}{\celsius}. La media con signo es \SI{0.02}{\celsius}; no debe confundirse con la media absoluta. Resolver la procedencia de los \DiferenciaTermicaMaxima{} exige recuperar el registro primario de la comparación. Hasta entonces, se distinguen el resumen comunicado y lo calculable a partir de la tabla disponible.
 
-El Fluke participó también en el ajuste del offset, por lo que la comparación no es independiente. La incertidumbre de referencia citada en el proyecto es de $\pm\SI{1.5}{\celsius}$ para el Fluke y de $\pm\SI{2}{\celsius}$ para la FLIR; se trata de especificaciones declaradas de los instrumentos, no de un presupuesto de incertidumbre certificado para este montaje. No se dispone de certificado vigente del Fluke. Además, la lectura infrarroja depende de emisividad, área observada y geometría, mientras la PT100 depende de contacto y fijación.
+El Fluke sirvió también para ajustar el offset, así que la comparación no es independiente. Sus especificaciones son $\pm\SI{1.5}{\celsius}$ y las de la FLIR $\pm\SI{2}{\celsius}$, sin certificado vigente del Fluke; la lectura infrarroja depende de la emisividad, el área observada y la geometría, y la PT100 del contacto y la fijación.
 
-Por esas razones, la conclusión es \EstadoTemperatura{}. Ni la diferencia de la tabla ni el máximo comunicado acreditan exactitud absoluta de SmartSense o un error inferior a \SI{1}{\celsius}. Para establecerla se requiere una referencia de contacto calibrada, comparación independiente del ajuste en varias temperaturas y en los tres nodos, y un presupuesto de incertidumbre que incluya referencia, conversión, conductores, montaje y repetibilidad \citep{jcgm2012,jcgm2008}. La imagen térmica de la sección~\ref{sec:resultados-succionador} aporta contexto espacial del calentamiento, no una validación metrológica adicional.
+Por eso la conclusión es \EstadoTemperatura{}: ni la tabla ni el máximo comunicado establecen una exactitud absoluta menor de \SI{1}{\celsius}. El presupuesto por especificaciones de la sección~\ref{sec:fund-incertidumbre} acota la incertidumbre expandida en \IncertidumbreTipoB{} ($k=2$) a 70~\textdegree C con una sonda de clase B, sin contacto ni montaje; establecer la exactitud requiere una referencia de contacto calibrada y comparaciones independientes del ajuste en varias temperaturas y en los tres nodos \citep{jcgm2012,jcgm2008}. La imagen térmica de la sección~\ref{sec:resultados-succionador} aporta contexto espacial, no validación metrológica.
 
 \section{Alcance y señal recibida}
 \label{sec:resultados-alcance}
@@ -198,15 +239,15 @@ El ensayo del 20 de agosto de 2026 registró un enlace operativo a \emph{al meno
 \label{fig:resultados-alcance}
 \end{figure}
 
-El recorrido terminó voluntariamente; por ello el resultado es una \EstadoAlcance{}. No se ensayaron posiciones fijas repetidas ni se determinó el punto de pérdida de comunicación. No se infiere un margen numérico respecto de sensibilidad a partir de valores genéricos de LoRa, porque faltan la variante exacta del E220 y la verificación completa de su configuración física. La cobertura obtenida tampoco garantiza igual desempeño entre estructuras y fuentes de interferencia de otra planta.
+El recorrido terminó por decisión, así que el resultado es una \EstadoAlcance{}: no se ensayaron posiciones fijas ni se llegó al punto de pérdida. Frente a la sensibilidad típica de ficha del E220-400T22D a 2.4~kbps, $-127$~dBm (entre $-126$ y $-129$), el RSSI de \RSSILejano{} deja un margen cercano a 29~dB \citep{e220manual}, que es un margen sobre el dato del fabricante. Otra planta, con otras estructuras e interferencias, puede comportarse distinto.
 
-El indicador de batería permaneció alrededor de 94\,\% durante aproximadamente 2.6~h según el registro documentado. Este porcentaje derivado de tensión tiene la limitación descrita en el capítulo~\ref{cap:implementacion}; su estabilidad no mide capacidad consumida ni valida meses de funcionamiento. El RSSI corresponde a este ensayo posterior, no al despliegue de mayo--junio. La interfaz del módulo utilizada no expuso SNR y no existe una serie de esa variable para sustentar resultados.
+El indicador de batería se mantuvo cerca del 94\,\% durante las 2.6~h del ensayo; es el porcentaje derivado de tensión del capítulo~\ref{cap:implementacion}, no una medida de carga consumida. El RSSI es de este ensayo, no del despliegue de mayo y junio, y el módulo no expone SNR.
 
 \section{Intervalo activo y recuperación tras reinicio}
 \label{sec:resultados-arranque}
-El registro documentado de diez arranques contiene ocho valores de \TiempoActivo{} y variaciones menores en los dos restantes, cuyos valores exactos no se transcriben en la fuente. Se trata de un intervalo instrumentado en el firmware, empleado para caracterizar parte de la adquisición y transmisión. El cociente respecto de \PeriodoNominal{} produce el ciclo de trabajo aproximado de \CicloTrabajo{} de la ecuación~\ref{eq:metodo-duty}.
+En diez arranques instrumentados, ocho dieron \TiempoActivo{} y los otros dos variaron en milisegundos (uno de ellos, 2.277~s, consta en las capturas del monitor serie). Es el intervalo que el firmware mide entre su marca de arranque y el sueño, y con \PeriodoNominal{} da el ciclo de trabajo de \CicloTrabajo{} de la ecuación~\ref{eq:metodo-duty}.
 
-Este dato no garantiza el tiempo físico total entre aplicar alimentación y recibir una primera muestra válida y persistida en el gateway. El código sitúa el inicio de la instrumentación después de inicializar el puerto serie y de una pausa de 200~ms, como se detalla en la sección~\ref{sec:metodo-autonomia}. Falta medir de forma sincronizada la inicialización previa, el instante real de transmisión y la recepción remota. Por tanto, no se declara verificado el criterio de recuperación tras reinicio de hasta 120~s únicamente a partir de \TiempoActivo{}. La recuperación después de un corte, la recuperación ante bloqueo del enlace y la latencia extremo a extremo requieren ensayos distintos. Tampoco se atribuye el mismo ciclo de trabajo a intentos de configuración o a todas las condiciones de falla.
+El intervalo empieza después de inicializar el puerto serie y una pausa de 200~ms (sección~\ref{sec:metodo-autonomia}), así que no incluye el arranque previo ni la recepción en el gateway. La recuperación tras un corte, la recuperación ante bloqueo del enlace y la latencia extremo a extremo requieren ensayos con relojes sincronizados; el criterio de 120~s del anteproyecto se evalúa con esa salvedad en la sección~\ref{sec:resultados-anteproyecto}.
 
 \section{Descarga parcial y autonomía estimada}
 \label{sec:resultados-autonomia}
@@ -228,21 +269,66 @@ Actividad instrumentada & \TiempoActivo{}; \CicloTrabajo{} & Aproximación con p
 \end{tabularx}
 \end{table}
 
-La figura~\ref{fig:resultados-autonomia} visualiza la extensión del modelo mucho más allá de los dos puntos medidos. Los \AutonomiaLinealEstimada{} constituyen una proyección menor que la del modelo LiPo, pero no un límite inferior físico garantizado. El intervalo \AutonomiaModeloEstimada{} expresa el efecto de dos tensiones de corte sobre un modelo, no un intervalo estadístico de confianza. Ninguna de las dos proyecciones demuestra esa duración en servicio.
+La figura~\ref{fig:resultados-autonomia} muestra cuánto se extiende el modelo más allá de los dos puntos medidos. Los \AutonomiaLinealEstimada{} son la menor de las dos proyecciones y el intervalo \AutonomiaModeloEstimada{} refleja dos tensiones de corte, no un intervalo de confianza; lo observado son las 120~h.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\textwidth]{autonomia-descarga.pdf}
-\caption[Descarga parcial y curvas de autonomía estimada.]{Dos puntos de tensión observados y curvas de extrapolación. La denominación de cota conservadora en la figura compara modelos bajo sus supuestos; no certifica un mínimo de vida útil. La curva LiPo es típica y no una descarga completa medida de la celda. Fuente: figura existente de \texttt{analisis/autonomia\_bateria.py}.}
+\caption[Descarga parcial y curvas de autonomía estimada.]{Descarga parcial de cinco días con la celda de \SI{1000}{\milli\ampere\hour}: los dos puntos de tensión medidos y las dos extrapolaciones, lineal y por curva típica LiPo. La curva lineal, rotulada en la figura como cota conservadora, es el menor de los dos modelos; ninguna de las dos es una descarga completa medida de la celda. Fuente: figura de \texttt{analisis/autonomia\_bateria.py}.}
 \label{fig:resultados-autonomia}
 \end{figure}
 
-La caída de tensión es pequeña y sensible a temperatura, resolución del ADC, carga y relajación de la batería. No se dispone de un registro integrado de corriente del nodo completo durante actividad y sueño. El perfil modelado de corriente y el montaje de la figura~\ref{fig:metodo-montaje-corriente} no sustituyen ese registro. El resultado energético se mantiene como \EstadoAutonomia{} y no se extrapola automáticamente a otra capacidad nominal.
+La caída de tensión es pequeña y sensible a la temperatura, a la resolución del ADC, a la carga y a la relajación de la celda, y no hay un registro de corriente del nodo completo; el resultado energético es una \EstadoAutonomia{}. La subsección siguiente la contrasta con un modelo por fichas.
+
+\subsection{Modelo de consumo por estados a partir de fichas técnicas}
+\label{sec:resultados-modelo-consumo}
+Como el prototipo se entregó a la empresa aliada al terminar el piloto, la corriente del nodo no se midió. Para acotar la autonomía con un método independiente de la descarga parcial se construyó un modelo de consumo por estados con los valores de ficha de cada componente y los tiempos que fija el firmware (\texttt{analisis/modelo\_consumo.py}). La tabla~\ref{tab:resultados-modelo-entradas} resume las entradas; cada una se muestrea con una distribución triangular entre su mínimo y su máximo, con moda en el valor nominal, en 50\,000 corridas Monte Carlo.
+
+Dos comprobaciones del firmware condicionan el modelo. Primero, el nodo no envía el radio a dormir de forma explícita, pero al entrar el ESP32-C6 en sueño profundo sus pines quedan en alta impedancia y las resistencias internas de M0 y M1 llevan al E220 al modo 3, de \SI{5}{\micro\ampere} \citep{e220manual}; si el radio hubiera quedado en recepción, a 16.8~mA, la celda de 1000~mAh habría durado unos 2.4~días, lo que las 120~h observadas descartan. Segundo, los 2.279~s instrumentados incluyen la espera de 1.5~s por configuración remota, que solo ocurre en los 30 ciclos siguientes a energizar el nodo; en régimen permanente el tiempo activo se acerca a 0.75~s más el arranque previo a la instrumentación.
+
+\begin{table}[htbp]
+\centering\small
+\caption[Entradas del modelo de consumo por estados.]{Entradas del modelo de consumo por estados. Fuentes: hoja de datos del ESP32-C6 (Espressif, tablas 5-10 y 5-11), wiki del XIAO ESP32C6 \citep{xiaoc6}, manual del E220-400T22D \citep{e220manual} y el firmware del nodo.}
+\label{tab:resultados-modelo-entradas}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.6cm}rr>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Parámetro} & \textbf{Nominal} & \textbf{Rango} & \textbf{Origen} \\
+\midrule
+Periodo del ciclo & 120 s & 119--122 & Periodo nominal; mediana observada 121 s \\
+Arranque previo a la instrumentación & 0.35 s & 0.25--0.45 & Arranque del ESP32 y pausa de 200 ms del firmware \\
+Tiempo activo en régimen permanente & 0.75 s & 0.65--0.90 & 2.279 s instrumentados menos la espera de configuración de 1.5 s \\
+Tiempo al aire de la trama & 0.35 s & 0.25--0.50 & Trama de unos 85 bytes a 2.4 kbps más preámbulo \\
+Tiempo con el sensor alimentado & 0.45 s & 0.35--0.55 & Inicialización de 80 ms, cuatro conversiones y pausas \\
+ESP32-C6 activo & 30 mA & 27--38 & CPU a 160 MHz en modem-sleep, según periféricos activos \\
+E220 en recepción & 16.8 mA & 15--18.5 & Ficha del módulo; permanece en modo 0 durante el tiempo activo \\
+E220 en transmisión & 110 mA & 100--120 & Ficha del módulo \\
+MAX31865 y módulo & 2 mA & 1--3 & Supuesto; ficha por confirmar \\
+Polarización de la RTD & 6 mA & 5.5--6.5 & 3.3 V sobre 421.1 más unos 127 $\Omega$ \\
+XIAO en sueño profundo & 15 $\mu$A & 12--20 & Ficha de la placa \\
+E220 en modo 3 & 5 $\mu$A & 4--8 & Ficha del módulo \\
+Divisor de batería & 3.1 $\mu$A & fijo & 4.2 V sobre 1.339 M$\Omega$ \\
+Protección de la batería & 4 $\mu$A & 2--8 & Circuito de protección del módulo de carga \\
+Autodescarga de la celda & 2 \%/mes & 1--3 & Valor típico de una celda LiPo \\
+Capacidad utilizable & 0.95 & 0.85--1.00 & Fracción de 1000 mAh hasta 3.30 V \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+En el caso nominal la carga por ciclo es de 87.7~mA$\cdot$s, repartida entre el ESP32-C6 (38\,\%), el exceso de corriente durante la transmisión LoRa (37\,\%), la recepción del radio durante el tiempo activo (21\,\%) y el MAX31865 con la polarización de la RTD (4\,\%); la corriente media resulta de 0.79~mA y la autonomía de 50~días. El Monte Carlo da una corriente media de \CorrienteFichaMediana{}, entre \CorrienteFichaRango{} (percentiles 5 y 95), y una autonomía de \AutonomiaFichaMediana{}, entre \AutonomiaFichaRango{} (figura~\ref{fig:resultados-modelo-consumo}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{modelo-consumo.pdf}
+\caption[Modelo de consumo por fichas frente a la descarga observada.]{Modelo de consumo por estados con valores de ficha: reparto de la carga por ciclo en el caso nominal y distribución Monte Carlo de la autonomía, frente a las dos proyecciones de la descarga observada. Fuente: \texttt{analisis/modelo\_consumo.py}.}
+\label{fig:resultados-modelo-consumo}
+\end{figure}
+
+La descarga observada implica una corriente media de 0.13 a 0.24~mA según se use la curva LiPo o la extrapolación lineal, es decir, entre 3.5 y 6.4 veces menos que el modelo de fichas. Con 0.82~mA la tabla OCV--SoC habría llevado la celda de 4.112 a cerca de 4.00~V en 120~h, y no a los 4.089~V observados. La diferencia puede deberse a que las fichas describen el peor caso de cada componente, con la CPU en ejecución continua y la potencia máxima de transmisión, o a que la inferencia por tensión subestima la carga consumida porque la lectura inicial no corresponde a una celda en reposo. El modelo no resuelve cuál de las dos explicaciones domina; sí acota la autonomía entre \AutonomiaFichaRango{} en el escenario conservador de fichas y \AutonomiaModeloEstimada{} en el escenario de la descarga observada. En cualquiera de ellos se supera con holgura el criterio de 8~h del anteproyecto (sección~\ref{sec:resultados-anteproyecto}), y solo una medición de corriente por estado permitirá cerrar el intervalo.
 
 \section{Observación de campo: motor del succionador}
 \label{sec:resultados-succionador}
 \subsection{Serie térmica y contexto operacional}
-El caso se organiza desde el dato térmico hacia su contexto y la asociación posterior. La captura del dashboard de la figura~\ref{fig:resultados-succionador} muestra una jornada del succionador de la máquina Twin: comienza cerca de 48--49~\textdegree C, presenta un ascenso alrededor de la 01:30 por encima de \SI{63}{\celsius} y contiene ciclos posteriores de calentamiento y enfriamiento. Durante buena parte de la jornada la curva ocupa aproximadamente la zona de 57--61~\textdegree C, con nuevos picos y descensos. Los colores corresponden a umbrales configurados, no a un clasificador de fallas mecánicas.
+El caso se organiza desde el dato térmico hacia su contexto y la asociación posterior. La captura del dashboard de la figura~\ref{fig:resultados-succionador} muestra una jornada del succionador de la máquina Twin: comienza cerca de 48--49~\textdegree C, presenta un ascenso alrededor de la 01:30 por encima de \SI{63}{\celsius} y contiene ciclos posteriores de calentamiento y enfriamiento. Durante buena parte de la jornada la curva ocupa aproximadamente la zona de 57--61~\textdegree C, con nuevos picos y descensos. Los colores son los umbrales configurados en el dashboard.
 
 \begin{figure}[htbp]
 \centering
@@ -251,26 +337,69 @@ El caso se organiza desde el dato térmico hacia su contexto y la asociación po
 \label{fig:resultados-succionador}
 \end{figure}
 
-La captura presenta indicadores de mínimo 21.8, promedio 36.6 y máximo \SI{67.0}{\celsius}; la documentación reconoce que la actualización periódica sobrescribió indicadores con estadísticas del día en curso mientras permanecía visible otra fecha. Por ello, no se utilizan esos indicadores para cuantificar la jornada ni se equipara su máximo con los \SI{70.0}{\celsius} del archivo del Nodo A. Las estadísticas de la tabla~\ref{tab:resultados-estadisticas} proceden del resumen de datos del proyecto. Esta diferencia demuestra la necesidad de asociar curva, fecha y resumen antes de extraer una conclusión de la interfaz.
+Los indicadores de la captura (mínimo 21.8, promedio 36.6 y máximo \SI{67.0}{\celsius}) corresponden al día en curso y no a la fecha visible, por un defecto de actualización de la interfaz ya identificado; por eso no se usan para cuantificar la jornada, y las estadísticas válidas son las de la tabla~\ref{tab:resultados-estadisticas}.
 
-Según las observaciones operacionales recogidas en planta, varios ascensos coincidían con detenciones de la Twin mientras el succionador continuaba girando en vacío; los descensos se asociaron al retorno de la operación. Es contexto aportado por la observación de campo. No existe una bitácora sincronizada del estado de máquina que permita asignar a cada cambio térmico una transición exacta de marcha o parada, cuantificar su retardo o probar una relación causal.
+Según las observaciones de planta, varios ascensos coincidían con detenciones de la Twin mientras el succionador seguía girando en vacío, y los descensos con el retorno de la operación. La cronología de la sección~\ref{sec:resultados-cronologia} ubica las paradas del succionador en el registro: 10, 14 al 21, 24, 30 y 31 de mayo, y 6 al 8 de junio. Sin una bitácora sincronizada del estado de la máquina no se puede asignar a cada cambio térmico una transición exacta ni medir su retardo.
 
 \subsection{Imagen térmica y asociación posterior con la inspección}
-La imagen FLIR de la figura~\ref{fig:resultados-termica} muestra un punto caliente sobre la carcasa, en torno a 70--71~\textdegree C. Es coherente en orden de magnitud con las lecturas de contacto y la referencia infrarroja, pero no se documenta sincronización suficiente para tratar la imagen, las cinco parejas y cada pico histórico como una única observación simultánea. Su incertidumbre declarada de $\pm\SI{2}{\celsius}$ limita igualmente su uso metrológico.
+La imagen FLIR de la figura~\ref{fig:resultados-termica} muestra el punto caliente sobre la carcasa, en torno a 70--71~\textdegree C, coherente con las lecturas de contacto y con la referencia infrarroja; no está sincronizada con las parejas ni con el pico histórico, y su especificación de $\pm\SI{2}{\celsius}$ la deja como contexto espacial.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.68\textwidth,height=8cm,keepaspectratio]{evidencias/termica-succionador.jpg}
-\caption[Imagen térmica del motor del succionador.]{Imagen térmica del motor del succionador, atribuida en el registro de campo a una cámara FLIR C8. Aporta localización espacial del calentamiento observado; no demuestra la causa mecánica ni valida exactitud de la PT100. Fuente: evidencia fotográfica del proyecto.}
+\caption[Imagen térmica del motor del succionador.]{Imagen térmica del motor del succionador, tomada según el registro de campo con una cámara FLIR C8, que localiza el punto caliente sobre la carcasa. Sirve como contexto espacial del calentamiento; no identifica su causa mecánica. Fuente: evidencia fotográfica del proyecto.}
 \label{fig:resultados-termica}
 \end{figure}
 
-La revisión posterior en planta relacionó el comportamiento con una condición anómala de los rodamientos. La evidencia disponible permite relatar esa asociación posterior a la observación térmica; no contiene un experimento controlado, una serie de inspecciones etiquetadas ni una evaluación antes y después de reparar que aísle la contribución del rodamiento. La secuencia interpretativa es: serie térmica, contexto operacional observado, imagen del punto caliente y asociación posterior durante inspección.
+La revisión posterior en planta relacionó el comportamiento con una condición anómala de los rodamientos. La secuencia es: serie térmica, contexto operacional observado, imagen del punto caliente y asociación durante la inspección; no hubo un experimento controlado ni una evaluación antes y después de la reparación que aísle la contribución del rodamiento.
 
-El caso ilustra el valor de conservar tendencias que una lectura manual aislada no reconstruye. No establece predicción, tiempo de anticipación, causalidad, sensibilidad ni desempeño frente a falsas alarmas. El aporte verificado es disponibilidad de un historial para apoyar la revisión de una condición térmica; diagnosticar automáticamente una falla o anticiparla requiere evidencia adicional.
+El caso muestra el valor de conservar tendencias que una lectura manual no reconstruye: el historial llevó a revisar una condición térmica. No establece predicción, anticipación, causalidad ni desempeño frente a falsas alarmas.
+
+\section{Cumplimiento de los criterios de aceptación del anteproyecto}
+\label{sec:resultados-anteproyecto}
+El anteproyecto aprobado fijó criterios de aceptación de ingeniería para la validación en planta piloto. La tabla~\ref{tab:resultados-anteproyecto} contrasta cada criterio con lo obtenido y distingue si el resultado fue medido, estimado o no evaluado. El presupuesto ejecutado coincide con el previsto: los 627\,000~COP de componentes más la contingencia del 10\,\% dan los 689\,700~COP del anteproyecto.
+
+\begingroup
+\footnotesize\singlespacing
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{4.1cm}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}p{2.7cm}@{}}
+\caption{Criterios de aceptación del anteproyecto frente a los resultados obtenidos.}\label{tab:resultados-anteproyecto}\\
+\toprule
+\textbf{Criterio del anteproyecto} & \textbf{Resultado obtenido} & \textbf{Evidencia y método} & \textbf{¿Cumple?} \\
+\midrule\endfirsthead
+\multicolumn{4}{l}{Tabla~\thetable{} (continuación)}\\
+\toprule
+\textbf{Criterio del anteproyecto} & \textbf{Resultado obtenido} & \textbf{Evidencia y método} & \textbf{¿Cumple?} \\
+\midrule\endhead
+\bottomrule\endfoot
+Prototipo funcional: tres nodos PT100 y gateway operando simultáneamente en planta piloto. & \NumeroNodos{} nodos y un gateway; \TotalMuestras{} muestras registradas. & Series por MAC del 8 de mayo al 20 de julio de 2026 (sección~\ref{sec:resultados-despliegue}). & Sí, medido. \\
+Disponibilidad de datos $\geq$95\,\%. & Cruda: 76.0, 32.3 y 75.1\,\%. Enlace en periodos activos: \DisponibilidadEnlace{}. & Tabla~\ref{tab:resultados-disponibilidad}; la cruda incluye paradas de planta con el gateway apagado. & Sí para el enlace en periodos activos; no en el calendario completo. \\
+PDR $\geq$95\,\% por nodo. & 96.55, 96.07 y 95.32\,\%. & Tabla~\ref{tab:resultados-pdr}; estimado por intervalos porque el histórico no llevaba contador de envíos. & Sí, estimado. \\
+Pérdida de paquetes $\leq$5\,\% por nodo. & 3.45, 3.93 y 4.68\,\%. & Misma estimación. & Sí, estimado. \\
+Latencia promedio $\leq$5~s y percentil 95 $\leq$10~s. & No medida extremo a extremo; acotada por modelo en menos de 3~s. & Sin relojes sincronizados entre nodo y gateway; el intervalo activo de \TiempoActivo{} más el tiempo al aire a 2.4~kbps acotan la latencia del lado del nodo (sección~\ref{sec:resultados-arranque}). & No evaluada; estimación. \\
+Error absoluto medio $\leq$1.0~\textdegree C tras compensación básica, frente a instrumento de referencia. & 0.06~\textdegree C medio y 0.1~\textdegree C máximo en cinco parejas entre 65 y 71~\textdegree C (máximo comunicado \DiferenciaTermicaMaxima{}, pendiente de conciliar). & Fluke 62 MAX infrarrojo, $\pm$1.5~\textdegree C, sin certificado vigente; el mismo instrumento ajustó el offset (tabla~\ref{tab:resultados-parejas}). & Sí frente a la referencia de campo; no es validación metrológica. \\
+Autonomía $\geq$8~h por nodo, sin recarga. & 120~h continuas sin recarga, del 13 al 18 de agosto, con una caída de 23~mV. & Descarga parcial (sección~\ref{sec:resultados-autonomia}); la proyección a meses es estimada. & Sí, observado. \\
+Recuperación de recepción $\leq$120~s tras interrupción controlada. & 2.279~s de arranque a primera trama; tras cada hueco la recepción se reanuda en el ciclo siguiente. & Diez arranques instrumentados y cobertura de la figura~\ref{fig:resultados-cobertura}; no se ejecutó la interrupción controlada como estaba definida. & Sí, con salvedad. \\
+Gateway operativo $\geq$95\,\% del tiempo, con histórico diario, vista de 24~h, batería y eventos. & Funciones implementadas y usadas durante el piloto; tiempo operativo sin bitácora de reinicios. & Dashboard y archivos diarios (sección~\ref{sec:impl-almacenamiento}); las paradas de planta apagaron el gateway de forma deliberada. & Funciones sí; tiempo operativo no evaluable como se definió. \\
+Informe técnico con datos, fórmulas, tablas, conclusiones y limitaciones. & Este documento y el artículo asociado. & Capítulos~\ref{cap:metodologia} a~\ref{cap:discusion} y anexos. & Sí. \\
+\end{longtable}
+\endgroup
+
+\subsection{Cambios respecto al anteproyecto}
+\begin{itemize}
+  \item La pantalla táctil del gateway es la LCD de 1.47 pulgadas con controlador ST7789 que trae integrada la placa ESP32-C6; el anteproyecto la denominó OLED. Es el mismo elemento con el nombre corregido.
+  \item El anteproyecto preveía registrar RSSI y SNR. El E220-400T22D entrega RSSI por trama, habilitado después del despliegue y usado en la prueba de alcance, y no expone SNR.
+  \item El contador de paquetes previsto en la trama no existía en el histórico del piloto; se agregó después (\texttt{SEQ}). Por eso el PDR de los 32 días es una estimación por intervalos y no un conteo directo.
+  \item La latencia extremo a extremo no se midió porque nodo y gateway no comparten reloj; se acota por modelo y queda como trabajo futuro.
+  \item La prueba de interrupción controlada no se ejecutó como estaba definida. La recuperación se apoya en el tiempo de arranque instrumentado y en la reanudación observada tras los huecos.
+  \item No se llevó bitácora de reinicios del gateway, y durante las paradas de planta se apagó a propósito; el criterio de estabilidad no se puede evaluar como se definió.
+  \item El instrumento de referencia fue un termómetro infrarrojo Fluke 62 MAX sin certificado vigente, no la sonda calibrada que el anteproyecto consideraba preferible.
+  \item La validación se extendió más allá de lo previsto: el anteproyecto planteaba pruebas de 60 minutos por jornada y una autonomía de 8 horas; el despliegue duró 32 días para dos nodos y la descarga parcial 120 horas.
+  \item El prototipo se entregó a la empresa aliada al terminar el piloto, por lo que las caracterizaciones pendientes (corriente por estado, exactitud con referencia calibrada, latencia sincronizada) se presentan como estimaciones por modelo y como trabajo futuro.
+\end{itemize}
 
 \section{Síntesis funcional y respuesta a los criterios}
 \label{sec:resultados-sintesis}
-Los registros por MAC y las figuras del capítulo permiten verificar adquisición, recepción y conservación de muestras. El dashboard documentado en la figura~\ref{fig:impl-dashboard} y el caso anterior aportan evidencia de consulta por fecha y comparación visual; el código del capítulo~\ref{cap:implementacion} explica compensaciones y alarmas. La evidencia no incluye una matriz exhaustiva de pruebas de cada alarma ni elimina la inconsistencia de los resúmenes de la captura histórica. La exportación directa CSV desde la web sigue sin verificación; disponer de un CSV conservado por el proyecto no prueba esa función de interfaz.
+Los registros por MAC y las figuras del capítulo verifican adquisición, recepción y conservación de muestras; el dashboard de la figura~\ref{fig:impl-dashboard} y el caso del succionador muestran la consulta por fecha y la comparación visual, y el capítulo~\ref{cap:implementacion} explica compensaciones y alarmas. No hay una matriz exhaustiva de pruebas de cada alarma, la inconsistencia de los resúmenes de la captura sigue pendiente de corregir, y la exportación CSV desde la web no se verificó.
 
-La evaluación respalda el funcionamiento del piloto y caracteriza sus límites. Los criterios de enlace son compatibles con los estimadores disponibles; exactitud absoluta, recuperación completa tras energización y latencia no quedan acreditadas por métodos directos. La alimentación por batería se observó durante la descarga parcial, mientras las duraciones mayores siguen siendo proyecciones. Esta lectura mantiene la separación entre implementación, funcionamiento observado e indicadores pendientes de validación.
+La evaluación respalda el funcionamiento del piloto y delimita sus límites: los criterios de enlace se cumplen bajo los estimadores disponibles, la alimentación por batería se observó durante 120~h y las duraciones mayores son proyecciones; exactitud absoluta, recuperación completa y latencia quedan para mediciones directas.

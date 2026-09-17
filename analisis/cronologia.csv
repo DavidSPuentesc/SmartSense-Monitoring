@@ -1,0 +1,18 @@
+fecha,evento,fuente
+2026-05-08,Instalación de los nodos A y C; inicio del registro,CSV
+2026-05-10,Inicio del registro del nodo B,CSV
+2026-05-10,Succionador detenido (10/05); sonda entre 21 y 42 °C,CSV
+2026-05-13,"Gateway sin registrar del 13/05 05:16 al 13/05 18:02 (13 h), simultáneo en los tres nodos",CSV
+2026-05-13,"Gateway sin registrar del 13/05 21:03 al 14/05 22:35 (26 h), simultáneo en los tres nodos",CSV
+2026-05-14,Succionador detenido (14/05 al 15/05); sonda entre 19 y 26 °C,CSV
+2026-05-15,"Gateway sin registrar del 15/05 02:19 al 15/05 19:04 (17 h), simultáneo en los tres nodos",CSV
+2026-05-15,"Gateway sin registrar del 15/05 19:04 al 19/05 11:27 (88 h), simultáneo en los tres nodos",CSV
+2026-05-19,Succionador detenido (19/05 al 21/05); sonda entre 20 y 27 °C,CSV
+2026-05-23,Máximo histórico del succionador: 70.0 °C a las 15:26,CSV
+2026-05-24,Succionador detenido (24/05); sonda entre 20 y 43 °C,CSV
+2026-05-30,Succionador detenido (30/05 al 31/05); sonda entre 18 y 54 °C,CSV
+2026-06-07,Succionador detenido (07/06 al 08/06); sonda entre 17 y 26 °C,CSV
+2026-06-09,Fin del registro de los nodos A y C,CSV
+2026-08-13,"Inicio de la descarga parcial (celda de 1000 mAh, 4.112 V)",Ensayo
+2026-08-18,Fin de la descarga parcial (4.089 V tras 120 h),Ensayo
+2026-08-20,Prueba de alcance urbana: 688 m con RSSI de −98 dBm,Ensayo

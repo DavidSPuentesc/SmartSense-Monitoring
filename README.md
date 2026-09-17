@@ -59,7 +59,7 @@ con las cinco parejas disponibles, cuyo máximo es 0,1 °C.
 
 Hay firmware, hardware, carcasa STL/3MF, BOM, figuras y scripts. Faltan CSV
 primarios, configuración final del piloto e identificación completa de
-PT100/E220 para replicar toda la evaluación. Los manuscritos citan el
+la PT100 para replicar toda la evaluación. Los manuscritos citan el
 [snapshot público de artefactos fuente 5641bcd](https://github.com/jesusabojacal-commits/SmartSense-Monitoring/tree/5641bcd89d9026c39ccc62ce8c738ba5ee37781b),
 consultado el 15 de septiembre de 2026; no contiene la monografía, sus módulos,
 los dos scripts nuevos ni las correcciones locales posteriores del artículo.
