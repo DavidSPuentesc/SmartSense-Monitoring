@@ -1,0 +1,20 @@
+{
+  "title": "SmartSense Monitoring: open-source wireless PT100 node and gateway for surface-temperature monitoring of industrial equipment",
+  "description": "Design files, firmware, software and analysis scripts of SmartSense Monitoring: battery-powered nodes (Seeed Studio XIAO ESP32-C6, three-wire PT100, MAX31865, Ebyte E220-400T22D LoRa at 433 MHz) and a gateway with touch display and local web dashboard that keeps a rolling 30-day per-sensor history without any cloud service. Hardware (KiCad schematics, BOM, PLA enclosure STL/3MF) is released under CERN-OHL-S v2, firmware and software under MIT, and documentation under CC-BY 4.0; see LICENSES/README.md. Developed as an undergraduate thesis in Electronic Engineering at Universidad ECCI (Bogota, Colombia) and evaluated in a 32-day industrial pilot with three nodes.",
+  "creators": [
+    {"name": "Bojaca Lopez, Jesus Andre", "affiliation": "Universidad ECCI"},
+    {"name": "Puentes Cardenas, David Santiago", "affiliation": "Universidad ECCI"}
+  ],
+  "contributors": [
+    {"name": "Vera, Jhon Edwin", "affiliation": "Universidad ECCI", "type": "Supervisor"},
+    {"name": "Mora Martinez, Sergio Francisco", "affiliation": "Universidad ECCI", "type": "Supervisor"}
+  ],
+  "keywords": ["open-source hardware", "LoRa", "PT100", "RTD", "MAX31865", "ESP32-C6", "industrial temperature monitoring", "condition monitoring", "wireless sensor network"],
+  "license": "other-open",
+  "access_right": "open",
+  "upload_type": "software",
+  "language": "spa",
+  "related_identifiers": [
+    {"identifier": "https://github.com/jesusabojacal-commits/SmartSense-Monitoring", "relation": "isSupplementTo", "scheme": "url"}
+  ]
+}
