@@ -203,6 +203,15 @@ The following steps describe the construction of one sensor node and the gateway
 \label{fig:node-photo}
 \end{figure}
 
+\begin{figure}[h]\centering
+\includegraphics[height=5.2cm]{evidencias/nodo-carcasa-final.jpg}\hspace{3mm}
+\includegraphics[height=5.2cm]{evidencias/nodo-carcasa-tapa.jpg}\hspace{3mm}
+\includegraphics[height=5.2cm]{evidencias/gateway-carcasa-final.jpg}
+\caption{Final 3D-printed PLA enclosures. Left: cylindrical node enclosure with the SMA antenna. Centre: node lid with the USB-C charging port and antenna. Right: gateway enclosure with the touch-screen window, antenna and the label of its paired node. STL and 3MF files are in \texttt{hardware/carcasa/}.}
+\label{fig:enclosures}
+\end{figure}
+
+
 \section{Operation instructions}
 
 \begin{enumerate}[noitemsep]
@@ -280,7 +289,7 @@ Time & SmartSense ($^{\circ}$C) & Fluke ($^{\circ}$C) & $|\Delta T|$ ($^{\circ}$
 
 The FLIR image (Fig.~\ref{fig:termica}), attributed in the field record to a C8 camera, corroborates the location and approximate 70--71~$^{\circ}$C magnitude of the hotspot; it is not documented as synchronized to every paired reading. The result is field consistency, not traceable calibration. The Fluke was also used to adjust the offset, so the comparison is not independent. The project cites instrument specifications of $\pm$1.5~$^{\circ}$C for the Fluke and $\pm$2~$^{\circ}$C for the FLIR, with no current Fluke calibration certificate. These limits exceed the order of the 1~$^{\circ}$C target and are not a combined uncertainty budget for the installed system. Emissivity and viewed area affect infrared readings; contact and mounting affect the PT100. Complementary characterization must use a calibrated contact reference, separate adjustment from verification, compare the three nodes at multiple temperatures and account for reference, conversion, lead, mounting and repeatability contributions. Absolute accuracy and inter-node repeatability remain unestablished.
 
-\textbf{Field observation (case study).} The suction-fan motor history includes rises and falls and a recorded maximum of 70.0~$^{\circ}$C (Fig.~\ref{fig:serie}). Plant observations associated rising segments with periods when the machine stopped while the fan continued spinning unloaded; no synchronized machine-state log establishes the timing or lag of each transition. The thermal image then provides spatial context for the hotspot (Fig.~\ref{fig:termica}). Subsequent inspection associated the case with a bearing anomaly. This sequence---thermal history, operational context, thermal image and later inspection association---illustrates the use of historical data in condition monitoring. It does not establish diagnosis, prediction, lead time, causality, sensitivity or false-alarm performance; load, ventilation, mounting and other factors were not controlled.
+\textbf{Field observation (case study).} The suction-fan motor history includes rises and falls and a recorded maximum of 70.0~$^{\circ}$C (Fig.~\ref{fig:serie}). Plant observations associated rising segments with periods when the machine stopped while the fan continued spinning unloaded; no synchronized machine-state log establishes the timing or lag of each transition. The thermal image then provides spatial context for the hotspot (Fig.~\ref{fig:termica}). Subsequent inspection associated the case with a bearing anomaly, which the plant team serviced during the machine stops of 30--31 May and 7--8 June 2026, after the 23 May peak; the exported history shows the probe near ambient temperature during those stops. This sequence---thermal history, operational context, thermal image and later inspection association---illustrates the use of historical data in condition monitoring. It does not establish diagnosis, prediction, lead time, causality, sensitivity or false-alarm performance; load, ventilation, mounting and other factors were not controlled.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.7\linewidth]{evidencias/termica-succionador.jpg}

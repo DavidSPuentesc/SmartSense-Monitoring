@@ -179,6 +179,8 @@ Quién: equipo. Esfuerzo: medio día.
 
 Quién: equipo, con una llamada a la planta. Esfuerzo: dos horas.
 
+Estado al 18 de septiembre: hecho. La cronología se reconstruyó del CSV del piloto con `analisis/cronologia.py` (tabla y figura en resultados): paradas del succionador con la sonda a temperatura ambiente, cuatro periodos sin registro del gateway simultáneos en los tres nodos, y el máximo de 70,0 °C el 23 de mayo. El equipo confirmó que el rodamiento se intervino en las paradas del 30 y 31 de mayo y del 7 y 8 de junio, después del máximo; así quedó en la tesis, el artículo y la figura.
+
 1. Armar una tabla de eventos con fecha, evento y fuente: 8 de mayo inicio de A y C; 10 de mayo inicio de B; huecos simultáneos (fechas que imprime `analisis/figuras_validacion.py` al correrlo con el CSV); fecha y hora del máximo de 70,0 °C del nodo A (del CSV); fecha de las fotos del Fluke y de la imagen FLIR (galería del teléfono); fecha de la inspección y del cambio de rodamiento (preguntar en planta); 9 de junio fin de A y C; 20 de julio fin de B; 13 a 18 de agosto descarga parcial; 20 de agosto prueba de alcance.
 2. Guardarla como `analisis/cronologia.csv` y generar una línea de tiempo con matplotlib en `figuras/cronologia.pdf`.
 3. Agregar en la sección 8.2 una subsección "Qué ocurrió durante el piloto" con la tabla y la figura.

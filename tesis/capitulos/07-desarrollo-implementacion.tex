@@ -33,6 +33,34 @@ El MAX31865 se conecta por SPI implementado en software; la alimentación del ac
 \label{fig:impl-nodo-montado}
 \end{figure}
 
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{0.31\textwidth}\centering
+\includegraphics[height=6.2cm]{evidencias/nodo-carcasa-final.jpg}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\textwidth}\centering
+\includegraphics[height=6.2cm]{evidencias/nodo-carcasa-tapa.jpg}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\textwidth}\centering
+\includegraphics[height=6.2cm]{evidencias/gateway-carcasa-final.jpg}
+\end{minipage}
+\caption[Carcasas finales del nodo y del gateway.]{Carcasas finales impresas en PLA. Izquierda: nodo cilíndrico con la antena SMA. Centro: tapa del nodo con el conector USB-C de carga y la antena. Derecha: gateway con la ventana de la pantalla táctil, la antena y la marca del nodo asociado. Los archivos STL y 3MF están en \texttt{hardware/carcasa/}. Fuente: registro fotográfico del proyecto.}
+\label{fig:impl-carcasas-finales}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{0.48\textwidth}\centering
+\includegraphics[height=6.5cm]{evidencias/succionador-maquina.jpg}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}\centering
+\includegraphics[height=6.5cm]{evidencias/nodo-instalado-final.jpg}
+\end{minipage}
+\caption[Nodo A instalado sobre el motor del succionador.]{Izquierda: ventilador de succión de la máquina Twin con su motor y el nodo A instalado sobre la carcasa. Derecha: detalle del nodo con la carcasa final sobre el motor, fijado por el imán de la sonda. Fuente: registro fotográfico del proyecto.}
+\label{fig:impl-instalacion-final}
+\end{figure}
+
+
 \subsection{Ciclo de adquisición y control de fallas}
 El archivo \texttt{Nodo\_Lora.ino} de la versión con LoRa y página local inicia interfaces, carga configuración persistida, alimenta el acondicionador y revisa su registro de fallas. En condiciones normales intenta cuatro conversiones, descarta valores no numéricos y valores fuera de los límites programados, y promedia las lecturas aceptadas. El registro de fallas del MAX31865 permite identificar problemas eléctricos \citep{max31865}; los límites de software son filtros, no el rango de la sonda.
 

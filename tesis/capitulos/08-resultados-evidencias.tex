@@ -93,9 +93,9 @@ La tabla~\ref{tab:resultados-cronologia} y la figura~\ref{fig:resultados-cronolo
 23 de mayo & Máximo histórico del succionador: 70.0~\textdegree C a las 15:26. \\
 24 de mayo & Parada de un día (media 24.8~\textdegree C). \\
 25 al 29 de mayo & Operación, máximos diarios de 65 a 69~\textdegree C. \\
-30 y 31 de mayo & Parada desde la mañana del 30; el 31 la sonda marca entre 18 y 22~\textdegree C. \\
+30 y 31 de mayo & Parada desde la mañana del 30; el 31 la sonda marca entre 18 y 22~\textdegree C. Primera intervención del rodamiento según el equipo de planta. \\
 1 al 5 de junio & Operación, máximos diarios de 65 a 68~\textdegree C. \\
-6 al 8 de junio & Parada desde la tarde del 6; el 7 y el 8 la sonda marca entre 17 y 26~\textdegree C. \\
+6 al 8 de junio & Parada desde la tarde del 6; el 7 y el 8 la sonda marca entre 17 y 26~\textdegree C. Segunda intervención del rodamiento según el equipo de planta. \\
 9 de junio & Último registro de los nodos A y C a las 21:12. \\
 17 de junio al 20 de julio & Nodo B con registro esporádico, con huecos de 185 y 792~h. \\
 13 al 18 de agosto & Descarga parcial de la celda de 1000~mAh: de 4.112 a 4.089~V en 120~h. \\
@@ -111,7 +111,7 @@ La tabla~\ref{tab:resultados-cronologia} y la figura~\ref{fig:resultados-cronolo
 \label{fig:resultados-cronologia}
 \end{figure}
 
-La secuencia que importa para el caso del succionador es: operación con máximos crecientes, máximo histórico de 70.0~\textdegree C el 23 de mayo y paradas posteriores el 24, el 30 y 31 de mayo y del 6 al 8 de junio, en las que la sonda vuelve a la temperatura ambiente. Según el equipo de planta, en una de esas paradas se intervino el rodamiento del motor; la fecha exacta no quedó en el registro del sistema y debe tomarse de la bitácora de mantenimiento de la empresa. Las paradas de planta con el gateway apagado explican la disponibilidad cruda de la sección siguiente.
+La secuencia que importa para el caso del succionador es: operación con máximos crecientes, máximo histórico de 70.0~\textdegree C el 23 de mayo y paradas posteriores el 24, el 30 y 31 de mayo y del 6 al 8 de junio, en las que la sonda vuelve a la temperatura ambiente. Según el equipo de planta, el rodamiento del motor se intervino en las paradas del 30 y 31 de mayo y del 7 y 8 de junio, es decir, después del máximo del 23 de mayo: la serie mostró primero el calentamiento y la intervención vino en las dos paradas siguientes. Las paradas de planta con el gateway apagado explican la disponibilidad cruda de la sección siguiente.
 
 \subsection{Disponibilidad cruda y disponibilidad durante actividad inferida}
 \label{sec:resultados-disponibilidad}
@@ -203,7 +203,7 @@ La hora se eligió con el criterio de al menos 25 registros por nodo (sección~\
 
 \section{Concordancia térmica de campo}
 \label{sec:resultados-termica}
-La comparación de campo comprende cinco parejas de lecturas sobre el motor del succionador, entre aproximadamente 65 y \SI{71}{\celsius}. El resumen del proyecto comunica una diferencia media cercana a \DiferenciaTermicaMedia{} y una diferencia absoluta máxima de \DiferenciaTermicaMaxima{}. Se mantiene esta última como \emph{máximo comunicado por el proyecto}, con una salvedad de trazabilidad: las cinco parejas transcritas en la fuente, reproducidas en la tabla~\ref{tab:resultados-parejas}, no permiten reconstruir ese máximo.
+La comparación de campo comprende cinco parejas de lecturas sobre el motor del succionador, entre aproximadamente 65 y \SI{71}{\celsius} (figura~\ref{fig:resultados-fluke-campo}). El resumen del proyecto comunica una diferencia media cercana a \DiferenciaTermicaMedia{} y una diferencia absoluta máxima de \DiferenciaTermicaMaxima{}. Se mantiene esta última como \emph{máximo comunicado por el proyecto}, con una salvedad de trazabilidad: las cinco parejas transcritas en la fuente, reproducidas en la tabla~\ref{tab:resultados-parejas}, no permiten reconstruir ese máximo.
 
 \begin{table}[htbp]
 \centering
@@ -221,6 +221,19 @@ La comparación de campo comprende cinco parejas de lecturas sobre el motor del 
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{0.42\textwidth}\centering
+\includegraphics[height=7cm]{evidencias/fluke-lectura-motor.jpg}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.42\textwidth}\centering
+\includegraphics[height=7cm]{evidencias/sonda-caja-motor.jpg}
+\end{minipage}
+\caption[Comparación de campo con el Fluke 62 MAX sobre el motor.]{Izquierda: lectura del Fluke 62 MAX apuntando a la carcasa del motor del succionador durante la comparación de campo. Derecha: caja de conexión de la sonda PT100 magnética fijada sobre las aletas del motor. Fuente: registro fotográfico del proyecto.}
+\label{fig:resultados-fluke-campo}
+\end{figure}
+
 
 Aplicando la ecuación~\ref{eq:marco-concordancia} a esas cinco filas, la diferencia absoluta media es $(0+0+0.1+0.1+0.1)/5=\SI{0.06}{\celsius}$, aproximadamente \DiferenciaTermicaMedia{} al redondear a una cifra decimal, y su máximo es \SI{0.1}{\celsius}. La media con signo es \SI{0.02}{\celsius}; no debe confundirse con la media absoluta. Resolver la procedencia de los \DiferenciaTermicaMaxima{} exige recuperar el registro primario de la comparación. Hasta entonces, se distinguen el resumen comunicado y lo calculable a partir de la tabla disponible.
 
@@ -328,7 +341,7 @@ La descarga observada implica una corriente media de 0.13 a 0.24~mA según se us
 \section{Observación de campo: motor del succionador}
 \label{sec:resultados-succionador}
 \subsection{Serie térmica y contexto operacional}
-El caso se organiza desde el dato térmico hacia su contexto y la asociación posterior. La captura del dashboard de la figura~\ref{fig:resultados-succionador} muestra una jornada del succionador de la máquina Twin: comienza cerca de 48--49~\textdegree C, presenta un ascenso alrededor de la 01:30 por encima de \SI{63}{\celsius} y contiene ciclos posteriores de calentamiento y enfriamiento. Durante buena parte de la jornada la curva ocupa aproximadamente la zona de 57--61~\textdegree C, con nuevos picos y descensos. Los colores son los umbrales configurados en el dashboard.
+El equipo es el ventilador de succión de la máquina Twin, cuyo motor lleva el nodo A (figura~\ref{fig:impl-instalacion-final}). El caso se organiza desde el dato térmico hacia su contexto y la asociación posterior. La captura del dashboard de la figura~\ref{fig:resultados-succionador} muestra una jornada del succionador de la máquina Twin: comienza cerca de 48--49~\textdegree C, presenta un ascenso alrededor de la 01:30 por encima de \SI{63}{\celsius} y contiene ciclos posteriores de calentamiento y enfriamiento. Durante buena parte de la jornada la curva ocupa aproximadamente la zona de 57--61~\textdegree C, con nuevos picos y descensos. Los colores son los umbrales configurados en el dashboard.
 
 \begin{figure}[htbp]
 \centering
@@ -351,7 +364,7 @@ La imagen FLIR de la figura~\ref{fig:resultados-termica} muestra el punto calien
 \label{fig:resultados-termica}
 \end{figure}
 
-La revisión posterior en planta relacionó el comportamiento con una condición anómala de los rodamientos. La secuencia es: serie térmica, contexto operacional observado, imagen del punto caliente y asociación durante la inspección; no hubo un experimento controlado ni una evaluación antes y después de la reparación que aísle la contribución del rodamiento.
+La revisión posterior en planta relacionó el comportamiento con una condición anómala de los rodamientos, que se intervinieron en las paradas del 30 y 31 de mayo y del 7 y 8 de junio (sección~\ref{sec:resultados-cronologia}). La secuencia es: serie térmica con el máximo del 23 de mayo, contexto operacional observado, imagen del punto caliente e intervención en las dos paradas siguientes; no hubo un experimento controlado ni una evaluación antes y después de la reparación que aísle la contribución del rodamiento, y el registro termina el 9 de junio, un día después de la segunda intervención.
 
 El caso muestra el valor de conservar tendencias que una lectura manual no reconstruye: el historial llevó a revisar una condición térmica. No establece predicción, anticipación, causalidad ni desempeño frente a falsas alarmas.
 

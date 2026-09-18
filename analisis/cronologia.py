@@ -28,6 +28,8 @@ plt.rcParams.update({"font.size": 9, "figure.dpi": 150, "savefig.bbox": "tight"}
 T_PARADA = 30.0      # C: media diaria por debajo -> maquina detenida
 GAP_H = 6.0          # h: hueco largo
 ANON = {"58:E6:C5:13:A3:C0": "Nodo A", "58:E6:C5:13:A9:20": "Nodo B", "58:E6:C5:19:28:20": "Nodo C"}
+# paradas en las que, segun el equipo de planta, se intervino el rodamiento del succionador
+MANTENIMIENTO = {(date(2026, 5, 30), date(2026, 5, 31)), (date(2026, 6, 7), date(2026, 6, 8))}
 
 
 def cargar(ruta):
@@ -91,7 +93,8 @@ for a, b in simultaneos:
     eventos.append((a.date(), f"Gateway sin registrar del {a:%d/%m %H:%M} al {b:%d/%m %H:%M} ({(b-a).total_seconds()/3600:.0f} h), simultáneo en los tres nodos", "CSV"))
 for ini, fin in paradas:
     rango = f"{ini:%d/%m}" if ini == fin else f"{ini:%d/%m} al {fin:%d/%m}"
-    eventos.append((ini, f"Succionador detenido ({rango}); sonda entre {min(min(por_dia[d]) for d in por_dia if ini <= d <= fin):.0f} y {max(max(por_dia[d]) for d in por_dia if ini <= d <= fin):.0f} °C", "CSV"))
+    extra = "; intervención del rodamiento (equipo de planta)" if (ini, fin) in MANTENIMIENTO else ""
+    eventos.append((ini, f"Succionador detenido ({rango}); sonda entre {min(min(por_dia[d]) for d in por_dia if ini <= d <= fin):.0f} y {max(max(por_dia[d]) for d in por_dia if ini <= d <= fin):.0f} °C{extra}", "CSV"))
 eventos.append((pico[0].date(), f"Máximo histórico del succionador: {pico[1]:.1f} °C a las {pico[0]:%H:%M}", "CSV"))
 eventos.append((fin_piloto.date(), "Fin del registro de los nodos A y C", "CSV"))
 eventos += [(date(2026, 8, 13), "Inicio de la descarga parcial (celda de 1000 mAh, 4.112 V)", "Ensayo"),
@@ -115,7 +118,8 @@ dias = sorted(por_dia)
 a1.bar(dias, [maximo[d] for d in dias], width=0.8, color="#cbd5e1", label="Máximo diario")
 a1.plot(dias, [media[d] for d in dias], color="#1e40af", lw=1.4, marker="o", ms=2.5, label="Media diaria")
 for ini, fin in paradas:
-    a1.axvspan(ini - timedelta(hours=12), fin + timedelta(hours=12), color="#fde68a", alpha=0.5, lw=0)
+    mant = (ini, fin) in MANTENIMIENTO
+    a1.axvspan(ini - timedelta(hours=12), fin + timedelta(hours=12), color="#fca5a5" if mant else "#fde68a", alpha=0.55 if mant else 0.5, lw=0)
 for a, b in simultaneos:
     a1.axvspan(a, b, color="#94a3b8", alpha=0.35, hatch="//", lw=0)
 a1.plot([pico[0].date()], [pico[1]], "v", color="#b91c1c", ms=8, zorder=5)
@@ -129,7 +133,7 @@ a1.set_title("Nodo A (succionador de la Twin): días de operación, paradas y pe
 a1.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
 a1.legend(loc="upper right", fontsize=7.5, ncol=2, framealpha=0.95)
 a1.grid(True, lw=0.3, alpha=0.5)
-a1.text(0.01, 0.97, "sombreado amarillo: máquina detenida · rayado gris: gateway sin registrar", transform=a1.transAxes, fontsize=7, va="top", color="#334155")
+a1.text(0.01, 0.97, "amarillo: máquina detenida · rojo: parada con intervención del rodamiento · rayado gris: gateway sin registrar", transform=a1.transAxes, fontsize=7, va="top", color="#334155")
 
 # linea de tiempo completa (mayo a agosto)
 hitos = [(date(2026, 5, 8), "instalación"), (pico[0].date(), "máximo 70 °C"), (date(2026, 6, 9), "fin A y C"),
