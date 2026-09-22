@@ -33,6 +33,8 @@ kicad-cli sch export pdf -o nodo_sensor.pdf nodo_sensor.kicad_sch
 
 ## Qué se publica en Zenodo (design files del artículo)
 
+Publicado: versión `v1.0-tesis`, DOI 10.5281/zenodo.22903028 (22 de septiembre de 2026).
+
 - Carpeta `hardware/kicad/` completa (proyecto editable — requisito OSHWA/HardwareX).
 - PDF/SVG del esquemático.
 - `BOM.csv` (esta carpeta).

@@ -12,14 +12,16 @@ Las copias históricas conservadas localmente en `PDF_Para_Compartir/Articulo_Sm
 
 El mapa es coherente con las declaraciones del artículo HardwareX: CERN-OHL-S v2 para hardware, MIT para firmware/software/análisis y CC-BY 4.0 para documentación. La tesis y sus PDF aplican esta misma licencia de documentación.
 
-## Depósito en Zenodo (pendiente)
+## Depósito en Zenodo
 
-Snapshot a subir a Zenodo (para el DOI que pide HardwareX):
+Versión `v1.0-tesis` archivada el 22 de septiembre de 2026: DOI de concepto
+[10.5281/zenodo.22903028](https://doi.org/10.5281/zenodo.22903028), que resuelve a la
+versión más reciente (esta versión: 10.5281/zenodo.22903029). El depósito incluye los
+esquemáticos KiCad editables, la BOM y las conexiones, el firmware, la réplica Docker,
+los scripts de análisis, los STL/3MF de la carcasa, las fuentes de la tesis y del
+artículo y estos archivos de licencia. Cada release nuevo en GitHub genera una versión
+nueva bajo el mismo DOI de concepto.
 
-- [ ] Esquemáticos KiCad editables (`hardware/kicad/`) + PDF/SVG.
-- [ ] `hardware/BOM.csv` y `hardware/CONEXIONES.md`.
-- [ ] Réplica Docker (`docker/`) y scripts de análisis (`analisis/`).
-- [ ] **CAD editable + STL** de la carcasa (cuando estén).
-- [ ] Estos archivos de licencia.
-
-⚠️ Antes de publicar: una credencial histórica expuesta debe rotarse; verificar que ningún archivo del snapshot contenga credenciales. El DOI de Zenodo se anota luego en la tabla de especificaciones del artículo y en `CERN-OHL-S-v2.txt`.
+⚠️ `secrets.h` está fuera del repositorio y el árbol versionado no contiene credenciales,
+pero la clave WiFi antigua sigue en el historial de git y debe rotarse; verificar antes
+de cada release.

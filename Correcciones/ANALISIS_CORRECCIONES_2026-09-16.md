@@ -228,6 +228,8 @@ Estado al 17 de septiembre: como el prototipo se entregó al cliente, se hizo lo
 
 Quién: equipo. Esfuerzo: una hora, al final.
 
+Estado al 22 de septiembre: hecho. El repositorio se transfirió a la cuenta DavidSPuentesc, se publicó el release `v1.0-tesis` y Zenodo generó el DOI de concepto 10.5281/zenodo.22903028 (versión: 10.5281/zenodo.22903029). El DOI y la nueva URL quedaron en artículo, tesis, README y licencias. Pendiente: rotar la clave WiFi del historial y publicar `v1.1-tesis` con el DOI ya escrito en los documentos.
+
 1. Cambiar la contraseña de la red WiFi vieja, que sigue en el historial de git.
 2. Sacar del repositorio las carpetas `.superpowers/` y `docs/superpowers/` y agregar `.superpowers/` al `.gitignore`.
 3. Agregar los CSV de análisis (parejas, cronología y, si la planta lo permite, el histórico exportado) y la identificación de componentes en la BOM.

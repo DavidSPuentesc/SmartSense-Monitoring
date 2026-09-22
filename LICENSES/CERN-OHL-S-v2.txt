@@ -11,6 +11,6 @@ documentation is distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY,
 INCLUDING OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A
 PARTICULAR PURPOSE. Please see the CERN-OHL-S v2 for applicable conditions.
 
-Source location (repository / Zenodo DOI): to be filled in upon deposit.
+Source location (repository / Zenodo DOI): https://github.com/DavidSPuentesc/SmartSense-Monitoring / https://doi.org/10.5281/zenodo.22903028
 
 Full licence text: https://ohwr.org/cern_ohl_s_v2.txt

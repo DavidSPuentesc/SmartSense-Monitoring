@@ -1,5 +1,7 @@
 # SmartSense Monitoring
 
+[![DOI](https://zenodo.org/badge/1315489382.svg)](https://doi.org/10.5281/zenodo.22903028)
+
 Proyecto académico de monitoreo de temperatura superficial industrial con
 PT100 de tres hilos, MAX31865, ESP32-C6, comunicación LoRa y consulta histórica
 en un dashboard local. Apoya monitoreo de condición; no implementa ni valida
@@ -57,14 +59,12 @@ usan filtros distintos. La autonomía se extrapola de cinco días; 688 m es
 una cota inferior del recorrido. Los 0,4 °C comunicados no se reconstruyen
 con las cinco parejas disponibles, cuyo máximo es 0,1 °C.
 
-Hay firmware, hardware, carcasa STL/3MF, BOM, figuras y scripts. Faltan CSV
-primarios, configuración final del piloto e identificación completa de
-la PT100 para replicar toda la evaluación. Los manuscritos citan el
-[snapshot público de artefactos fuente 5641bcd](https://github.com/DavidSPuentesc/SmartSense-Monitoring/tree/5641bcd89d9026c39ccc62ce8c738ba5ee37781b),
-consultado el 15 de septiembre de 2026; no contiene la monografía, sus módulos,
-los dos scripts nuevos ni las correcciones locales posteriores del artículo.
-Esta rama debe publicarse como versión identificada para cerrar esa parte
-de la reproducibilidad; no se declara un DOI existente.
+Hay firmware, hardware, carcasa STL/3MF, BOM, figuras, scripts y las fuentes de la
+tesis y del artículo. Faltan los CSV primarios del piloto, cuya publicación depende
+de la empresa aliada, y la identificación completa de la PT100. El repositorio está
+publicado como versión `v1.0-tesis` y archivado en Zenodo con el DOI de concepto
+[10.5281/zenodo.22903028](https://doi.org/10.5281/zenodo.22903028), que resuelve a la
+versión más reciente (esta versión: 10.5281/zenodo.22903029).
 
 Las licencias están descritas en [LICENSES/README.md](LICENSES/README.md):
 CERN-OHL-S v2 para hardware (incluida la BOM), MIT para firmware/software/análisis
