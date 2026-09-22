@@ -65,7 +65,7 @@ Open-source hardware; LoRa; PT100; RTD; MAX31865; ESP32-C6; industrial temperatu
 \hline \textbf{Closest commercial analog} & Industrial wireless RTD/condition-monitoring loggers such as the Advantech WISE-2410 and commercial PT100 wireless data loggers. \\
 \hline \textbf{Open source license} & Hardware: CERN-OHL-S v2. Firmware and software: MIT License. Documentation: CC-BY 4.0. \\
 \hline \textbf{Cost of hardware} & Itemized total: 627{,}000~COP ($\approx$157~USD at the project conversion assumption of 4{,}000~COP/USD). Node-specific parts: 149{,}000~COP ($\approx$37~USD), before shared wiring; see Bill of materials. \\
-\hline \textbf{Source file repository} & \href{https://github.com/jesusabojacal-commits/SmartSense-Monitoring}{SmartSense-Monitoring on GitHub}; source-artifact snapshot identified in Design files. No archived DOI is documented. \\
+\hline \textbf{Source file repository} & \href{https://github.com/DavidSPuentesc/SmartSense-Monitoring}{SmartSense-Monitoring on GitHub}; archived on Zenodo, DOI \href{https://doi.org/10.5281/zenodo.22903028}{10.5281/zenodo.22903028} (concept DOI resolving to the latest version; release v1.0-tesis: 10.5281/zenodo.22903029). \\
 \hline
 \end{tabu}
 \end{flushleft}
@@ -118,9 +118,9 @@ The documented radio configuration uses 9600~bit/s UART (8N1), 2.4~kbit/s air ra
 
 \section*{\textit{Design files}}
 
-The public source-artifact snapshot is \href{https://github.com/jesusabojacal-commits/SmartSense-Monitoring/tree/5641bcd89d9026c39ccc62ce8c738ba5ee37781b}{GitHub commit 5641bcd89d9026c39ccc62ce8c738ba5ee37781b}, reviewed on 15 September 2026. It includes editable KiCad schematics, node/gateway firmware, software, BOM, enclosure files, analysis scripts, figures and licenses. It does not contain the later local thesis and article corrections described here. No Zenodo deposit or DOI is documented in the reviewed repository. The corrected manuscript branch still requires publication as an identified release.
+The complete repository, with the editable KiCad schematics, node and gateway firmware, software, BOM, enclosure files, analysis scripts, figures, licenses and the manuscript sources, is released as version \texttt{v1.0-tesis} on GitHub (\href{https://github.com/DavidSPuentesc/SmartSense-Monitoring}{DavidSPuentesc/SmartSense-Monitoring}) and archived on Zenodo under the concept DOI \href{https://doi.org/10.5281/zenodo.22903028}{10.5281/zenodo.22903028}, which resolves to the latest version (this release: 10.5281/zenodo.22903029).
 
-Primary historical and range-test CSV files referenced by the scripts are not included in the reviewed copy; the final pilot configuration and complete PT100/E220 part identification are also absent. Thus the repository supports inspection and reconstruction of the documented design, but does not yet permit exact replication of every reported experiment. Historical results below are retained from project records and figures, not newly recomputed from primary CSVs.
+The primary historical and range-test CSV files read by the scripts are not included in the archived version; their publication depends on the partner company\textquotesingle s authorization. The exact PT100 part identification is also pending. The repository therefore supports inspection and reconstruction of the documented design, but not yet exact replication of every reported experiment.
 
 \section{Design files summary}
 \vskip 0.1cm

@@ -15,6 +15,6 @@
   "upload_type": "software",
   "language": "spa",
   "related_identifiers": [
-    {"identifier": "https://github.com/jesusabojacal-commits/SmartSense-Monitoring", "relation": "isSupplementTo", "scheme": "url"}
+    {"identifier": "https://github.com/DavidSPuentesc/SmartSense-Monitoring", "relation": "isSupplementTo", "scheme": "url"}
   ]
 }
