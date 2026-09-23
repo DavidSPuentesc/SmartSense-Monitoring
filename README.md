@@ -61,7 +61,7 @@ con las cinco parejas disponibles, cuyo máximo es 0,1 °C.
 
 Hay firmware, hardware, carcasa STL/3MF, BOM, figuras, scripts y las fuentes de la
 tesis y del artículo. Faltan los CSV primarios del piloto, cuya publicación depende
-de la empresa aliada, y la identificación completa de la PT100. El repositorio está
+de la empresa aliada, y la clase de tolerancia de la PT100. El repositorio está
 publicado como versión `v1.0-tesis` y archivado en Zenodo con el DOI de concepto
 [10.5281/zenodo.22903028](https://doi.org/10.5281/zenodo.22903028), que resuelve a la
 versión más reciente (esta versión: 10.5281/zenodo.22903029).

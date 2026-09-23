@@ -2,7 +2,7 @@ Designator,Component,Number,Cost per unit - COP,Total cost - COP,Source of mater
 U1,Seeed Studio XIAO ESP32-C6 (nodo sensor),3,30000,90000,https://www.seeedstudio.com/,Semi-conductor
 U2,Placa ESP32-C6 Touch LCD 1.47 (gateway/visualizador),1,90000,90000,Distribuidor local,Semi-conductor
 U3,Modulo LoRa Ebyte E220-400T22D (LLCC68; 410.125-493.125 MHz; 22 dBm; antena SMA),4,30000,120000,https://www.cdebyte.com/products/E220-400T22D,Semi-conductor
-RT1,Sonda PT100 magnetica de 3 hilos (rango declarado -60 a +200 C; fabricante y clase no indicados por el vendedor),3,30000,90000,https://www.aliexpress.com/item/1005008619909588.html,Metal
+RT1,Sonda PT100 magnetica de 3 hilos ZUIDID (elemento de pelicula delgada; sonda 19x9.5 mm; cable -60 a +200 C; terminal en U; clase de tolerancia no indicada),3,30000,90000,https://www.aliexpress.com/item/1005008619909588.html,Metal
 U4,Modulo acondicionador MAX31865,3,14000,42000,https://www.sigmaelectronica.net/,Semi-conductor
 BT1,Bateria LiPo 3.7 V 1000 mAh,3,30000,90000,https://www.didacticaselectronicas.com/,Other
 U5,Modulo de carga/proteccion LiPo (TP4056 o equivalente),3,5000,15000,Distribuidor local,Semi-conductor

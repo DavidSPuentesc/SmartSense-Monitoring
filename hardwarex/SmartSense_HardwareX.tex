@@ -77,7 +77,7 @@ Continuous temperature monitoring of motors and other industrial equipment helps
 
 Wireless sensor networks distribute measurement points without installing communication cabling at each location [1,2,6]. For low-data-rate applications, LoRa provides a long-range, low-power alternative suited to battery-powered nodes, whose range and scalability have been characterised experimentally [3,7,8]. Relevant precedents include LoRaWAN temperature monitoring with a local-server option [9], an open condition-monitoring sensor with vibration and acoustic measurements [10], and the local SD-based HIGROTERM logger [12]. SmartSense contributes the integration of an external three-wire PT100 and MAX31865, point-to-point radio, battery operation and a gateway-hosted daily history and dashboard. Its contribution is this documented platform and pilot evaluation, rather than invention of its constituent technologies or superiority over all existing systems. It supports condition-based maintenance [4,11] but does not implement or validate a predictive-maintenance algorithm.
 
-A PT100 RTD was selected for its established industrial use, three-wire lead compensation with the MAX31865 and availability in a magnetic surface probe suitable for motor housings. The installed probe is a magnetic three-wire PT100 purchased as AliExpress item 1005008619909588, with a seller-stated range of $-60$ to 200~$^{\circ}$C; the seller does not state the manufacturer or the tolerance class [14]. The generic RTD conversion range therefore cannot be assigned to the complete installed probe, cable or enclosure. The field comparison below characterises agreement in a narrow temperature interval, not the full measurement range or inter-node repeatability.
+A PT100 RTD was selected for its established industrial use, three-wire lead compensation with the MAX31865 and availability in a magnetic surface probe suitable for motor housings. The installed probe is a ZUIDID magnetic three-wire PT100 (AliExpress item 1005008619909588): a thin-film element in a 19~$\times$~9.5~mm probe with a protective tube and spring sheath, epoxy-encapsulated with thermally conductive silicone, a standard cable rated $-60$ to 200~$^{\circ}$C and a three-wire U-terminal [14]. The seller does not state the tolerance class, and the $-60$ to 200~$^{\circ}$C figure is the cable rating, so the generic RTD conversion range cannot be assigned to the complete installed probe. The field comparison below characterises agreement in a narrow temperature interval, not the full measurement range or inter-node repeatability.
 
 Compared with proprietary industrial loggers such as the Advantech WISE-2410, SmartSense Monitoring trades integrated vibration sensing for full openness and local-first operation. Table~\ref{tab:comparison} contrasts both systems by capability rather than price alone, making it suitable for pilot plants and educational settings where flexibility and reproducibility matter more than a turnkey platform.
 
@@ -120,7 +120,7 @@ The documented radio configuration uses 9600~bit/s UART (8N1), 2.4~kbit/s air ra
 
 The complete repository, with the editable KiCad schematics, node and gateway firmware, software, BOM, enclosure files, analysis scripts, figures, licenses and the manuscript sources, is released as version \texttt{v1.0-tesis} on GitHub (\href{https://github.com/DavidSPuentesc/SmartSense-Monitoring}{DavidSPuentesc/SmartSense-Monitoring}) and archived on Zenodo under the concept DOI \href{https://doi.org/10.5281/zenodo.22903028}{10.5281/zenodo.22903028}, which resolves to the latest version (this release: 10.5281/zenodo.22903029).
 
-The primary historical and range-test CSV files read by the scripts are not included in the archived version; their publication depends on the partner company\textquotesingle s authorization. The PT100 probe is identified by its purchase listing only; its tolerance class is not stated by the seller. The repository therefore supports inspection and reconstruction of the documented design, but not yet exact replication of every reported experiment.
+The primary historical and range-test CSV files read by the scripts are not included in the archived version; their publication depends on the partner company\textquotesingle s authorization. The tolerance class of the PT100 probe is not stated by its seller. The repository therefore supports inspection and reconstruction of the documented design, but not yet exact replication of every reported experiment.
 
 \section{Design files summary}
 \vskip 0.1cm
@@ -156,7 +156,7 @@ Costs reproduce the project BOM, reviewed on 15 September 2026, in Colombian pes
 U1 & Seeed Studio XIAO ESP32-C6 (node) & 3 & 30{,}000 & 90{,}000 & \href{https://www.seeedstudio.com/}{Seeed Studio} & Semiconductor \\\hline
 U2 & ESP32-C6 Touch LCD 1.47 board (gateway) & 1 & 90{,}000 & 90{,}000 & Local distributor & Semiconductor \\\hline
 U3 & Ebyte E220-400T22D LoRa module (LLCC68, 22~dBm) + antenna & 4 & 30{,}000 & 120{,}000 & \href{https://www.cdebyte.com/products/E220-400T22D}{Ebyte} & Semiconductor \\\hline
-RT1 & Magnetic three-wire PT100 probe (seller-stated $-60$ to 200~$^{\circ}$C) & 3 & 30{,}000 & 90{,}000 & \href{https://www.aliexpress.com/item/1005008619909588.html}{AliExpress} [14] & Metal \\\hline
+RT1 & ZUIDID magnetic three-wire PT100 probe (thin film; cable rated $-60$ to 200~$^{\circ}$C) & 3 & 30{,}000 & 90{,}000 & \href{https://www.aliexpress.com/item/1005008619909588.html}{AliExpress} [14] & Metal \\\hline
 U4 & MAX31865 RTD front-end module & 3 & 14{,}000 & 42{,}000 & \href{https://www.sigmaelectronica.net/}{Sigma Electr\'onica} & Semiconductor \\\hline
 BT1 & LiPo battery 3.7~V 1000~mAh & 3 & 30{,}000 & 90{,}000 & \href{https://www.didacticaselectronicas.com/}{Did\'acticas Electr\'onicas} & Other \\\hline
 U5 & LiPo charge and protection module (TP4056 or equiv.) & 3 & 5{,}000 & 15{,}000 & Local distributor & Semiconductor \\\hline
@@ -175,7 +175,7 @@ The following steps describe the construction of one sensor node and the gateway
 
 \textbf{Sensor node}
 \begin{enumerate}[noitemsep]
-\item Use a three-wire magnetic PT100 probe (the pilot used AliExpress item 1005008619909588, seller-stated $-60$ to 200~$^{\circ}$C, tolerance class not stated [14]); record the manufacturer, reference and tolerance class when available before replication. Configure the MAX31865 module in three-wire mode (bridge the 2/3-wire jumper), and connect the PT100 leads: the two leads from the same probe end to F+ and RTD+, and the remaining lead to RTD-, bridged to F-.
+\item Use a three-wire magnetic PT100 probe (the pilot used a ZUIDID thin-film probe, AliExpress item 1005008619909588, cable rated $-60$ to 200~$^{\circ}$C, tolerance class not stated [14]); record the tolerance class when available before replication. Configure the MAX31865 module in three-wire mode (bridge the 2/3-wire jumper), and connect the PT100 leads: the two leads from the same probe end to F+ and RTD+, and the remaining lead to RTD-, bridged to F-.
 \item Wire the MAX31865 SPI bus to the XIAO ESP32-C6: CLK\,$\rightarrow$\,D6 (GPIO16), SDO\,$\rightarrow$\,D5 (GPIO23), SDI\,$\rightarrow$\,D4 (GPIO22), CS\,$\rightarrow$\,D3 (GPIO21). Power the module VIN from D2 (GPIO2) so the firmware can switch it off during deep sleep.
 \item Connect the E220 LoRa module by UART: E220 TXD\,$\rightarrow$\,D7 (GPIO17), RXD\,$\rightarrow$\,D8 (GPIO19), M0\,$\rightarrow$\,D10 (GPIO18), M1\,$\rightarrow$\,D9 (GPIO20); power VCC/GND from 3V3/GND.
 \item Build the battery divider: VBAT\,--\,R1 (344.8~k$\Omega$)\,--\,A0 (GPIO0)\,--\,R2 (994.3~k$\Omega$)\,--\,GND. Connect the LiPo cell through the TP4056 charge/protection module to the XIAO battery pads.
@@ -329,7 +329,7 @@ Both values are estimated autonomy, not experimentally demonstrated lifetime. Th
 
 \textbf{Capabilities and limitations.}
 \begin{itemize}[noitemsep]
-\item Acquires periodic surface-temperature readings with a three-wire PT100 and configurable per-node offset; the probe is identified by its purchase listing and its tolerance class is not stated by the seller.
+\item Acquires periodic surface-temperature readings with a three-wire PT100 and configurable per-node offset; the tolerance class of the probe is not stated by the seller.
 \item Raw availability is 76.0\%, 32.3\% and 75.1\% in the individual windows; conditioned link availability is 97.8--98.4\% and PDR is inferred at 95.3--96.6\%, using different gap filters.
 \item Operates locally with a rolling 30-day per-sensor store; older dates are removed after rotation. Pre-rotation exports preserved the records analysed beyond 30 days, including Node B's longer history. LittleFS is an alternative storage medium, not a mirrored backup. Direct web CSV export is unverified and primary CSVs are absent from the reviewed repository.
 \item Five pairs support field agreement after adjustment to the same Fluke reference. The project-reported 0.4~$^{\circ}$C maximum is not reconstructible from those pairs. Absolute accuracy requires an independent calibrated contact reference and an uncertainty budget.
@@ -372,7 +372,7 @@ The authors thank the partner company that provided access to the pilot plant. T
 \item Z. M. Çınar, A. A. Nuhu, Q. Zeeshan, O. Korhan, M. Asmael, and B. Safaei, ``Machine learning in predictive maintenance towards sustainable smart manufacturing in Industry 4.0,'' \textit{Sustainability}, vol. 12, no. 19, art. 8211, 2020.
 \item R. R. Ribeiro, E. Bauer, and R. Lameiras, ``HIGROTERM: An open-source and low-cost temperature and humidity monitoring system for laboratory applications,'' \textit{Inventions}, vol. 6, no. 4, art. 84, 2021.
 \item Chengdu Ebyte Electronic Technology Co., Ltd., ``E220-400T22D user manual: 433/470~MHz 22~dBm LoRa wireless module,'' v1.0, 2020. \href{https://www.cdebyte.com/products/E220-400T22D}{Manufacturer page}, accessed 17 September 2026.
-\item AliExpress item 1005008619909588 product page, ``Magnetic RTD PT100 sensor, high temperature, oil and corrosion resistant,'' seller-stated range $-60$ to 200~$^{\circ}$C, accessed 23 September 2026. \href{https://www.aliexpress.com/item/1005008619909588.html}{Product page}.
+\item ZUIDID, ``Magnetic RTD PT100 sensor, high temperature, oil and corrosion resistant,'' AliExpress item 1005008619909588 product page (thin-film element, 19~$\times$~9.5~mm probe, cable rated $-60$ to 200~$^{\circ}$C, three-wire U-terminal), accessed 23 September 2026. \href{https://www.aliexpress.com/item/1005008619909588.html}{Product page}.
 \end{enumerate}
 
 \end{document}
