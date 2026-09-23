@@ -6,7 +6,7 @@ El aporte del piloto consiste en integrar adquisición superficial, comunicació
 
 Frente a los métodos disponibles, el Fluke da una lectura puntual útil para contrastar una condición en campo y SmartSense añade el registro automático y el histórico. El WISE-2410 incorpora vibración y depende de su plataforma de integración (capítulo~\ref{cap:estado-arte}); la comparación es funcional, porque no hubo un ensayo controlado con los mismos puntos de montaje, referencias y criterios.
 
-La operación local permite consultar sin Internet y la apertura del firmware permite estudiar cómo se forman y conservan los datos. La reproducibilidad es parcial: falta identificar la sonda y los CSV primarios no están en el repositorio. La contribución es un prototipo documentado y evaluado en un piloto, no una solución industrial certificada ni una red mayor que la ensayada.
+La operación local permite consultar sin Internet y la apertura del firmware permite estudiar cómo se forman y conservan los datos. La reproducibilidad es parcial: la sonda solo se identifica por su origen de compra, sin fabricante ni clase, y los CSV primarios no están en el repositorio. La contribución es un prototipo documentado y evaluado en un piloto, no una solución industrial certificada ni una red mayor que la ensayada.
 
 \section{Qué significa la concordancia térmica obtenida}
 La diferencia frente a una referencia de campo responde a una pregunta acotada: cuánto se separan dos indicaciones en el montaje y el rango observados. Cinco parejas de un solo nodo entre 65 y \SI{71}{\celsius} no cubren desde ambiente hasta la temperatura de operación, ni las diferencias entre los tres conjuntos PT100 y MAX31865, ni la deriva con el tiempo o el desmontaje.
@@ -67,6 +67,6 @@ Cobertura y selección & Fechas desiguales; huecos excluidos con dos reglas; hor
 Alcance & Nodo móvil, geometría variable, sin repeticiones por distancia y sin SNR. & 688~m es cota inferior del recorrido; no permite estimar cobertura universal. & Posiciones fijas, repeticiones y antenas documentadas. \\
 Energía y tiempo & Descarga parcial y solo dos tensiones; intervalo de firmware sin energización física sincronizada. & Autonomía prolongada y recuperación completa siguen sin demostración. & Corriente por estados, descarga hasta corte y marcas temporales sincronizadas. \\
 Software y datos & Resúmenes de captura desalineados con la fecha; CSV web sin verificar; 0.0 posible ante falla total de lectura. & Una pantalla o valor finito puede inducir interpretación errónea. & Validar fecha de consulta, exportación, calidad y manejo explícito de lecturas inválidas. \\
-Reproducción y alcance externo & CSV externos ausentes en la copia revisada, PT100 y E220 sin identificación completa; piloto de tres nodos. & No se replica toda la evaluación ni se generaliza a otras plantas o cargas de red. & Publicar los datos primarios en una versión posterior del depósito Zenodo; completar la BOM y ampliar despliegues controlados. \\
+Reproducción y alcance externo & CSV primarios fuera del repositorio, PT100 sin fabricante ni clase de tolerancia; piloto de tres nodos. & No se replica toda la evaluación ni se generaliza a otras plantas o cargas de red. & Publicar los datos primarios en una versión posterior del depósito Zenodo; completar la BOM y ampliar despliegues controlados. \\
 \end{longtable}
 \endgroup

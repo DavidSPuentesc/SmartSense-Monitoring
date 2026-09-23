@@ -33,6 +33,8 @@ Parámetros de firmware: `RREF = 421,1 Ω` (valor calibrado del módulo usado; e
 
 ### 1.3 Sonda PT100 de 3 hilos → bornes del MAX31865
 
+Sonda: PT100 magnética de tres hilos, artículo 1005008619909588 de AliExpress (rango declarado por el vendedor −60 a +200 °C). El vendedor no indica fabricante ni clase de tolerancia; el presupuesto de incertidumbre de la tesis asume clase B.
+
 - Puente **2/3-Wire** del módulo: soldado (modo 3 hilos).
 - Los dos hilos del mismo extremo de la sonda → bornes **F+** y **RTD+**.
 - El hilo restante → borne **RTD−** (unido a **F−** por el puente del módulo).

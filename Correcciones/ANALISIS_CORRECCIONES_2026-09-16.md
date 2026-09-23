@@ -148,6 +148,8 @@ Quién: equipo. Esfuerzo: una hora, más lo que tarde el proveedor.
 
 Estado al 17 de septiembre: hecho para el radio y la batería. El módulo es el E220-400T22D (LLCC68; canal 23 = 433,125 MHz; 22 dBm, código 0, valor de fábrica y el que fija la rutina de configuración del firmware; sensibilidad de ficha −127 dBm típica a 2,4 kbps, margen de unos 29 dB frente al RSSI de −98 dBm). La celda de los nodos es de 1000 mAh, la misma del ensayo de descarga, así que desapareció la distinción con los "2000 mAh de la BOM". Todo eso ya está en la BOM, en CONEXIONES.md, en la tesis, en el artículo (referencia [13]) y en el README. Sigue pendiente la PT100: solo se sabe que es de tres hilos.
 
+Estado al 23 de septiembre: la PT100 quedó identificada por su origen de compra (AliExpress, artículo 1005008619909588, rango declarado −60 a +200 °C); el vendedor no indica fabricante ni clase, así que el presupuesto de incertidumbre mantiene la clase B como supuesto declarado.
+
 1. Fotografiar la serigrafía del módulo de radio. Las variantes de 433 MHz de Ebyte se llaman E220-400T22D (22 dBm) y E220-400T30D (30 dBm); el sufijo dice la potencia máxima.
 2. Leer la configuración guardada en el radio con la herramienta de Ebyte por USB-TTL o con el modo de configuración descrito en el manual del modelo identificado: potencia, canal, tasa aérea y dirección. El nodo no reconfigura el radio al arrancar, así que lo que tenga guardado es lo que se usó en el piloto.
 3. Para la PT100, buscar la factura o el pedido del distribuidor. Si no hay ficha, hacer una verificación en baño de hielo: medir la resistencia a 0 °C con un multímetro de cuatro hilos. La clase B admite 100 ± 0,12 Ω y la clase A 100 ± 0,06 Ω. No demuestra la clase, pero descarta una sonda fuera de tolerancia.
