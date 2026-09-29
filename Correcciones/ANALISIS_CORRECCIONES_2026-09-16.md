@@ -131,7 +131,7 @@ Artículo: el abstract termina con "absent primary CSV files and incomplete comp
 
 Quién: Santy. Esfuerzo: una o dos horas.
 
-Estado al 29 de septiembre: hecho. Las cinco parejas transcritas eran reales pero de una visita sin CSV exportado, así que salieron de la estadística y el 0,4 °C dejó de figurar. La comparación quedó con cinco parejas cuya foto tiene hora y se verifica contra el CSV (`analisis/parejas_fluke.py`): cuatro en régimen estable dan 0,12 °C de media absoluta, 0,13 °C de RMSE y 0,2 °C de máximo; una tomada durante un arranque (10 de mayo, 22:54) difiere 3,6 °C por retardo térmico y se reporta aparte.
+Estado al 29 de septiembre: hecho. Las cinco parejas transcritas eran reales pero de una visita sin CSV exportado, así que salieron de la estadística y el 0,4 °C dejó de figurar. La comparación quedó con siete parejas cuya foto tiene hora y se verifica contra el CSV (`analisis/parejas_fluke.py`): seis en régimen estable, de tres visitas, dan 0,15 °C de media absoluta, 0,16 °C de RMSE y 0,23 °C de máximo; una tomada durante un arranque (10 de mayo, 22:54) difiere 3,6 °C por retardo térmico y se reporta aparte.
 
 Las 21 fotos de `figuras/adjuntos_mediciones/` son el registro original. Contienen dos cosas: fotos del Fluke 62 MAX apuntando al motor del succionador (se ven lecturas de 62,0 y 62,6 °C, que no están entre las cinco parejas transcritas de 65 a 71 °C) y capturas del monitor serie con los arranques (2,279 s en la mayoría y al menos uno de 2,277 s).
 

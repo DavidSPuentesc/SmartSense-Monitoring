@@ -28,6 +28,8 @@ FOTOS = [
     ("1000089954.jpg / 1000089981.jpg", "2026-05-25 17:09:02", 67.7),
     ("1000089954.jpg / 1000089981.jpg", "2026-05-25 17:15:18", 67.7),
     ("1000089984.jpg", "2026-05-25 19:20:49", 65.3),
+    ("foto del 5 de junio (galeria 17:14:19)", "2026-06-05 17:14:19", 62.5),
+    ("foto del 5 de junio (galeria 17:30:01)", "2026-06-05 17:30:01", 61.4),
 ]
 
 serie = []
@@ -78,11 +80,11 @@ def resumen(nombre, difs):
 
 print()
 todas = [f["diferencia_c"] for f in filas]
-resumen("Las cinco parejas", todas)
+resumen("Todas las parejas", todas)
 # 10 de mayo: dia de parada; a las 22:54 el motor arrancaba tras horas detenido (sonda a 21-42 C ese dia)
 sin_arranque = [f["diferencia_c"] for f in filas if not f["fecha_hora"].startswith("2026-05-10")]
 mae, mx = resumen("Sin la pareja del arranque del 10 de mayo", sin_arranque)
 
 # comprobaciones
-assert len(filas) == 5 and len(sin_arranque) == 4
+assert len(filas) == 7 and len(sin_arranque) == 6
 assert mx < 0.5 and mae < 0.2

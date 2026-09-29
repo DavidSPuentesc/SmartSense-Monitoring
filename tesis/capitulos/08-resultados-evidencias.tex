@@ -203,7 +203,7 @@ La hora se eligió con el criterio de al menos 25 registros por nodo (sección~\
 
 \section{Concordancia térmica de campo}
 \label{sec:resultados-termica}
-La comparación de campo usa las fotografías del Fluke 62 MAX sobre el motor del succionador (figura~\ref{fig:resultados-fluke-campo}) cuya hora se pudo recuperar del teléfono. Cada foto se empareja con la lectura del nodo A interpolada en ese instante, de modo que cualquier pareja puede verificarse contra el CSV exportado. La tabla~\ref{tab:resultados-parejas} reúne las cinco parejas disponibles.
+La comparación de campo usa las fotografías del Fluke 62 MAX sobre el motor del succionador (figura~\ref{fig:resultados-fluke-campo}) cuya hora se pudo recuperar del teléfono. Cada foto se empareja con la lectura del nodo A interpolada en ese instante, de modo que cualquier pareja puede verificarse contra el CSV exportado. La tabla~\ref{tab:resultados-parejas} reúne las siete parejas disponibles.
 
 \begin{table}[htbp]
 \centering\small
@@ -218,6 +218,8 @@ La comparación de campo usa las fotografías del Fluke 62 MAX sobre el motor de
 25/05 17:09:02 & 67.7 & 67.6 & $-0.1$ & $-0.01$ \\
 25/05 17:15:18 & 67.7 & 67.5 & $-0.2$ & $-0.01$ \\
 25/05 19:20:49 & 65.3 & 65.2 & $-0.1$ & $-0.02$ \\
+05/06 17:14:19 & 62.5 & 62.3 & $-0.2$ & $-0.04$ \\
+05/06 17:30:01 & 61.4 & 61.6 & $+0.2$ & $-0.04$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -235,9 +237,9 @@ La comparación de campo usa las fotografías del Fluke 62 MAX sobre el motor de
 \end{figure}
 
 
-Las cuatro parejas tomadas con el motor en régimen estable, con cambios menores de 0.1~\textdegree C por minuto, dan una diferencia media con signo de $-\SI{0.12}{\celsius}$, una media absoluta de \DiferenciaTermicaMedia{}, un RMSE de \RMSETermico{} y un máximo de \DiferenciaTermicaMaxima{}, entre 51.6 y \SI{67.6}{\celsius}. Las cuatro diferencias tienen el mismo signo: SmartSense marca una o dos décimas por debajo del Fluke. La pareja del 10 de mayo a las 22:54 se tomó cuando el motor arrancaba después de una parada y la superficie subía 0.34~\textdegree C por minuto; la carcasa que observa el Fluke se calienta antes que el punto de contacto de la sonda magnética, y la diferencia de $-\SI{3.6}{\celsius}$ refleja ese retardo térmico más que un error de medición. Con las cinco parejas, la media absoluta sube a \SI{0.81}{\celsius} y el RMSE a \SI{1.61}{\celsius}; ambas cifras se reportan para que la exclusión quede visible.
+Las seis parejas tomadas con el motor en régimen estable, con cambios menores de 0.1~\textdegree C por minuto, dan una diferencia media con signo de $-\SI{0.07}{\celsius}$, una media absoluta de \DiferenciaTermicaMedia{}, un RMSE de \RMSETermico{} y un máximo de \DiferenciaTermicaMaxima{}, entre 51.6 y \SI{67.6}{\celsius} y en tres visitas distintas. Cinco de las seis diferencias son negativas: SmartSense tiende a marcar una o dos décimas por debajo del Fluke. La pareja del 10 de mayo a las 22:54 se tomó cuando el motor arrancaba después de una parada y la superficie subía 0.34~\textdegree C por minuto; la carcasa que observa el Fluke se calienta antes que el punto de contacto de la sonda magnética, y la diferencia de $-\SI{3.6}{\celsius}$ refleja ese retardo térmico más que un error de medición. Con las siete parejas, la media absoluta sube a \SI{0.64}{\celsius} y el RMSE a \SI{1.37}{\celsius}; ambas cifras se reportan para que la exclusión quede visible.
 
-Hay además dos grupos de mediciones que no entran en la estadística. Las fotografías del 5 de junio hacia las 17:14 y las 17:30 muestran lecturas del Fluke entre 61.6 y \SI{62.8}{\celsius}, dentro del recorrido de 60.8 a \SI{62.7}{\celsius} que registró el nodo A en esos minutos, pero no se identificó qué fotografía corresponde a cada hora. Y cinco lecturas de campo anteriores, de 65 a \SI{71}{\celsius}, se tomaron en una visita cuyo registro no quedó en el CSV exportado, por lo que no se pueden verificar y se conservan solo como observación.
+Otras cinco lecturas de campo, de 65 a \SI{71}{\celsius}, se tomaron en una visita cuyo registro no quedó en el CSV exportado, por lo que no se pueden verificar y se conservan solo como observación, fuera de la estadística.
 
 El Fluke sirvió también para ajustar el offset, así que la comparación no es independiente. Sus especificaciones son $\pm\SI{1.5}{\celsius}$ y las de la FLIR $\pm\SI{2}{\celsius}$, sin certificado vigente del Fluke; la lectura infrarroja depende de la emisividad, el área observada y la geometría, y la PT100 del contacto y la fijación.
 
