@@ -22,7 +22,7 @@ La tabla~\ref{tab:resultados-evidencia} relaciona cada resultado con su método 
 Nodos & Identificación por MAC y registros separados. & \NumeroNodos{} nodos. & Funcional y documental. & Adquisición distribuida en el piloto. & No es una prueba de capacidad máxima de red. \\
 Muestras & Conteo documentado por sensor. & \TotalMuestras{}. & Histórico observado. & Volumen total del archivo analizado. & A y C abarcan \DuracionComunDias{} días; B incluye una extensión. No son todas de una ventana común idéntica. \\
 Temperatura & Mínimos y máximos por nodo. & 15.3--70.0~\textdegree C. & Histórico observado. & Intervalo registrado en el conjunto. & No es el rango calibrado de la sonda; las parejas de campo son otro registro. \\
-Concordancia & Cinco parejas frente al Fluke, 65--71~\textdegree C. & Media próxima a \DiferenciaTermicaMedia{}; máximo comunicado \DiferenciaTermicaMaxima{}. & Comparación de campo y resultado comunicado. & Reproducción local de la referencia tras ajustar offset. & El máximo comunicado no se reconstruye con las cinco parejas transcritas; véase sección~\ref{sec:resultados-termica}. \\
+Concordancia & Parejas Fluke--SmartSense con foto y hora, emparejadas con el CSV. & \NumeroParejas{} parejas estables: media absoluta \DiferenciaTermicaMedia{}, máximo \DiferenciaTermicaMaxima{}. & Comparación de campo verificable. & Concordancia con la referencia tras ajustar offset. & Referencia infrarroja sin certificado, usada también en el ajuste; una pareja en arranque difiere 3.6~\textdegree C. \\
 Disponibilidad cruda & Recibidos frente a esperados en la ventana individual, con 121~s. & A: 76.0\,\%; B: 32.3\,\%; C: 75.1\,\%. & Cálculo sobre registros. & Cobertura que recibió el usuario, incluidos huecos. & Las ventanas tienen distinta duración. \\
 Disponibilidad de enlace & Se excluyen intervalos mayores de 363~s. & \DisponibilidadEnlace{}. & Cálculo condicionado a actividad inferida. & Cobertura en los tramos clasificados como activos. & La exclusión no prueba alimentación del gateway ni causa de cada hueco. \\
 PDR histórico & Estimado por intervalos, 120~s; exclusión sobre 1800~s. & \PDREstimado{}. & Inferencia temporal. & Entrega estimada durante periodos activos. & Sin contador de envíos; población distinta de disponibilidad. \\
@@ -203,21 +203,21 @@ La hora se eligió con el criterio de al menos 25 registros por nodo (sección~\
 
 \section{Concordancia térmica de campo}
 \label{sec:resultados-termica}
-La comparación de campo comprende cinco parejas de lecturas sobre el motor del succionador, entre aproximadamente 65 y \SI{71}{\celsius} (figura~\ref{fig:resultados-fluke-campo}). El resumen del proyecto comunica una diferencia media cercana a \DiferenciaTermicaMedia{} y una diferencia absoluta máxima de \DiferenciaTermicaMaxima{}. Se mantiene esta última como \emph{máximo comunicado por el proyecto}, con una salvedad de trazabilidad: las cinco parejas transcritas en la fuente, reproducidas en la tabla~\ref{tab:resultados-parejas}, no permiten reconstruir ese máximo.
+La comparación de campo usa las fotografías del Fluke 62 MAX sobre el motor del succionador (figura~\ref{fig:resultados-fluke-campo}) cuya hora se pudo recuperar del teléfono. Cada foto se empareja con la lectura del nodo A interpolada en ese instante, de modo que cualquier pareja puede verificarse contra el CSV exportado. La tabla~\ref{tab:resultados-parejas} reúne las cinco parejas disponibles.
 
 \begin{table}[htbp]
-\centering
-\caption[Cinco parejas de temperatura frente al Fluke 62 MAX.]{Cinco parejas transcritas de la comparación con Fluke 62 MAX. El máximo de estas filas se distingue del máximo comunicado en el resumen del proyecto.}
+\centering\small
+\caption[Parejas SmartSense y Fluke 62 MAX con hora verificable.]{Parejas de la comparación de campo con hora de la fotografía. SmartSense es la lectura del nodo A interpolada en la hora de la foto; la tasa es el cambio de la superficie en los diez minutos alrededor. Fuente: \texttt{analisis/parejas\_fluke.py}.}
 \label{tab:resultados-parejas}
-\begin{tabular}{lrrr}
+\begin{tabular}{lrrrr}
 \toprule
-\textbf{Hora} & \textbf{SmartSense (\textdegree C)} & \textbf{Fluke (\textdegree C)} & $\boldsymbol{|\Delta T|}$ \textbf{(\textdegree C)} \\
+\textbf{Fecha y hora} & \textbf{Fluke (\textdegree C)} & \textbf{SmartSense (\textdegree C)} & $\boldsymbol{\Delta T}$ \textbf{(\textdegree C)} & \textbf{Tasa (\textdegree C/min)} \\
 \midrule
-06:40 & 71.0 & 71.0 & 0.0 \\
-07:06 & 70.6 & 70.6 & 0.0 \\
-07:58 & 69.7 & 69.6 & 0.1 \\
-08:09 & 69.5 & 69.4 & 0.1 \\
-09:49 & 65.1 & 65.2 & 0.1 \\
+10/05 22:54:00 & 37.4 & 33.8 & $-3.6$ & $+0.34$ \\
+12/05 14:17:15 & 51.7 & 51.6 & $-0.1$ & $-0.08$ \\
+25/05 17:09:02 & 67.7 & 67.6 & $-0.1$ & $-0.01$ \\
+25/05 17:15:18 & 67.7 & 67.5 & $-0.2$ & $-0.01$ \\
+25/05 19:20:49 & 65.3 & 65.2 & $-0.1$ & $-0.02$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -235,11 +235,13 @@ La comparación de campo comprende cinco parejas de lecturas sobre el motor del 
 \end{figure}
 
 
-Aplicando la ecuación~\ref{eq:marco-concordancia} a esas cinco filas, la diferencia absoluta media es $(0+0+0.1+0.1+0.1)/5=\SI{0.06}{\celsius}$, aproximadamente \DiferenciaTermicaMedia{} al redondear a una cifra decimal, y su máximo es \SI{0.1}{\celsius}. La media con signo es \SI{0.02}{\celsius}; no debe confundirse con la media absoluta. Resolver la procedencia de los \DiferenciaTermicaMaxima{} exige recuperar el registro primario de la comparación. Hasta entonces, se distinguen el resumen comunicado y lo calculable a partir de la tabla disponible.
+Las cuatro parejas tomadas con el motor en régimen estable, con cambios menores de 0.1~\textdegree C por minuto, dan una diferencia media con signo de $-\SI{0.12}{\celsius}$, una media absoluta de \DiferenciaTermicaMedia{}, un RMSE de \RMSETermico{} y un máximo de \DiferenciaTermicaMaxima{}, entre 51.6 y \SI{67.6}{\celsius}. Las cuatro diferencias tienen el mismo signo: SmartSense marca una o dos décimas por debajo del Fluke. La pareja del 10 de mayo a las 22:54 se tomó cuando el motor arrancaba después de una parada y la superficie subía 0.34~\textdegree C por minuto; la carcasa que observa el Fluke se calienta antes que el punto de contacto de la sonda magnética, y la diferencia de $-\SI{3.6}{\celsius}$ refleja ese retardo térmico más que un error de medición. Con las cinco parejas, la media absoluta sube a \SI{0.81}{\celsius} y el RMSE a \SI{1.61}{\celsius}; ambas cifras se reportan para que la exclusión quede visible.
+
+Hay además dos grupos de mediciones que no entran en la estadística. Las fotografías del 5 de junio hacia las 17:14 y las 17:30 muestran lecturas del Fluke entre 61.6 y \SI{62.8}{\celsius}, dentro del recorrido de 60.8 a \SI{62.7}{\celsius} que registró el nodo A en esos minutos, pero no se identificó qué fotografía corresponde a cada hora. Y cinco lecturas de campo anteriores, de 65 a \SI{71}{\celsius}, se tomaron en una visita cuyo registro no quedó en el CSV exportado, por lo que no se pueden verificar y se conservan solo como observación.
 
 El Fluke sirvió también para ajustar el offset, así que la comparación no es independiente. Sus especificaciones son $\pm\SI{1.5}{\celsius}$ y las de la FLIR $\pm\SI{2}{\celsius}$, sin certificado vigente del Fluke; la lectura infrarroja depende de la emisividad, el área observada y la geometría, y la PT100 del contacto y la fijación.
 
-Por eso la conclusión es \EstadoTemperatura{}: ni la tabla ni el máximo comunicado establecen una exactitud absoluta menor de \SI{1}{\celsius}. El presupuesto por especificaciones de la sección~\ref{sec:fund-incertidumbre} acota la incertidumbre expandida en \IncertidumbreTipoB{} ($k=2$) a 70~\textdegree C con una sonda de clase B, sin contacto ni montaje; establecer la exactitud requiere una referencia de contacto calibrada y comparaciones independientes del ajuste en varias temperaturas y en los tres nodos \citep{jcgm2012,jcgm2008}. La imagen térmica de la sección~\ref{sec:resultados-succionador} aporta contexto espacial, no validación metrológica.
+Por eso la conclusión es \EstadoTemperatura{}: la tabla no establece una exactitud absoluta menor de \SI{1}{\celsius}. El presupuesto por especificaciones de la sección~\ref{sec:fund-incertidumbre} acota la incertidumbre expandida en \IncertidumbreTipoB{} ($k=2$) a 70~\textdegree C con una sonda de clase B, sin contacto ni montaje; establecer la exactitud requiere una referencia de contacto calibrada y comparaciones independientes del ajuste en varias temperaturas y en los tres nodos \citep{jcgm2012,jcgm2008}. La imagen térmica de la sección~\ref{sec:resultados-succionador} aporta contexto espacial, no validación metrológica.
 
 \section{Alcance y señal recibida}
 \label{sec:resultados-alcance}
@@ -390,7 +392,7 @@ Disponibilidad de datos $\geq$95\,\%. & Cruda: 76.0, 32.3 y 75.1\,\%. Enlace en 
 PDR $\geq$95\,\% por nodo. & 96.55, 96.07 y 95.32\,\%. & Tabla~\ref{tab:resultados-pdr}; estimado por intervalos porque el histórico no llevaba contador de envíos. & Sí, estimado. \\
 Pérdida de paquetes $\leq$5\,\% por nodo. & 3.45, 3.93 y 4.68\,\%. & Misma estimación. & Sí, estimado. \\
 Latencia promedio $\leq$5~s y percentil 95 $\leq$10~s. & No medida extremo a extremo; acotada por modelo en menos de 3~s. & Sin relojes sincronizados entre nodo y gateway; el intervalo activo de \TiempoActivo{} más el tiempo al aire a 2.4~kbps acotan la latencia del lado del nodo (sección~\ref{sec:resultados-arranque}). & No evaluada; estimación. \\
-Error absoluto medio $\leq$1.0~\textdegree C tras compensación básica, frente a instrumento de referencia. & 0.06~\textdegree C medio y 0.1~\textdegree C máximo en cinco parejas entre 65 y 71~\textdegree C (máximo comunicado \DiferenciaTermicaMaxima{}, pendiente de conciliar). & Fluke 62 MAX infrarrojo, $\pm$1.5~\textdegree C, sin certificado vigente; el mismo instrumento ajustó el offset (tabla~\ref{tab:resultados-parejas}). & Sí frente a la referencia de campo; no es validación metrológica. \\
+Error absoluto medio $\leq$1.0~\textdegree C tras compensación básica, frente a instrumento de referencia. & \DiferenciaTermicaMedia{} de media absoluta y \DiferenciaTermicaMaxima{} de máximo en \NumeroParejas{} parejas estables entre 51.6 y 67.6~\textdegree C; 3.6~\textdegree C en una pareja durante un arranque. & Fluke 62 MAX infrarrojo, $\pm$1.5~\textdegree C, sin certificado vigente; el mismo instrumento ajustó el offset (tabla~\ref{tab:resultados-parejas}). & Sí frente a la referencia de campo; no es validación metrológica. \\
 Autonomía $\geq$8~h por nodo, sin recarga. & 120~h continuas sin recarga, del 13 al 18 de agosto, con una caída de 23~mV. & Descarga parcial (sección~\ref{sec:resultados-autonomia}); la proyección a meses es estimada. & Sí, observado. \\
 Recuperación de recepción $\leq$120~s tras interrupción controlada. & 2.279~s de arranque a primera trama; tras cada hueco la recepción se reanuda en el ciclo siguiente. & Diez arranques instrumentados y cobertura de la figura~\ref{fig:resultados-cobertura}; no se ejecutó la interrupción controlada como estaba definida. & Sí, con salvedad. \\
 Gateway operativo $\geq$95\,\% del tiempo, con histórico diario, vista de 24~h, batería y eventos. & Funciones implementadas y usadas durante el piloto; tiempo operativo sin bitácora de reinicios. & Dashboard y archivos diarios (sección~\ref{sec:impl-almacenamiento}); las paradas de planta apagaron el gateway de forma deliberada. & Funciones sí; tiempo operativo no evaluable como se definió. \\

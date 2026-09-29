@@ -56,8 +56,8 @@ Los tres archivos de nodos suman 51.338 muestras: A/C abarcan 8 de mayo a 9 de
 junio de 2026 (32 días); B abarca 10 de mayo a 20 de julio. No son 32 días
 completos comunes. Disponibilidad durante actividad inferida y PDR estimado
 usan filtros distintos. La autonomía se extrapola de cinco días; 688 m es
-una cota inferior del recorrido. Los 0,4 °C comunicados no se reconstruyen
-con las cinco parejas disponibles, cuyo máximo es 0,1 °C.
+una cota inferior del recorrido. Frente al Fluke, cuatro parejas con foto y hora
+verificables contra el CSV difieren 0,12 °C de media absoluta y 0,2 °C como máximo.
 
 Hay firmware, hardware, carcasa STL/3MF, BOM, figuras, scripts y las fuentes de la
 tesis y del artículo. Faltan los CSV primarios del piloto, cuya publicación depende
