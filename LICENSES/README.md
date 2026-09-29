@@ -22,6 +22,6 @@ los scripts de análisis, los STL/3MF de la carcasa, las fuentes de la tesis y d
 artículo y estos archivos de licencia. Cada release nuevo en GitHub genera una versión
 nueva bajo el mismo DOI de concepto.
 
-⚠️ `secrets.h` está fuera del repositorio y el árbol versionado no contiene credenciales,
-pero la clave WiFi antigua sigue en el historial de git y debe rotarse; verificar antes
-de cada release.
+`secrets.h` está fuera del repositorio y el árbol versionado no contiene credenciales.
+La clave que quedó en el historial de git es la del punto de acceso del propio
+prototipo, sin valor fuera de él.

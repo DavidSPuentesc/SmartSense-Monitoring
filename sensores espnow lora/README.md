@@ -37,8 +37,6 @@ una rama diferente y evitar editar simultáneamente el mismo sketch.
 
 ## Seguridad
 
-El repositorio debe permanecer privado. Algunos prototipos contienen
-credenciales locales necesarias para las pruebas de Wi-Fi y actualización OTA.
-Antes de publicar el proyecto o compartirlo con terceros, esas credenciales
-deben moverse a archivos locales ignorados por Git y cambiarse en los equipos.
+Las credenciales locales de las pruebas de Wi-Fi y actualización OTA van en
+`secrets.h`, que Git ignora; cada sketch trae una plantilla `secrets.example.h`.
 
